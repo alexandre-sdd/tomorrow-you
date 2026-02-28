@@ -56,7 +56,7 @@ export const mockCurrentSelf: SelfCard = {
   visualStyle: {
     primaryColor: "#1F3A5F",
     accentColor: "#D6E4F0",
-    mood: "composed",
+    mood: "calm",
     glowIntensity: 0.34,
   },
   voiceId: "voice_current_placeholder",
