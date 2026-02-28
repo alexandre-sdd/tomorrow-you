@@ -2,13 +2,20 @@ from __future__ import annotations
 
 import json
 import time
-import uuid
 from pathlib import Path
 
 from fastapi import APIRouter, Depends, HTTPException
 
 from backend.config.settings import Settings, get_settings
-from backend.engines.future_self_generator import FutureSelfGenerator
+from backend.engines.context_resolver import (
+    collect_sibling_names,
+    resolve_ancestor_context,
+)
+from backend.engines.future_self_generator import (
+    FutureSelfGenerator,
+    GenerationContext,
+    hash_id,
+)
 from backend.models.schemas import (
     GenerateFutureSelvesRequest,
     GenerateFutureSelvesResponse,
@@ -108,11 +115,11 @@ def _create_memory_branches(
     existing_branch_names = {b["name"] for b in branches}
 
     for self_card in future_selves:
-        branch_name = self_card.name.lower().replace(" ", "-")
+        branch_name = hash_id(self_card.name, parent_branch_name, now)
         if branch_name in existing_branch_names:
             continue  # idempotent
 
-        node_id = f"node_branch_{uuid.uuid4().hex[:8]}"
+        node_id = hash_id(self_card.id, parent_node_id, now)
 
         node_data = {
             "id": node_id,
@@ -120,7 +127,7 @@ def _create_memory_branches(
             "branchLabel": branch_name,
             "facts": [
                 {
-                    "id": f"fact_{uuid.uuid4().hex[:8]}",
+                    "id": hash_id(self_card.optimization_goal, node_id, now),
                     "fact": f"Optimizes for: {self_card.optimization_goal}",
                     "source": "interview",
                     "extractedAt": now,
@@ -167,17 +174,20 @@ async def generate_future_selves(
     settings: Settings = Depends(get_settings),
 ) -> GenerateFutureSelvesResponse:
     """
-    Generate future self personas. Supports multi-level branching.
-    
-    - If parent_self_id is None: Generate root-level futures from current dilemma
-    - If parent_self_id is set: Generate secondary futures exploring that path's evolution
-    
+    Generate future self personas at any depth.
+
+    - parent_self_id is None  → root-level futures from current dilemma
+    - parent_self_id is set   → deeper exploration from that path
+
+    Conversation context and ancestor summaries are automatically resolved
+    and fed into the generation prompt, so deeper explorations benefit
+    from everything the user has revealed so far.
+
     Tree structure preserved in session — nothing is ever lost.
-    All generated selves stored in futureSelvesFull, exploration paths tracked.
     """
     # 1. Load session from disk
     session_data = _load_session(request.session_id, settings.storage_path)
-    
+
     # 2. Initialize tree structures if not present
     if "futureSelvesFull" not in session_data:
         session_data["futureSelvesFull"] = {}
@@ -191,98 +201,110 @@ async def generate_future_selves(
             status_code=400,
             detail="Session is missing 'userProfile' — run profile build first",
         )
-
     user_profile = UserProfile.model_validate(raw_profile)
 
-    # 4. Branch: Root generation vs Secondary generation
+    raw_current_self = session_data.get("currentSelf")
+    if not raw_current_self:
+        raise HTTPException(
+            status_code=400,
+            detail="Session is missing 'currentSelf' — run profile build first",
+        )
+    current_self = SelfCard.model_validate(raw_current_self)
+
+    # 4. Build GenerationContext — unified for all depths
     if request.parent_self_id is None:
-        # ROOT LEVEL GENERATION
-        raw_current_self = session_data.get("currentSelf")
-        if not raw_current_self:
-            raise HTTPException(
-                status_code=400,
-                detail="Session is missing 'currentSelf' — run profile build first",
-            )
-        
-        current_self = SelfCard.model_validate(raw_current_self)
-        
-        try:
-            future_selves = await _generator.generate(
-                user_profile=user_profile,
-                current_self=current_self,
-                count=request.count,
-            )
-        except ValueError as exc:
-            raise HTTPException(status_code=500, detail=str(exc)) from exc
-        
+        # --- ROOT LEVEL ---
         parent_key = "root"
         parent_node_id = _find_root_node_id(request.session_id, settings.storage_path)
         parent_branch_name = "root"
         level_desc = "root level"
 
-        # Set tree metadata on root-level selves
-        for card in future_selves:
-            card.parent_self_id = None
-            card.depth_level = 1
-            card.children_ids = []
-        
+        ctx = GenerationContext(
+            user_profile=user_profile,
+            current_self=current_self,
+            count=request.count,
+            parent_self=None,
+            depth=0,
+            time_horizon=request.time_horizon or "5 years",
+            sibling_names=collect_sibling_names(session_data, parent_key),
+        )
     else:
-        # SECONDARY LEVEL GENERATION
+        # --- ANY DEEPER LEVEL ---
         parent_self_data = session_data["futureSelvesFull"].get(request.parent_self_id)
         if not parent_self_data:
             raise HTTPException(
                 status_code=404,
-                detail=f"Parent self '{request.parent_self_id}' not found in session"
+                detail=f"Parent self '{request.parent_self_id}' not found in session",
             )
-        
         parent_self = SelfCard.model_validate(parent_self_data)
-        
-        try:
-            future_selves = await _generator.generate_secondary(
-                parent_self=parent_self,
-                user_profile=user_profile,
-                count=request.count,
-            )
-        except ValueError as exc:
-            raise HTTPException(status_code=500, detail=str(exc)) from exc
-        
+
         parent_key = request.parent_self_id
         parent_node_id = _find_node_id_for_self(
             request.session_id, settings.storage_path, request.parent_self_id
         )
-        parent_branch_name = parent_self.name.lower().replace(" ", "-")
+        # Use hashed branch name (deterministic, collision-safe)
+        now_for_branch = time.time()
+        parent_branch_name = hash_id(parent_self.name, "branch", now_for_branch)
         level_desc = f"from '{parent_self.name}'"
-        
-        # Update parent's children_ids
-        if parent_self.id in session_data["futureSelvesFull"]:
-            existing_children = session_data["futureSelvesFull"][parent_self.id].get("childrenIds", [])
-            session_data["futureSelvesFull"][parent_self.id]["childrenIds"] = [
-                *existing_children,
-                *[s.id for s in future_selves]
-            ]
 
-    # 5. Update session tree structures
+        # Resolve ancestor chain + conversation excerpts
+        ancestor_summary, conversation_excerpts = resolve_ancestor_context(
+            request.session_id, request.parent_self_id, settings.storage_path
+        )
+
+        # Default time horizon adapts by depth
+        default_horizon = FutureSelfGenerator.DEFAULT_TIME_HORIZONS.get(
+            parent_self.depth_level + 1, "1-2 years"
+        )
+
+        ctx = GenerationContext(
+            user_profile=user_profile,
+            current_self=current_self,
+            count=request.count,
+            parent_self=parent_self,
+            ancestor_summary=ancestor_summary,
+            conversation_excerpts=conversation_excerpts,
+            sibling_names=collect_sibling_names(session_data, parent_key),
+            depth=parent_self.depth_level,
+            time_horizon=request.time_horizon or default_horizon,
+        )
+
+    # 5. Generate
+    try:
+        future_selves = await _generator.generate(ctx)
+    except ValueError as exc:
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
+
+    # 6. Update parent's children_ids (non-root only)
+    if request.parent_self_id and request.parent_self_id in session_data["futureSelvesFull"]:
+        existing_children = session_data["futureSelvesFull"][request.parent_self_id].get("childrenIds", [])
+        session_data["futureSelvesFull"][request.parent_self_id]["childrenIds"] = [
+            *existing_children,
+            *[s.id for s in future_selves],
+        ]
+
+    # 7. Update session tree structures
     now = time.time()
-    
+
     # Add to full tree (preserves all selves)
     for self_card in future_selves:
         session_data["futureSelvesFull"][self_card.id] = self_card.model_dump(by_alias=True)
-    
+
     # Track exploration path
     if parent_key not in session_data["explorationPaths"]:
         session_data["explorationPaths"][parent_key] = []
     session_data["explorationPaths"][parent_key].extend([s.id for s in future_selves])
-    
-    # Update futureSelfOptions (backward compat - only root level)
+
+    # Update futureSelfOptions (backward compat — only root level)
     if request.parent_self_id is None:
         session_data["futureSelfOptions"] = [
             s.model_dump(by_alias=True) for s in future_selves
         ]
         session_data["status"] = "selection"
-    
+
     session_data["updatedAt"] = now
 
-    # 6. Create memory branch nodes
+    # 8. Create memory branch nodes
     _create_memory_branches(
         session_id=request.session_id,
         storage_path=settings.storage_path,
@@ -293,16 +315,16 @@ async def generate_future_selves(
         session_data=session_data,
     )
 
-    # 7. Persist updated session
+    # 9. Persist updated session
     _save_session(request.session_id, settings.storage_path, session_data)
 
-    # 8. Append system transcript entry
+    # 10. Append system transcript entry
     self_names = ", ".join(s.name for s in future_selves)
     _append_transcript_entry(
         request.session_id,
         settings.storage_path,
         {
-            "id": f"te_{uuid.uuid4().hex[:8]}",
+            "id": hash_id(f"te_{self_names}", request.session_id, now),
             "turn": len(session_data.get("transcript", [])) + 1,
             "phase": "selection",
             "role": "system",

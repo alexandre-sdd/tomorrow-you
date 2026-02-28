@@ -38,6 +38,7 @@ export interface VisualStyle {
 }
 
 export interface SelfCard {
+  /** Content-hashed ID: sha256(name + parentId + timestamp)[:10] */
   id: string;
   type: SelfType;
   name: string;
@@ -53,6 +54,7 @@ export interface SelfCard {
 
   // Tree navigation fields for multi-level branching
   parentSelfId: string | null;
+  /** Branch depth: 0=current self, 1=initial choice, 2+=deeper exploration (no upper limit) */
   depthLevel: number;
   childrenIds: string[];
 }

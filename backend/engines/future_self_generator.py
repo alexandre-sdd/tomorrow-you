@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import hashlib
 import uuid
+from dataclasses import dataclass, field
 
 from mistralai import Mistral
 
@@ -12,6 +14,48 @@ from backend.models.schemas import (
     UserProfile,
     VisualStyle,
 )
+
+
+# ---------------------------------------------------------------------------
+# Content-hashed ID generation
+# ---------------------------------------------------------------------------
+
+def hash_id(name: str, parent_id: str | None, timestamp: float) -> str:
+    """
+    Generate a short deterministic ID from content.
+
+    Uses SHA-256 of (name + parent_id + timestamp) truncated to 10 hex chars
+    (40 bits ≈ 1 trillion values). Virtually collision-free within a session.
+    """
+    raw = f"{name}|{parent_id or ''}|{timestamp}"
+    return hashlib.sha256(raw.encode()).hexdigest()[:10]
+
+
+# ---------------------------------------------------------------------------
+# Generation context — single contract for all depths
+# ---------------------------------------------------------------------------
+
+@dataclass
+class GenerationContext:
+    """
+    Everything the engine needs to generate personas at any depth.
+
+    Callers (the router) are responsible for resolving ancestor summaries
+    and conversation excerpts before constructing this object.
+    """
+    user_profile: UserProfile
+    current_self: SelfCard
+    count: int = 2
+
+    # Depth-specific (None / empty at root level)
+    parent_self: SelfCard | None = None
+    ancestor_summary: str = ""
+    conversation_excerpts: list[str] = field(default_factory=list)
+    sibling_names: list[str] = field(default_factory=list)
+
+    # Derived / overridable
+    depth: int = 0
+    time_horizon: str = "5 years"
 
 # ---------------------------------------------------------------------------
 # JSON schema enforced via Mistral's response_format
@@ -107,11 +151,13 @@ FUTURE_SELF_RESPONSE_FORMAT = {
 }
 
 # ---------------------------------------------------------------------------
-# User message template (runtime injection)
+# Unified prompt template — adapts by depth, injects conversation context
 # ---------------------------------------------------------------------------
 
-_USER_MESSAGE_TEMPLATE = """\
+_GENERATION_TEMPLATE = """\
 Generate {count} contrasting future self personas for the following person.
+
+{depth_framing}
 
 ---
 
@@ -125,15 +171,15 @@ USER PROFILE:
 
 ---
 
-CURRENT SELF (the selves you generate must feel genuinely different from this):
-- Name: {current_self_name}
-- Optimization goal: {current_self_optimization_goal}
-- Tone of voice: {current_self_tone_of_voice}
-- Worldview: {current_self_worldview}
-- Core belief: {current_self_core_belief}
-- Visual mood: {current_self_mood}
+{anchor_section}
 
----
+{parent_section}
+
+{ancestor_section}
+
+{conversation_section}
+
+{sibling_section}
 
 GENERATION RULES REMINDER:
 - Generate exactly {count} future selves.
@@ -146,49 +192,44 @@ GENERATION RULES REMINDER:
 - Respond ONLY with the JSON object. No text before or after.\
 """
 
-# ---------------------------------------------------------------------------
-# Secondary generation template (for branching from a chosen path)
-# ---------------------------------------------------------------------------
+_ANCHOR_SECTION = """\
+CURRENT SELF (the anchor — selves you generate must feel genuinely different from this):
+- Name: {name}
+- Optimization goal: {optimization_goal}
+- Tone of voice: {tone_of_voice}
+- Worldview: {worldview}
+- Core belief: {core_belief}
+- Visual mood: {mood}\
+"""
 
-_SECONDARY_MESSAGE_TEMPLATE = """\
-Generate {count} contrasting future scenarios for a person who chose a specific life path {time_ago}.
+_PARENT_SECTION = """\
+PARENT PATH CHOSEN (the immediate decision this person already made):
+- Name: {name}
+- What they optimized for: {optimization_goal}
+- Their worldview: {worldview}
+- Their core belief: {core_belief}
+- What they traded off: {trade_off}
+- Visual mood: {mood}\
+"""
 
-This person made a major decision and has been living with it. Generate futures exploring how that SAME initial choice evolved differently based on life factors (relationships, health, opportunities, unexpected events, trade-off consequences).
+_ROOT_DEPTH_FRAMING = """\
+This person stands at a crossroads. Generate futures that diverge from their \
+current self — each representing a genuinely different life path.\
+"""
 
----
+_BRANCH_DEPTH_FRAMING = """\
+Generate {count} contrasting future scenarios for a person who chose a specific \
+life path {time_horizon} ago.
 
-PARENT PATH CHOSEN:
-- Name: {parent_name}
-- What they optimized for: {parent_optimization_goal}
-- Their worldview: {parent_worldview}
-- Their core belief: {parent_core_belief}
-- What they traded off: {parent_trade_off}
-- Visual mood: {parent_mood}
+This person made a major decision and has been living with it. Generate futures \
+exploring how that SAME initial choice evolved differently based on life factors \
+(relationships, health, opportunities, unexpected events, trade-off consequences).
 
----
-
-ORIGINAL USER PROFILE (for context):
-- Core values: {core_values}
-- Fears: {fears}
-- Hidden tensions: {hidden_tensions}
-
----
-
-GENERATION RULES:
-- Generate exactly {count} future selves, all starting from the SAME chosen path ("{parent_name}")
-- Explore how the initial choice's **consequences played out differently** based on:
-  * How relationships evolved (thrived, struggled, unexpected connections)
-  * How career/goals progressed (accelerated, plateaued, pivoted)
-  * How trade-offs manifested (worse than expected, better than expected, different than expected)
-  * External factors (health, economy, opportunities, crises)
-- Each self should feel like "{parent_name} + {time_ago} + different life circumstances"
+Each self should feel like "{parent_name} + {time_horizon} + different life circumstances".
 - Names should be: "Self Who [parent choice] and [what happened]"
-  Example: "Self Who Took the Singapore Move and Found Unexpected Community"
 - Trade-offs should reference the parent choice and what happened since
 - Do NOT rehash the original dilemma — focus on what happened AFTER the choice
-- Visual mood should reflect the emotional outcome (not copy parent mood: {parent_mood})
-- All standard technical rules apply (voice_id="VOICE_ASSIGN_BY_MOOD", avatar_url=null, unique colors/moods)
-- Respond ONLY with the JSON object. No text before or after.\
+- Visual mood should reflect the emotional outcome (not copy parent mood: {parent_mood})\
 """
 
 
@@ -198,8 +239,13 @@ GENERATION RULES:
 
 class FutureSelfGenerator:
     """
-    Stateless engine — receives profile + current self, calls the Mistral
-    Future Self agent, assigns ElevenLabs voice IDs, and returns SelfCards.
+    Stateless engine — builds a depth-aware prompt from a GenerationContext,
+    calls the Mistral Future Self agent, assigns ElevenLabs voice IDs,
+    and returns SelfCards with content-hashed IDs.
+
+    A single ``generate(ctx)`` method handles every depth level.
+    The caller (router) is responsible for resolving ancestor summaries,
+    conversation excerpts, and sibling names before calling this.
     """
 
     # Adjacent moods to try when the primary mood voice is already in use
@@ -213,29 +259,42 @@ class FutureSelfGenerator:
         "calm":      ["grounded", "warm", "ethereal"],
     }
 
+    # Default time horizons by depth (overridable via GenerationContext)
+    DEFAULT_TIME_HORIZONS: dict[int, str] = {
+        0: "5 years",
+        1: "5 years",
+        2: "2-3 years",
+    }
+
     def __init__(self) -> None:
         self.settings = get_settings()
         self.client = Mistral(api_key=self.settings.mistral_api_key)
 
-    async def generate(
-        self,
-        user_profile: UserProfile,
-        current_self: SelfCard,
-        count: int = 2,
-    ) -> list[SelfCard]:
+    # ------------------------------------------------------------------
+    # Public API — single entry point for all depths
+    # ------------------------------------------------------------------
+
+    async def generate(self, ctx: GenerationContext) -> list[SelfCard]:
         """
-        Generate `count` future self SelfCards for the given user.
+        Generate ``ctx.count`` future self SelfCards at any depth.
+
+        Works for root level (ctx.parent_self is None, ctx.depth == 0)
+        and for branching at any depth (ctx.parent_self set, ctx.depth >= 1).
+
+        Returns:
+            List of SelfCards with content-hashed IDs, tree metadata
+            (parent_self_id, depth_level) already set, and voices assigned.
 
         Raises:
             ValueError: if Mistral returns unparseable or schema-invalid JSON.
             Exception: propagates Mistral API errors as-is.
         """
-        user_message = self._build_user_message(user_profile, current_self, count)
+        user_message = self._build_message(ctx)
 
         response = await self.client.agents.complete_async(
             agent_id=self.settings.mistral_agent_id_future_self,
             messages=[{"role": "user", "content": user_message}],
-            response_format=FUTURE_SELF_RESPONSE_FORMAT, # pyright: ignore[reportArgumentType]
+            response_format=FUTURE_SELF_RESPONSE_FORMAT,  # pyright: ignore[reportArgumentType]
         )
 
         raw_json = response.choices[0].message.content
@@ -243,129 +302,126 @@ class FutureSelfGenerator:
             raise ValueError("Mistral returned an empty response")
 
         try:
-            raw_output = RawFutureSelvesOutput.model_validate_json(raw_json) # pyright: ignore[reportArgumentType]
+            raw_output = RawFutureSelvesOutput.model_validate_json(raw_json)  # pyright: ignore[reportArgumentType]
         except Exception as exc:
             raise ValueError(
-                f"Mistral output failed schema validation: {exc}\nRaw output: {raw_json[:500]}"
+                f"Mistral output failed schema validation: {exc}\n"
+                f"Raw output: {raw_json[:500]}"
             ) from exc
 
-        return self._assign_voices_and_finalize(raw_output.future_selves)
+        import time as _time
+        now = _time.time()
 
-    async def generate_secondary(
-        self,
-        parent_self: SelfCard,
-        user_profile: UserProfile,
-        count: int = 2,
-        time_horizon: str = "2-3 years",
-    ) -> list[SelfCard]:
-        """
-        Generate secondary futures exploring how a chosen path evolved.
-        
-        This creates branching scenarios from a parent choice, exploring how
-        the same initial decision led to different outcomes based on life factors.
-        
-        Args:
-            parent_self: The chosen future self to branch from
-            user_profile: Original user profile for context
-            count: Number of secondary futures to generate (2-3)
-            time_horizon: How far into the future (for prompt context)
-        
-        Returns:
-            List of secondary SelfCards with parent_self_id and depth_level set
-        
-        Raises:
-            ValueError: if Mistral returns unparseable or schema-invalid JSON
-            Exception: propagates Mistral API errors as-is
-        """
-        user_message = self._build_secondary_message(
-            parent_self, user_profile, count, time_horizon
+        return self._assign_voices_and_finalize(
+            raw_output.future_selves,
+            parent_id=ctx.parent_self.id if ctx.parent_self else None,
+            depth=ctx.depth + 1 if ctx.parent_self else 1,
+            timestamp=now,
         )
 
-        response = await self.client.agents.complete_async(
-            agent_id=self.settings.mistral_agent_id_future_self,
-            messages=[{"role": "user", "content": user_message}],
-            response_format=FUTURE_SELF_RESPONSE_FORMAT, # pyright: ignore[reportArgumentType]
+    # ------------------------------------------------------------------
+    # Prompt builder — single method, conditional sections
+    # ------------------------------------------------------------------
+
+    def _build_message(self, ctx: GenerationContext) -> str:
+        """Build a depth-aware prompt from the GenerationContext."""
+        profile = ctx.user_profile
+
+        # --- Depth framing ---
+        if ctx.parent_self is None:
+            depth_framing = _ROOT_DEPTH_FRAMING
+        else:
+            depth_framing = _BRANCH_DEPTH_FRAMING.format(
+                count=ctx.count,
+                time_horizon=ctx.time_horizon,
+                parent_name=ctx.parent_self.name,
+                parent_mood=ctx.parent_self.visual_style.mood,
+            )
+
+        # --- Anchor (current self — always present) ---
+        anchor_section = _ANCHOR_SECTION.format(
+            name=ctx.current_self.name,
+            optimization_goal=ctx.current_self.optimization_goal,
+            tone_of_voice=ctx.current_self.tone_of_voice,
+            worldview=ctx.current_self.worldview,
+            core_belief=ctx.current_self.core_belief,
+            mood=ctx.current_self.visual_style.mood,
         )
 
-        raw_json = response.choices[0].message.content
-        if not raw_json:
-            raise ValueError("Mistral returned an empty response")
+        # --- Parent (only at depth >= 1) ---
+        parent_section = ""
+        if ctx.parent_self is not None:
+            parent_section = _PARENT_SECTION.format(
+                name=ctx.parent_self.name,
+                optimization_goal=ctx.parent_self.optimization_goal,
+                worldview=ctx.parent_self.worldview,
+                core_belief=ctx.parent_self.core_belief,
+                trade_off=ctx.parent_self.trade_off,
+                mood=ctx.parent_self.visual_style.mood,
+            )
 
-        try:
-            raw_output = RawFutureSelvesOutput.model_validate_json(raw_json) # pyright: ignore[reportArgumentType]
-        except Exception as exc:
-            raise ValueError(
-                f"Mistral output failed schema validation: {exc}\nRaw output: {raw_json[:500]}"
-            ) from exc
+        # --- Ancestor summary (depth >= 2) ---
+        ancestor_section = ""
+        if ctx.ancestor_summary:
+            ancestor_section = (
+                "ANCESTOR CHAIN (summarized for context — this person's lineage of choices):\n"
+                f"{ctx.ancestor_summary}"
+            )
 
-        # Assign voices and set tree metadata
-        result = self._assign_voices_and_finalize(raw_output.future_selves)
-        
-        # Set parent and depth for tree navigation
-        for card in result:
-            card.parent_self_id = parent_self.id
-            card.depth_level = parent_self.depth_level + 1
-        
-        return result
+        # --- Conversation insights ---
+        conversation_section = ""
+        if ctx.conversation_excerpts:
+            excerpts = "\n".join(f"- {e}" for e in ctx.conversation_excerpts)
+            conversation_section = (
+                "CONVERSATION INSIGHTS (things revealed while talking to previously generated selves):\n"
+                f"{excerpts}\n"
+                "Use these revealed preferences and emotions to shape the generated personas."
+            )
 
-    # ------------------------------------------------------------------
-    # Private helpers
-    # ------------------------------------------------------------------
+        # --- Sibling dedup ---
+        sibling_section = ""
+        if ctx.sibling_names:
+            names = ", ".join(ctx.sibling_names)
+            sibling_section = (
+                f"ALREADY GENERATED AT THIS LEVEL (avoid overlap): {names}"
+            )
 
-    def _build_user_message(
-        self,
-        profile: UserProfile,
-        current_self: SelfCard,
-        count: int,
-    ) -> str:
-        return _USER_MESSAGE_TEMPLATE.format(
-            count=count,
+        return _GENERATION_TEMPLATE.format(
+            count=ctx.count,
+            depth_framing=depth_framing,
             core_values=", ".join(profile.core_values),
             fears=", ".join(profile.fears),
             hidden_tensions=" | ".join(profile.hidden_tensions),
             decision_style=profile.decision_style,
             self_narrative=profile.self_narrative,
             current_dilemma=profile.current_dilemma,
-            current_self_name=current_self.name,
-            current_self_optimization_goal=current_self.optimization_goal,
-            current_self_tone_of_voice=current_self.tone_of_voice,
-            current_self_worldview=current_self.worldview,
-            current_self_core_belief=current_self.core_belief,
-            current_self_mood=current_self.visual_style.mood,
+            anchor_section=anchor_section,
+            parent_section=parent_section,
+            ancestor_section=ancestor_section,
+            conversation_section=conversation_section,
+            sibling_section=sibling_section,
         )
 
-    def _build_secondary_message(
-        self,
-        parent_self: SelfCard,
-        profile: UserProfile,
-        count: int,
-        time_horizon: str,
-    ) -> str:
-        """Build prompt for secondary generation from a parent choice"""
-        return _SECONDARY_MESSAGE_TEMPLATE.format(
-            count=count,
-            time_ago=time_horizon,
-            parent_name=parent_self.name,
-            parent_optimization_goal=parent_self.optimization_goal,
-            parent_worldview=parent_self.worldview,
-            parent_core_belief=parent_self.core_belief,
-            parent_trade_off=parent_self.trade_off,
-            parent_mood=parent_self.visual_style.mood,
-            core_values=", ".join(profile.core_values),
-            fears=", ".join(profile.fears),
-            hidden_tensions=" | ".join(profile.hidden_tensions),
-        )
+    # ------------------------------------------------------------------
+    # Voice assignment & finalization (now with hashed IDs)
+    # ------------------------------------------------------------------
 
     def _assign_voices_and_finalize(
-        self, raw_selves: list[RawSelfCard]
+        self,
+        raw_selves: list[RawSelfCard],
+        *,
+        parent_id: str | None,
+        depth: int,
+        timestamp: float,
     ) -> list[SelfCard]:
         used_voice_ids: set[str] = set()
         result: list[SelfCard] = []
 
         for raw in raw_selves:
+            sid = hash_id(raw.name, parent_id, timestamp)
             voice_id = self._assign_voice(raw.visual_style.mood, used_voice_ids)
             card = SelfCard(
-                id=f"self_future_{uuid.uuid4().hex[:8]}",
+                id=sid,
                 type="future",
                 name=raw.name,
                 optimization_goal=raw.optimization_goal,
@@ -382,6 +438,9 @@ class FutureSelfGenerator:
                     glow_intensity=raw.visual_style.glow_intensity,
                 ),
                 voice_id=voice_id,
+                parent_self_id=parent_id,
+                depth_level=depth,
+                children_ids=[],
             )
             result.append(card)
 

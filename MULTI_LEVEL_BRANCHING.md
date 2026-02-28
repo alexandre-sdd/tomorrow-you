@@ -3,7 +3,8 @@
 ## Overview
 
 This system enables **tree-based exploration** of future selves, allowing users to:
-1. Generate initial choices (Level 1: NYC vs Singapore)  
+
+1. Generate initial choices (Level 1: NYC vs Singapore)
 2. Explore how each choice evolved differently (Level 2: outcomes based on life factors)
 3. Navigate back and forth without losing data
 4. Build a complete decision tree over multiple sessions
@@ -25,6 +26,7 @@ root (Current Self)
 ### Data Storage
 
 **Session Structure:**
+
 ```json
 {
   "futureSelfOptions": [...],           // Backward compat (root level only)
@@ -40,6 +42,7 @@ root (Current Self)
 ```
 
 **SelfCard Fields:**
+
 - `parent_self_id`: ID of parent (None for root level)
 - `depth_level`: 1 for initial choice, 2+ for secondary
 - `children_ids`: IDs of generated child selves
@@ -47,6 +50,7 @@ root (Current Self)
 ## Key Features
 
 ### 1. Root Level Generation
+
 ```python
 POST /future-self/generate
 {
@@ -55,11 +59,13 @@ POST /future-self/generate
   "parentSelfId": null  # Root level
 }
 ```
+
 - Generates initial choices from current dilemma
 - Uses original prompt template
 - Links to root memory node
 
 ### 2. Secondary Level Generation
+
 ```python
 POST /future-self/generate
 {
@@ -68,6 +74,7 @@ POST /future-self/generate
   "parentSelfId": "self_future_singapore_001"
 }
 ```
+
 - Generates outcome variations from chosen path
 - Uses secondary prompt template (explores consequences)
 - Links to parent self's memory node
@@ -75,18 +82,23 @@ POST /future-self/generate
 ### 3. Tree Navigation Endpoints
 
 **Get Full Tree:**
+
 ```python
 GET /future-self/{session_id}/tree
 ```
+
 Returns:
+
 - `allSelves`: All generated selves by ID
 - `explorationPaths`: Parent → children mapping
 - `rootOptions`: Level 1 choices (backward compat)
 
 **Get Children:**
+
 ```python
 GET /future-self/{session_id}/self/{self_id}/children
 ```
+
 Returns list of secondary selves generated from parent
 
 ## Implementation Details
@@ -94,6 +106,7 @@ Returns list of secondary selves generated from parent
 ### 1. Schema Updates (`backend/models/schemas.py`)
 
 Added to `SelfCard`:
+
 ```python
 parent_self_id: str | None = None
 depth_level: int = 1
@@ -101,6 +114,7 @@ children_ids: list[str] = []
 ```
 
 Added to `GenerateFutureSelvesRequest`:
+
 ```python
 parent_self_id: str | None = None
 ```
@@ -108,11 +122,13 @@ parent_self_id: str | None = None
 ### 2. Generator Engine (`backend/engines/future_self_generator.py`)
 
 **New Template:** `_SECONDARY_MESSAGE_TEMPLATE`
+
 - Context: Person chose X, 2-3 years later
 - Focus: How same choice evolved differently
 - Factors: Relationships, career, trade-offs, external events
 
 **New Method:** `generate_secondary()`
+
 - Takes parent_self and user_profile
 - Sets parent_self_id and depth_level on children
 - Returns list of secondary SelfCards
@@ -120,6 +136,7 @@ parent_self_id: str | None = None
 ### 3. Router Logic (`backend/routers/future_self.py`)
 
 **Branch Detection:**
+
 ```python
 if request.parent_self_id is None:
     # Root generation
@@ -133,6 +150,7 @@ else:
 ```
 
 **Tree Preservation:**
+
 ```python
 # Add to full tree
 session_data["futureSelvesFull"][self_card.id] = self_card
@@ -147,6 +165,7 @@ parent_data["childrenIds"].append(child_ids)
 ### 4. Memory Branch Linking
 
 Updated `_create_memory_branches()`:
+
 - Accepts `parent_node_id` and `parent_branch_name`
 - Links new nodes to parent (not always root)
 - Maintains branch hierarchy in branches.json
@@ -156,6 +175,7 @@ Updated `_create_memory_branches()`:
 ### Secondary Generation Prompt
 
 **Key Directives:**
+
 - ✅ Explore how SAME initial choice evolved differently
 - ✅ Focus on life factors (relationships, opportunities, trade-offs)
 - ✅ Names: "Self Who [parent choice] and [what happened]"
@@ -163,6 +183,7 @@ Updated `_create_memory_branches()`:
 - ✅ Visual mood reflects emotional outcome (not copy parent)
 
 **Example Names:**
+
 - "Self Who Took the Singapore Move and Found Unexpected Community"
 - "Self Who Took the Singapore Move and Experienced Career Burnout"
 - "Self Who Stayed in NYC and Started Own Business"
@@ -171,11 +192,13 @@ Updated `_create_memory_branches()`:
 ## Testing
 
 Run comprehensive test:
+
 ```bash
 $env:PYTHONPATH="$PWD"; python backend/test_multilevel_branching.py
 ```
 
 **Test validates:**
+
 - ✓ Root level generation
 - ✓ Secondary generation from first choice
 - ✓ Navigation back to generate from second choice
@@ -232,14 +255,6 @@ response3 = await generate_future_selves(
 4. **Backward Compatible**: `futureSelfOptions` still works for simple cases
 5. **Scalable**: Supports up to 5 depth levels (configurable)
 6. **Memory Coherence**: Branch nodes correctly linked in memory system
-
-## Future Enhancements
-
-1. **Depth Limits**: Enforce max depth per session
-2. **Branch Pruning**: Allow removing unwanted branches
-3. **Path Comparison**: Compare different paths side-by-side
-4. **Conversation Context**: Use parent conversations in secondary generation
-5. **Visual Tree UI**: Frontend tree visualization with navigation
 
 ## Files Modified
 

@@ -53,8 +53,7 @@ class SelfCard(BaseModel):
     depth_level: int = Field(
         default=0,
         ge=0,
-        le=5,
-        description="Branch depth: 0=current self, 1=initial choice, 2+=secondary"
+        description="Branch depth: 0=current self, 1=initial choice, 2+=secondary exploration"
     )
     children_ids: list[str] = Field(
         default_factory=list,
@@ -86,6 +85,10 @@ class GenerateFutureSelvesRequest(BaseModel):
     parent_self_id: str | None = Field(
         default=None,
         description="Generate secondary futures from this parent (None = root level)"
+    )
+    time_horizon: str | None = Field(
+        default=None,
+        description="Override the default time horizon (e.g. '5 years', '2-3 years')"
     )
 
 

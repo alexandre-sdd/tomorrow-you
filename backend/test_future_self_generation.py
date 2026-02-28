@@ -17,7 +17,7 @@ import json
 from pathlib import Path
 
 from backend.config.settings import get_settings
-from backend.engines.future_self_generator import FutureSelfGenerator
+from backend.engines.future_self_generator import FutureSelfGenerator, GenerationContext
 from backend.models.schemas import SelfCard, UserProfile
 
 # ---------------------------------------------------------------------------
@@ -229,11 +229,12 @@ async def main() -> None:
     print("-" * 80)
     try:
         generator = FutureSelfGenerator()
-        generated_selves = await generator.generate(
+        ctx = GenerationContext(
             user_profile=user_profile,
             current_self=current_self,
-            count=2,  # Generate 2 personas like the existing mock
+            count=2,
         )
+        generated_selves = await generator.generate(ctx)
         print(f"\n✓ Generation successful! Created {len(generated_selves)} personas")
     except Exception as e:
         print(f"\n✗ Error generating personas: {e}")
