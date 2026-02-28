@@ -146,6 +146,16 @@ def _create_memory_branches(
     branches_file.write_text(json.dumps(branches, indent=2), encoding="utf-8")
     session_data["memoryBranches"] = branches
 
+    # Keep session_data["memoryNodes"] in sync (inline array mirrors files)
+    if "memoryNodes" not in session_data:
+        session_data["memoryNodes"] = []
+    existing_node_ids = {n["id"] for n in session_data["memoryNodes"]}
+    for node_file in nodes_dir.glob("*.json"):
+        node = json.loads(node_file.read_text(encoding="utf-8"))
+        if node["id"] not in existing_node_ids:
+            session_data["memoryNodes"].append(node)
+            existing_node_ids.add(node["id"])
+
 
 # ---------------------------------------------------------------------------
 # Endpoints
@@ -209,6 +219,12 @@ async def generate_future_selves(
         parent_node_id = _find_root_node_id(request.session_id, settings.storage_path)
         parent_branch_name = "root"
         level_desc = "root level"
+
+        # Set tree metadata on root-level selves
+        for card in future_selves:
+            card.parent_self_id = None
+            card.depth_level = 1
+            card.children_ids = []
         
     else:
         # SECONDARY LEVEL GENERATION
@@ -288,7 +304,7 @@ async def generate_future_selves(
         {
             "id": f"te_{uuid.uuid4().hex[:8]}",
             "turn": len(session_data.get("transcript", [])) + 1,
-            "phase": "exploration",
+            "phase": "selection",
             "role": "system",
             "selfName": None,
             "content": f"Generated {len(future_selves)} futures ({level_desc}): {self_names}",

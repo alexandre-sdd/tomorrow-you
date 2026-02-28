@@ -61,7 +61,10 @@
       "mood": "calm",
       "glowIntensity": 0.34
     },
-    "voiceId": "voice_current_placeholder"
+    "voiceId": "voice_current_placeholder",
+    "parentSelfId": null,
+    "depthLevel": 0,
+    "childrenIds": ["self_future_singapore_001", "self_future_nyc_001"]
   },
   "futureSelfOptions": [
     {
@@ -81,7 +84,10 @@
         "mood": "elevated",
         "glowIntensity": 0.58
       },
-      "voiceId": "voice_future_singapore_placeholder"
+      "voiceId": "voice_future_singapore_placeholder",
+      "parentSelfId": null,
+      "depthLevel": 1,
+      "childrenIds": []
     },
     {
       "id": "self_future_nyc_001",
@@ -100,7 +106,10 @@
         "mood": "warm",
         "glowIntensity": 0.42
       },
-      "voiceId": "voice_future_nyc_placeholder"
+      "voiceId": "voice_future_nyc_placeholder",
+      "parentSelfId": null,
+      "depthLevel": 1,
+      "childrenIds": []
     }
   ],
   "selectedFutureSelf": null,
@@ -186,7 +195,10 @@
           "mood": "elevated",
           "glowIntensity": 0.58
         },
-        "voiceId": "voice_future_singapore_placeholder"
+        "voiceId": "voice_future_singapore_placeholder",
+        "parentSelfId": null,
+        "depthLevel": 1,
+        "childrenIds": []
       },
       "createdAt": 1772294420
     },
@@ -222,11 +234,63 @@
           "mood": "warm",
           "glowIntensity": 0.42
         },
-        "voiceId": "voice_future_nyc_placeholder"
+        "voiceId": "voice_future_nyc_placeholder",
+        "parentSelfId": null,
+        "depthLevel": 1,
+        "childrenIds": []
       },
       "createdAt": 1772294420
     }
   ],
   "createdAt": 1772294400,
-  "updatedAt": 1772294420
+  "updatedAt": 1772294420,
+  "futureSelvesFull": {
+    "self_future_singapore_001": {
+      "id": "self_future_singapore_001",
+      "type": "future",
+      "name": "Self Who Took the Singapore Move",
+      "optimizationGoal": "Maximize career acceleration, international exposure, leadership trajectory, and long-term upside.",
+      "toneOfVoice": "Calm, confident, precise, more decisive, emotionally controlled.",
+      "worldview": "Some decisions feel disruptive in the moment, but they become the moves that define your life if you fully grow into them.",
+      "coreBelief": "You do not become who you could be by staying where everything already fits.",
+      "tradeOff": "I gained speed, status, and reinvention, but I gave up familiarity, relational ease, and some short-term emotional safety.",
+      "avatarPrompt": "A realistic 33-year-old professional man living in Singapore after an international promotion, sharper presence, elegant tailored clothing, warm city lights in the background, confident but slightly more distant expression, global executive energy, premium cinematic portrait, sophisticated and emotionally restrained",
+      "avatarUrl": null,
+      "visualStyle": {
+        "primaryColor": "#0E5E6F",
+        "accentColor": "#D8F3DC",
+        "mood": "elevated",
+        "glowIntensity": 0.58
+      },
+      "voiceId": "voice_future_singapore_placeholder",
+      "parentSelfId": null,
+      "depthLevel": 1,
+      "childrenIds": []
+    },
+    "self_future_nyc_001": {
+      "id": "self_future_nyc_001",
+      "type": "future",
+      "name": "Self Who Stayed in New York",
+      "optimizationGoal": "Preserve relational stability, continuity, local momentum, and a more grounded long-term life path.",
+      "toneOfVoice": "Warm, steady, thoughtful, reassuring, emotionally available.",
+      "worldview": "A good life is not always the fastest one; sometimes depth comes from staying with what matters and building it well.",
+      "coreBelief": "Not every meaningful life is built through dramatic moves.",
+      "tradeOff": "I kept closeness, continuity, and a stronger sense of home, but I may always wonder how much further I could have gone.",
+      "avatarPrompt": "A realistic 33-year-old professional man still living in New York, grounded and emotionally present, refined but relaxed style, warm apartment or city evening lighting, stable and thoughtful expression, premium cinematic portrait, intimate and human",
+      "avatarUrl": null,
+      "visualStyle": {
+        "primaryColor": "#7A4E2D",
+        "accentColor": "#F3E9DC",
+        "mood": "warm",
+        "glowIntensity": 0.42
+      },
+      "voiceId": "voice_future_nyc_placeholder",
+      "parentSelfId": null,
+      "depthLevel": 1,
+      "childrenIds": []
+    }
+  },
+  "explorationPaths": {
+    "root": ["self_future_singapore_001", "self_future_nyc_001"]
+  }
 }

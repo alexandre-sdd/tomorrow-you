@@ -1,4 +1,6 @@
 import type {
+  ExplorationPaths,
+  FutureSelvesFull,
   MemoryBranch,
   MemoryNode,
   SelfCard,
@@ -60,6 +62,9 @@ export const mockCurrentSelf: SelfCard = {
     glowIntensity: 0.34,
   },
   voiceId: "voice_current_placeholder",
+  parentSelfId: null,
+  depthLevel: 0,
+  childrenIds: ["self_future_singapore_001", "self_future_nyc_001"],
 };
 
 export const mockSingaporeSelf: SelfCard = {
@@ -85,6 +90,9 @@ export const mockSingaporeSelf: SelfCard = {
     glowIntensity: 0.58,
   },
   voiceId: "voice_future_singapore_placeholder",
+  parentSelfId: null,
+  depthLevel: 1,
+  childrenIds: [],
 };
 
 export const mockSelfCards: SelfCard[] = [mockCurrentSelf, mockSingaporeSelf];
@@ -112,12 +120,24 @@ export const mockStayInNYCSelf: SelfCard = {
     glowIntensity: 0.42,
   },
   voiceId: "voice_future_nyc_placeholder",
+  parentSelfId: null,
+  depthLevel: 1,
+  childrenIds: [],
 };
 
 export const mockFutureSelfOptions: SelfCard[] = [
   mockSingaporeSelf,
   mockStayInNYCSelf,
 ];
+
+export const mockFutureSelvesFull: FutureSelvesFull = {
+  [mockSingaporeSelf.id]: mockSingaporeSelf,
+  [mockStayInNYCSelf.id]: mockStayInNYCSelf,
+};
+
+export const mockExplorationPaths: ExplorationPaths = {
+  root: [mockSingaporeSelf.id, mockStayInNYCSelf.id],
+};
 
 export const mockTranscript: TranscriptEntry[] = [
   {
@@ -238,4 +258,6 @@ export const mockSession: Session = {
   memoryNodes: mockMemoryNodes,
   createdAt: baseTimestamp,
   updatedAt: baseTimestamp + 20,
+  futureSelvesFull: mockFutureSelvesFull,
+  explorationPaths: mockExplorationPaths,
 };

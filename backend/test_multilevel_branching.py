@@ -78,7 +78,7 @@ def create_test_current_self() -> SelfCard:
             "accent_color": "#D6E4F0",
             "mood": "calm",
             "glow_intensity": 0.34,
-        },
+        }, # type: ignore
         voice_id="voice_current_multilevel",
     )
 

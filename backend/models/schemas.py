@@ -51,10 +51,10 @@ class SelfCard(BaseModel):
         description="ID of parent self (None for root level)"
     )
     depth_level: int = Field(
-        default=1,
-        ge=1,
+        default=0,
+        ge=0,
         le=5,
-        description="Branch depth: 1=initial choice, 2+=secondary"
+        description="Branch depth: 0=current self, 1=initial choice, 2+=secondary"
     )
     children_ids: list[str] = Field(
         default_factory=list,

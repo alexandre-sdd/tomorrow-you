@@ -15,7 +15,8 @@ export type TranscriptPhase =
   | "interview"
   | "conversation"
   | "backtrack"
-  | "selection";
+  | "selection"
+  | "exploration";
 
 export type TranscriptRole = "user" | "interviewer" | "future_self" | "system";
 
@@ -49,6 +50,11 @@ export interface SelfCard {
   avatarUrl: string | null;
   visualStyle: VisualStyle;
   voiceId: string;
+
+  // Tree navigation fields for multi-level branching
+  parentSelfId: string | null;
+  depthLevel: number;
+  childrenIds: string[];
 }
 
 export interface Message {
@@ -91,6 +97,12 @@ export interface TranscriptEntry {
   timestamp: number;
 }
 
+/** Lookup of every generated self by ID (tree storage) */
+export type FutureSelvesFull = Record<string, SelfCard>;
+
+/** Parent key → child self IDs (tracks what has been explored) */
+export type ExplorationPaths = Record<string, string[]>;
+
 export interface Session {
   id: string;
   status: SessionStatus;
@@ -104,4 +116,8 @@ export interface Session {
   memoryNodes: MemoryNode[];
   createdAt: number;
   updatedAt: number;
+
+  // Multi-level branching tree structures
+  futureSelvesFull: FutureSelvesFull;
+  explorationPaths: ExplorationPaths;
 }
