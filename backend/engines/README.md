@@ -34,7 +34,7 @@ Each engine is a Python class that encapsulates one stage of the pipeline. They 
 - Each persona optimizes for something different (e.g., ambition vs. peace vs. love)
 - Each has: name, optimization goal, tone of voice, worldview, core belief, trade-off/sacrifice, visual style
 - The variation comes from changing which values are prioritized and which are sacrificed
-- Uses Mistral with a generation prompt from `prompts/future_self.md`
+- Uses Mistral with a generation prompt from `prompts/future_self_generation.md`
 
 ### 4. ConversationEngine
 **File**: `conversation_engine.py`
@@ -84,6 +84,40 @@ Profile Built → AvatarGenerator.generate(currentSelf) [Mistral Pixtral / Gemin
 Future Selves Generated → AvatarGenerator.generate(futureSelf) [for each]
                        → Images displayed on PersonaCards + Conversation Chamber
 ```
+
+## CLI MVP Modules (Implemented)
+### `context_resolver.py`
+- Read-only loader for `storage/sessions/{session_id}/...`
+- Resolves one branch (`memory/branches.json` + `memory/nodes/*.json`) into:
+  - `userProfile`
+  - selected branch `selfCard`
+  - merged memory facts/notes from root → head
+  - compact profile summary for prompting
+- Does not write any session or memory files
+
+### `prompt_composer.py`
+- Builds a branch-grounded system prompt from resolved context
+- Produces model-ready message arrays (`system` + rolling history + latest user turn)
+- Keeps prompt compact with configurable caps for facts/notes/history
+
+### `mistral_client.py`
+- Thin Mistral chat wrapper using `MISTRAL_API_KEY`
+- Supports synchronous (`chat`) and streaming (`stream_chat`) completion calls
+- Returns plain text chunks for CLI rendering
+
+### `conversation_session.py`
+- In-memory branch conversation orchestrator
+- Uses: `ResolvedConversationContext` + `PromptComposer` + `MistralChatClient`
+- Tracks only rolling turn history in memory; no storage writes
+
+### `backend/cli/chat_future_self.py`
+- Terminal REPL for chatting with a selected future-self branch
+- Inputs: `--session-id`, `--branch`, model/config flags
+- Commands: `/context`, `/reset`, `/exit`
+
+### `CONVERSATION_ENGINE_MVP.md`
+- Defines scope and boundaries for the first CLI-only version
+- Excludes storage writes, voice, and UI for this phase
 
 ## TODO
 - [ ] Create base engine class/interface

@@ -133,7 +133,7 @@ TranscriptEntry {
 
 ## How This Is Used
 - **Backend (Python)**: These schemas map to Pydantic models in `backend/models/`
-- **Frontend (TypeScript)**: These schemas map to TypeScript types in `frontend/types/`
+- **Frontend (TypeScript)**: These schemas map to TypeScript types in `frontend/lib/types.ts`
 - This README is the canonical reference — if the Pydantic models and TS types ever disagree, this file is correct
 
 ## TODO
