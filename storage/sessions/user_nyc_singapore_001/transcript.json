@@ -1,0 +1,20 @@
+[
+  {
+    "id": "te_001",
+    "turn": 1,
+    "phase": "interview",
+    "role": "system",
+    "selfName": null,
+    "content": "Interview complete. Profile extracted.",
+    "timestamp": 1772294400
+  },
+  {
+    "id": "te_002",
+    "turn": 2,
+    "phase": "selection",
+    "role": "system",
+    "selfName": null,
+    "content": "Future self options generated: Self Who Took the Singapore Move, Self Who Stayed in New York.",
+    "timestamp": 1772294410
+  }
+]

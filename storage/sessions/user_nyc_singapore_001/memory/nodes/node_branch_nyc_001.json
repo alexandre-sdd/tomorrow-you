@@ -1,0 +1,36 @@
+{
+  "id": "node_branch_nyc_001",
+  "parentId": "node_root_profile",
+  "branchLabel": "self-who-stayed-in-new-york",
+  "facts": [
+    {
+      "id": "fact_nyc_001",
+      "fact": "This branch optimizes for relational continuity, emotional presence, and grounded growth.",
+      "source": "interview",
+      "extractedAt": 1772294420
+    }
+  ],
+  "notes": [
+    "Initial branch node for NYC path."
+  ],
+  "selfCard": {
+    "id": "self_future_nyc_001",
+    "type": "future",
+    "name": "Self Who Stayed in New York",
+    "optimizationGoal": "Preserve relational stability, continuity, local momentum, and a more grounded long-term life path.",
+    "toneOfVoice": "Warm, steady, thoughtful, reassuring, emotionally available.",
+    "worldview": "A good life is not always the fastest one; sometimes depth comes from staying with what matters and building it well.",
+    "coreBelief": "Not every meaningful life is built through dramatic moves.",
+    "tradeOff": "I kept closeness, continuity, and a stronger sense of home, but I may always wonder how much further I could have gone.",
+    "avatarPrompt": "A realistic 33-year-old professional man still living in New York, grounded and emotionally present, refined but relaxed style, warm apartment or city evening lighting, stable and thoughtful expression, premium cinematic portrait, intimate and human",
+    "avatarUrl": null,
+    "visualStyle": {
+      "primaryColor": "#7A4E2D",
+      "accentColor": "#F3E9DC",
+      "mood": "warm",
+      "glowIntensity": 0.42
+    },
+    "voiceId": "voice_future_nyc_placeholder"
+  },
+  "createdAt": 1772294420
+}

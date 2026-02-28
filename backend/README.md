@@ -3,6 +3,9 @@
 ## Purpose
 The API server that powers all AI logic: interview orchestration, profile extraction, future self generation, and real-time voice conversation. Handles the handoff between Mistral (LLM) and ElevenLabs (voice synthesis).
 
+## Architecture Map
+- See `backend/AGENT_INFRASTRUCTURE.md` for an end-to-end Mermaid schematic of routers, engines, prompts, memory/storage, and external providers.
+
 ## Tech Stack
 - **Framework**: FastAPI (async, WebSocket support, auto-docs)
 - **Language**: Python 3.11+ with type hints

@@ -1,0 +1,36 @@
+{
+  "id": "node_branch_singapore_001",
+  "parentId": "node_root_profile",
+  "branchLabel": "self-who-took-the-singapore-move",
+  "facts": [
+    {
+      "id": "fact_sg_001",
+      "fact": "This branch optimizes for acceleration, reinvention, and leadership upside.",
+      "source": "interview",
+      "extractedAt": 1772294420
+    }
+  ],
+  "notes": [
+    "Initial branch node for Singapore path."
+  ],
+  "selfCard": {
+    "id": "self_future_singapore_001",
+    "type": "future",
+    "name": "Self Who Took the Singapore Move",
+    "optimizationGoal": "Maximize career acceleration, international exposure, leadership trajectory, and long-term upside.",
+    "toneOfVoice": "Calm, confident, precise, more decisive, emotionally controlled.",
+    "worldview": "Some decisions feel disruptive in the moment, but they become the moves that define your life if you fully grow into them.",
+    "coreBelief": "You do not become who you could be by staying where everything already fits.",
+    "tradeOff": "I gained speed, status, and reinvention, but I gave up familiarity, relational ease, and some short-term emotional safety.",
+    "avatarPrompt": "A realistic 33-year-old professional man living in Singapore after an international promotion, sharper presence, elegant tailored clothing, warm city lights in the background, confident but slightly more distant expression, global executive energy, premium cinematic portrait, sophisticated and emotionally restrained",
+    "avatarUrl": null,
+    "visualStyle": {
+      "primaryColor": "#0E5E6F",
+      "accentColor": "#D8F3DC",
+      "mood": "elevated",
+      "glowIntensity": 0.58
+    },
+    "voiceId": "voice_future_singapore_placeholder"
+  },
+  "createdAt": 1772294420
+}

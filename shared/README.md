@@ -3,6 +3,12 @@
 ## Purpose
 The single source of truth for all data shapes that cross the frontend-backend boundary. Every API request/response, every stored object, and every internal data structure is defined here. This prevents frontend and backend from drifting apart.
 
+## Folder Responsibility
+- `shared/` is for contracts only (schema definitions and type shape documentation).
+- Do **not** store per-user data in `shared/` (for example `shared/usr1`).
+- Put runtime/session data under `storage/sessions/{session_id}/`.
+- Put frontend mock fixtures in `frontend/lib/mocks.ts` (or a `frontend/lib/mocks/` folder if it grows).
+
 ## Why This Exists
 The architecture.md critique identified that there were no defined data contracts between layers. Without explicit schemas, the frontend might expect `userName` while the backend sends `user_name`, or the profile might have different fields depending on which endpoint generated it. This folder fixes that.
 

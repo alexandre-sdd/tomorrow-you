@@ -69,6 +69,49 @@ More explicitly:
 - The result is rendered in a polished UI / Avatar layer.
 - At the end we produce a Summary / Reflection screen (not a priority, but rather stating the different options that were explored).
 
+## Architecture Diagram (Mermaid)
+```mermaid
+flowchart TD
+
+    subgraph ONB[Onboarding]
+        A[Interview Agent]
+        T([Interview Transcript])
+        B[Profile Builder]
+        P([User Profile])
+        A --> T
+        T --> B
+        B --> P
+    end
+
+    subgraph GEN[Future Self Generation]
+        S[Future Self Selector]
+        F[Future Self Generator]
+        C([Self Card])
+        S --> F
+        P --> F
+        F --> C
+    end
+
+    subgraph CONV[Live Conversation]
+        D[Conversation Engine]
+        M([Conversation Memory])
+        V[[ElevenLabs Voice Engine]]
+        P --> D
+        C --> D
+        M <--> D
+        V <--> D
+    end
+
+    subgraph EXP[Experience Layer]
+        R[Avatar Renderer]
+        UI[Frontend UI]
+        C --> R
+        D --> UI
+        R --> UI
+        V --> UI
+    end
+```
+
 ## Technical Structure (Simple)
 ### Frontend
 - Next.js / React

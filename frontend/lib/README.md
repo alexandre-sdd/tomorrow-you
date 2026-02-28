@@ -41,9 +41,18 @@ TypeScript type definitions matching the shared schemas.
 - `UserProfile`, `SelfCard`, `TranscriptEntry`, `KeyFact`, `MemoryNode`, `MemoryBranch`, `Session`
 - Single source of TS types, imported everywhere
 
+### `mocks.ts`
+Seed mock data for UI and flow development.
+- `mockUserProfile`
+- `mockSelfCards`
+- `mockStayInNYCSelf`
+- `mockFutureSelfOptions`
+- `mockSession`
+- Mirrors the storage seed in `storage/sessions/user_nyc_singapore_001/`
+
 ## TODO
 - [ ] Create API client with all endpoint wrappers
 - [ ] Create WebSocket client for conversation streaming
 - [ ] Create audio utilities (recording, playback, level detection)
 - [ ] Create Zustand store with session state and actions
-- [ ] Create TypeScript types matching shared schemas
+- [x] Create TypeScript types matching shared schemas

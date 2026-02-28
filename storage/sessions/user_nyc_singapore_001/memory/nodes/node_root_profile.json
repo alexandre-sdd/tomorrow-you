@@ -1,0 +1,31 @@
+{
+  "id": "node_root_profile",
+  "parentId": null,
+  "branchLabel": "root",
+  "facts": [
+    {
+      "id": "fact_root_001",
+      "fact": "Core values include family stability, career growth, and financial security.",
+      "source": "interview",
+      "extractedAt": 1772294400
+    },
+    {
+      "id": "fact_root_002",
+      "fact": "Current dilemma is a potential move from New York to Singapore for a promotion.",
+      "source": "interview",
+      "extractedAt": 1772294400
+    },
+    {
+      "id": "fact_root_003",
+      "fact": "Strong concern about protecting marriage quality while pursuing ambition.",
+      "source": "interview",
+      "extractedAt": 1772294400
+    }
+  ],
+  "notes": [
+    "Root node created from profile extraction.",
+    "Seed state before future-self branch selection."
+  ],
+  "selfCard": null,
+  "createdAt": 1772294400
+}
