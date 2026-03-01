@@ -423,7 +423,9 @@ def _choose_starting_persona(
     resolver: ContextResolver,
 ) -> SelfCard | None:
     """
-    Prompt the user to pick an existing future-self persona when no --self-id/--branch is supplied.
+    Show current self summary, generate fresh root futures, then prompt selection.
+
+    If generation fails, falls back to existing selectable futures in session.
     """
     session_file = Path(storage_root) / session_id / "session.json"
     if not session_file.exists():
@@ -436,6 +438,55 @@ def _choose_starting_persona(
         print(f"[setup error] Failed to read session data: {exc}")
         return None
 
+    _print_current_self_summary(session_data)
+
+    print(f"Generating {_future_runtime.default_count} future selves from current self...")
+    generated = _generate_root_futures(session_id=session_id)
+    if generated:
+        candidates = generated
+    else:
+        print("[generation warning] Could not generate fresh futures. Falling back to existing options.")
+        candidates = _collect_existing_selectable_futures(
+            session_id=session_id,
+            session_data=session_data,
+            resolver=resolver,
+        )
+
+    if not candidates:
+        print("No selectable future-self personas found in session.")
+        print("Generation failed and no existing personas are available.")
+        return None
+
+    print("Choose a future self to start the conversation:")
+    _print_persona_options(candidates)
+    selected = _prompt_select_option(candidates)
+    if selected is None:
+        print("No persona selected.")
+    return selected
+
+
+def _generate_root_futures(*, session_id: str) -> list[SelfCard]:
+    try:
+        settings = get_settings()
+        request = GenerateFutureSelvesRequest(
+            session_id=session_id,
+            count=_future_runtime.default_count,
+            parent_self_id=None,
+            time_horizon=None,
+        )
+        response = asyncio.run(generate_future_selves(request, settings))
+    except Exception as exc:
+        print(f"[generation error] {exc}")
+        return []
+    return list(response.future_self_options)
+
+
+def _collect_existing_selectable_futures(
+    *,
+    session_id: str,
+    session_data: dict,
+    resolver: ContextResolver,
+) -> list[SelfCard]:
     candidates: list[SelfCard] = []
     seen_ids: set[str] = set()
 
@@ -464,23 +515,37 @@ def _choose_starting_persona(
     if isinstance(full, dict):
         for raw in full.values():
             _try_add(raw)
+    return candidates
 
-    if not candidates:
-        print("No selectable future-self personas found in session.")
-        print("Generate futures first, then start chat with --self-id or rerun this command.")
-        return None
 
-    print("Available personas:")
+def _print_persona_options(candidates: list[SelfCard]) -> None:
     for idx, card in enumerate(candidates, start=1):
         print(f"{idx}. {card.name}")
         print(f"   id: {card.id}")
         print(f"   depth: {card.depth_level}")
         print(f"   goal: {card.optimization_goal}")
 
-    selected = _prompt_select_option(candidates)
-    if selected is None:
-        print("No persona selected.")
-    return selected
+
+def _print_current_self_summary(session_data: dict) -> None:
+    raw = session_data.get("currentSelf")
+    if not isinstance(raw, dict):
+        print("Current self summary unavailable (missing currentSelf).")
+        print()
+        return
+
+    try:
+        current = SelfCard.model_validate(raw)
+    except Exception:
+        print("Current self summary unavailable (invalid currentSelf format).")
+        print()
+        return
+
+    print("Current self summary:")
+    print(f"  name: {current.name}")
+    print(f"  goal: {current.optimization_goal}")
+    print(f"  worldview: {current.worldview}")
+    print(f"  trade-off: {current.trade_off}")
+    print()
 
 
 def _print_banner(session: BranchConversationSession) -> None:
