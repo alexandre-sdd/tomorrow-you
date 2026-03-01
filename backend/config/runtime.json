@@ -74,5 +74,14 @@
     "timeout_seconds": 30.0,
     "max_messages_for_analysis": 80,
     "input_roles": ["user", "assistant"]
+  },
+  "interview_voice": {
+    "enabled": true,
+    "stt_model": "scribe_v2",
+    "stt_language_code": "en",
+    "stt_max_audio_bytes": 8388608,
+    "tts_model": "eleven_flash_v2_5",
+    "tts_output_format": "mp3_44100_128",
+    "tts_optimize_streaming_latency": 0
   }
 }

@@ -16,10 +16,17 @@ interface InterviewScreenProps {
   isReadyForGeneration: boolean;
   isSending: boolean;
   isCompleting: boolean;
+  isRecording: boolean;
+  isTranscribing: boolean;
+  isSynthesizing: boolean;
+  isPlaying: boolean;
+  canReplayLastAudio: boolean;
   messages: InterviewMessage[];
   onSend: (text: string) => Promise<void>;
   onRefreshStatus: () => Promise<void>;
   onComplete: () => Promise<void>;
+  onToggleRecording: () => Promise<void>;
+  onReplayLastAudio: () => Promise<void>;
 }
 
 export function InterviewScreen({
@@ -28,13 +35,33 @@ export function InterviewScreen({
   isReadyForGeneration,
   isSending,
   isCompleting,
+  isRecording,
+  isTranscribing,
+  isSynthesizing,
+  isPlaying,
+  canReplayLastAudio,
   messages,
   onSend,
   onRefreshStatus,
   onComplete,
+  onToggleRecording,
+  onReplayLastAudio,
 }: InterviewScreenProps) {
   const completionPct = profileCompleteness * 100;
   const canComplete = completionPct >= 50;
+  const isVoiceBusy = isTranscribing || isSynthesizing;
+  const inputDisabled = isSending || isCompleting || isVoiceBusy || isRecording;
+  const recordButtonLabel = isRecording ? "■" : "🎙";
+  const recordButtonTitle = isRecording ? "Stop recording" : "Start recording";
+  const voiceStatus = isRecording
+    ? "Recording..."
+    : isTranscribing
+      ? "Transcribing..."
+      : isSynthesizing
+        ? "Synthesizing reply..."
+        : isPlaying
+          ? "Playing reply..."
+          : "Voice ready";
 
   return (
     <section className="stack-screen">
@@ -65,6 +92,17 @@ export function InterviewScreen({
             {isCompleting ? "Generating current self..." : "Complete and generate futures"}
           </button>
         </div>
+        <div className="voice-actions">
+          <button
+            type="button"
+            className="ghost-button"
+            onClick={onReplayLastAudio}
+            disabled={!canReplayLastAudio || isRecording || isTranscribing}
+          >
+            Play last reply
+          </button>
+          <p className="voice-status">{voiceStatus}</p>
+        </div>
         {!canComplete ? (
           <p className="status-hint">
             Reach 50.0% to unlock completion.
@@ -85,7 +123,12 @@ export function InterviewScreen({
       <InputBar
         placeholder="Type your response..."
         submitLabel={isSending ? "Sending..." : "Send"}
-        disabled={isSending || isCompleting}
+        disabled={inputDisabled}
+        secondaryActionLabel={recordButtonLabel}
+        secondaryActionTitle={recordButtonTitle}
+        secondaryActionClassName={isRecording ? "recording-button icon-button" : "ghost-button icon-button"}
+        secondaryActionDisabled={isCompleting || isSending || isVoiceBusy}
+        onSecondaryAction={onToggleRecording}
         onSubmit={onSend}
       />
     </section>

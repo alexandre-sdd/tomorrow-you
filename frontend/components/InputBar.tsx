@@ -6,6 +6,11 @@ interface InputBarProps {
   placeholder: string;
   submitLabel?: string;
   disabled?: boolean;
+  secondaryActionLabel?: string;
+  secondaryActionTitle?: string;
+  secondaryActionClassName?: string;
+  secondaryActionDisabled?: boolean;
+  onSecondaryAction?: () => Promise<void> | void;
   onSubmit: (text: string) => Promise<void> | void;
 }
 
@@ -13,6 +18,11 @@ export function InputBar({
   placeholder,
   submitLabel = "Send",
   disabled,
+  secondaryActionLabel,
+  secondaryActionTitle,
+  secondaryActionClassName,
+  secondaryActionDisabled,
+  onSecondaryAction,
   onSubmit,
 }: InputBarProps) {
   const [value, setValue] = useState("");
@@ -35,6 +45,17 @@ export function InputBar({
         placeholder={placeholder}
         disabled={disabled}
       />
+      {secondaryActionLabel && onSecondaryAction ? (
+        <button
+          type="button"
+          className={secondaryActionClassName}
+          title={secondaryActionTitle}
+          disabled={disabled || secondaryActionDisabled}
+          onClick={onSecondaryAction}
+        >
+          {secondaryActionLabel}
+        </button>
+      ) : null}
       <button type="submit" disabled={disabled || !value.trim()}>
         {submitLabel}
       </button>

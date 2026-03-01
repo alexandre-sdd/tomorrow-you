@@ -6,6 +6,8 @@ Onboarding is an interview-driven flow that builds enough profile context to gen
 - `POST /interview/start`
 - `POST /interview/reply`
 - `POST /interview/reply-stream`
+- `POST /interview/transcribe` (voice turn transcription)
+- `POST /interview/tts` (voice synthesis for agent replies)
 - `GET /interview/status`
 - `POST /interview/complete`
 
@@ -14,6 +16,11 @@ Onboarding is an interview-driven flow that builds enough profile context to gen
 - Completeness is tracked by `GET /interview/status`
 - Completion is gated (minimum completeness threshold)
 - `POST /interview/complete` finalizes `userProfile` and generates `currentSelf`
+- Voice path (push-to-talk):
+  - record user turn in frontend
+  - send to `POST /interview/transcribe`
+  - submit transcript to `POST /interview/reply`
+  - synthesize assistant reply via `POST /interview/tts`
 
 ## Handoff to Exploration
 After completion, pipeline flow continues with:

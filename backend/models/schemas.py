@@ -192,6 +192,30 @@ class InterviewReplyRequest(BaseModel):
     )
 
 
+class InterviewTranscribeRequest(BaseModel):
+    model_config = _camel_config()
+
+    session_id: str
+    audio_base64: str
+    mime_type: str
+    language_code: str | None = None
+
+
+class InterviewTranscribeResponse(BaseModel):
+    model_config = _camel_config()
+
+    session_id: str
+    transcript_text: str
+
+
+class InterviewTtsRequest(BaseModel):
+    model_config = _camel_config()
+
+    session_id: str
+    text: str = Field(min_length=1)
+    voice_id: str | None = None
+
+
 class InterviewStatusResponse(BaseModel):
     model_config = _camel_config()
 

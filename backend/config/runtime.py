@@ -125,6 +125,16 @@ class MemoryExtractionRuntimeConfig(BaseModel):
         return self
 
 
+class InterviewVoiceRuntimeConfig(BaseModel):
+    enabled: bool
+    stt_model: str
+    stt_language_code: str | None = None
+    stt_max_audio_bytes: int = Field(ge=1)
+    tts_model: str
+    tts_output_format: str
+    tts_optimize_streaming_latency: int = Field(ge=0, le=4)
+
+
 class RuntimeConfig(BaseModel):
     mistral_chat: MistralChatRuntimeConfig
     prompt_composer: PromptComposerRuntimeConfig
@@ -137,6 +147,7 @@ class RuntimeConfig(BaseModel):
     storage: StorageRuntimeConfig
     conversation_memory: ConversationMemoryRuntimeConfig
     memory_extraction: MemoryExtractionRuntimeConfig
+    interview_voice: InterviewVoiceRuntimeConfig
 
     @model_validator(mode="after")
     def _validate_cli_branch_default(self) -> RuntimeConfig:

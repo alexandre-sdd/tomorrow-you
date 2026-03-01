@@ -24,6 +24,29 @@ function getArr(source: Dict, camel: string, snake?: string): unknown[] {
   return Array.isArray(value) ? value : [];
 }
 
+async function blobToBase64(blob: Blob): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+
+    reader.onerror = () => {
+      reject(new Error("Failed to read audio blob."));
+    };
+
+    reader.onload = () => {
+      if (typeof reader.result !== "string") {
+        reject(new Error("Unexpected FileReader result for audio blob."));
+        return;
+      }
+
+      const result = reader.result;
+      const payload = result.includes(",") ? result.split(",", 2)[1] : result;
+      resolve(payload);
+    };
+
+    reader.readAsDataURL(blob);
+  });
+}
+
 async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
   const response = await fetch(`${API_BASE}${path}`, {
     ...init,
@@ -109,6 +132,11 @@ export interface InterviewReplyResponse {
   extractedFields: Record<string, boolean>;
 }
 
+export interface InterviewTranscribeResponse {
+  sessionId: string;
+  transcriptText: string;
+}
+
 export interface InterviewStatusResponse {
   sessionId: string;
   profileCompleteness: number;
@@ -191,6 +219,65 @@ export async function replyInterview(
     profileCompleteness: getNum(raw, "profileCompleteness", "profile_completeness"),
     extractedFields: (asObject(raw.extractedFields ?? raw.extracted_fields) as Record<string, boolean>) || {},
   };
+}
+
+export async function transcribeInterviewAudio(params: {
+  sessionId: string;
+  audioBlob: Blob;
+  languageCode?: string;
+}): Promise<InterviewTranscribeResponse> {
+  const mimeType = params.audioBlob.type || "audio/webm";
+  const audioBase64 = await blobToBase64(params.audioBlob);
+
+  const raw = await apiFetch<Dict>("/interview/transcribe", {
+    method: "POST",
+    body: JSON.stringify({
+      sessionId: params.sessionId,
+      audioBase64,
+      mimeType,
+      languageCode: params.languageCode || undefined,
+    }),
+  });
+
+  return {
+    sessionId: getStr(raw, "sessionId", "session_id") || params.sessionId,
+    transcriptText: getStr(raw, "transcriptText", "transcript_text"),
+  };
+}
+
+export async function synthesizeInterviewAudio(params: {
+  sessionId: string;
+  text: string;
+  voiceId?: string;
+}): Promise<Blob> {
+  const response = await fetch(`${API_BASE}/interview/tts`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      sessionId: params.sessionId,
+      text: params.text,
+      voiceId: params.voiceId || undefined,
+    }),
+  });
+
+  if (!response.ok) {
+    let detail = `Request failed: ${response.status}`;
+    try {
+      const payload = (await response.json()) as Dict;
+      const serverDetail = payload.detail;
+      if (typeof serverDetail === "string" && serverDetail.trim()) {
+        detail = serverDetail;
+      }
+    } catch {
+      const rawText = await response.text();
+      if (rawText.trim()) {
+        detail = rawText;
+      }
+    }
+    throw new Error(detail);
+  }
+
+  return response.blob();
 }
 
 export async function getInterviewStatus(sessionId: string): Promise<InterviewStatusResponse> {

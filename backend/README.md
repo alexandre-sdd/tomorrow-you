@@ -14,6 +14,8 @@ Backend service for onboarding, profile extraction, future-self generation, and 
 - `POST /interview/start`
 - `POST /interview/reply`
 - `POST /interview/reply-stream`
+- `POST /interview/transcribe` (voice input STT)
+- `POST /interview/tts` (assistant reply TTS)
 - `GET /interview/status`
 - `POST /interview/complete`
 
