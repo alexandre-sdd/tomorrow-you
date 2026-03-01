@@ -21,6 +21,9 @@ If backend runs on another host/port:
 
 - Landing: choose `sessionId` and start interview (`POST /interview/start`)
 - Interview chat (`POST /interview/reply`) with status refresh (`GET /interview/status`)
+- Voice interview turns (push-to-talk):
+  - `POST /interview/transcribe` for STT
+  - `POST /interview/tts` for assistant voice playback
 - Complete onboarding (`POST /interview/complete`)
 - Auto-start exploration (`POST /pipeline/start-exploration`)
 - Future self selection and conversation (`POST /conversation/reply`)

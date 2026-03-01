@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import {
   branchConversation,
@@ -11,6 +11,8 @@ import {
   replyInterview,
   startExploration,
   startInterview,
+  synthesizeInterviewAudio,
+  transcribeInterviewAudio,
   type ConversationHistoryMessage,
   type PipelineStatusResponse,
 } from "@/lib/api";
@@ -64,12 +66,26 @@ export default function HomePage() {
   const [isSendingInterview, setIsSendingInterview] = useState(false);
   const [isRefreshingStatus, setIsRefreshingStatus] = useState(false);
   const [isCompletingOnboarding, setIsCompletingOnboarding] = useState(false);
+  const [isRecordingInterview, setIsRecordingInterview] = useState(false);
+  const [isTranscribingInterview, setIsTranscribingInterview] = useState(false);
+  const [isSynthesizingInterview, setIsSynthesizingInterview] = useState(false);
+  const [isPlayingInterviewAudio, setIsPlayingInterviewAudio] = useState(false);
+  const [lastReplyAudioBlob, setLastReplyAudioBlob] = useState<Blob | null>(null);
+  const [lastAssistantReplyText, setLastAssistantReplyText] = useState("");
   const [isSendingConversation, setIsSendingConversation] = useState(false);
   const [isBranching, setIsBranching] = useState(false);
 
   const [pipelineStatus, setPipelineStatus] = useState<PipelineStatusResponse | null>(null);
   const [error, setError] = useState("");
   const [info, setInfo] = useState("");
+
+  const interviewRecorderRef = useRef<MediaRecorder | null>(null);
+  const interviewStreamRef = useRef<MediaStream | null>(null);
+  const interviewChunksRef = useRef<Blob[]>([]);
+  const interviewAudioRef = useRef<HTMLAudioElement | null>(null);
+  const interviewAudioUrlRef = useRef<string | null>(null);
+  const interviewPressActiveRef = useRef(false);
+  const interviewRecorderStartingRef = useRef(false);
 
   const activeSelf = useMemo(() => {
     if (!activeSelfId) {
@@ -83,10 +99,89 @@ export default function HomePage() {
     setError(message || fallback);
   };
 
+  const stopInterviewPlayback = () => {
+    if (interviewAudioRef.current) {
+      interviewAudioRef.current.pause();
+      interviewAudioRef.current.currentTime = 0;
+      interviewAudioRef.current = null;
+    }
+    if (interviewAudioUrlRef.current) {
+      URL.revokeObjectURL(interviewAudioUrlRef.current);
+      interviewAudioUrlRef.current = null;
+    }
+    setIsPlayingInterviewAudio(false);
+  };
+
+  const releaseInterviewMic = () => {
+    interviewPressActiveRef.current = false;
+    interviewRecorderStartingRef.current = false;
+    if (interviewStreamRef.current) {
+      for (const track of interviewStreamRef.current.getTracks()) {
+        track.stop();
+      }
+      interviewStreamRef.current = null;
+    }
+    interviewRecorderRef.current = null;
+    interviewChunksRef.current = [];
+    setIsRecordingInterview(false);
+  };
+
+  const playInterviewAudioBlob = async (blob: Blob) => {
+    stopInterviewPlayback();
+
+    const url = URL.createObjectURL(blob);
+    const audio = new Audio(url);
+    interviewAudioRef.current = audio;
+    interviewAudioUrlRef.current = url;
+
+    audio.onended = () => {
+      setIsPlayingInterviewAudio(false);
+    };
+    audio.onerror = () => {
+      setIsPlayingInterviewAudio(false);
+    };
+
+    await audio.play();
+    setIsPlayingInterviewAudio(true);
+  };
+
+  const synthesizeAndPlayInterviewReply = async (replyText: string) => {
+    if (!sessionId || !replyText.trim()) {
+      return;
+    }
+
+    setLastAssistantReplyText(replyText);
+    setIsSynthesizingInterview(true);
+    try {
+      const audioBlob = await synthesizeInterviewAudio({
+        sessionId,
+        text: replyText,
+      });
+      setLastReplyAudioBlob(audioBlob);
+      await playInterviewAudioBlob(audioBlob);
+    } catch (err) {
+      withError("Reply generated but voice playback failed", err);
+    } finally {
+      setIsSynthesizingInterview(false);
+    }
+  };
+
+  useEffect(() => {
+    return () => {
+      stopInterviewPlayback();
+      releaseInterviewMic();
+    };
+  }, []);
+
   const handleStart = async (params: { sessionId: string; userName: string }) => {
     setError("");
     setInfo("");
     setIsStarting(true);
+    interviewPressActiveRef.current = false;
+    stopInterviewPlayback();
+    releaseInterviewMic();
+    setLastReplyAudioBlob(null);
+    setLastAssistantReplyText("");
 
     try {
       const started = await startInterview(params.sessionId, params.userName);
@@ -125,7 +220,10 @@ export default function HomePage() {
     }
   };
 
-  const handleInterviewSend = async (text: string) => {
+  const handleInterviewSend = async (
+    text: string,
+    options: { speakReply?: boolean } = {},
+  ) => {
     if (!sessionId) {
       return;
     }
@@ -135,9 +233,12 @@ export default function HomePage() {
     setIsSendingInterview(true);
     setInterviewMessages((prev) => [...prev, createMessage("user", text)]);
 
+    let assistantMessage = "";
     try {
       const reply = await replyInterview(sessionId, text);
       setInterviewMessages((prev) => [...prev, createMessage("assistant", reply.agentMessage)]);
+      assistantMessage = reply.agentMessage;
+      setLastAssistantReplyText(reply.agentMessage);
       setProfileCompleteness(reply.profileCompleteness);
 
       const status = await getInterviewStatus(sessionId);
@@ -146,6 +247,145 @@ export default function HomePage() {
       withError("Interview reply failed", err);
     } finally {
       setIsSendingInterview(false);
+    }
+
+    if (assistantMessage && options.speakReply !== false) {
+      await synthesizeAndPlayInterviewReply(assistantMessage);
+    }
+  };
+
+  const handleStopInterviewRecording = async () => {
+    interviewPressActiveRef.current = false;
+    const activeRecorder = interviewRecorderRef.current;
+    if (activeRecorder && activeRecorder.state !== "inactive") {
+      activeRecorder.stop();
+    }
+  };
+
+  const handleStartInterviewRecording = async () => {
+    interviewPressActiveRef.current = true;
+    if (
+      !sessionId
+      || isRecordingInterview
+      || interviewRecorderStartingRef.current
+      || isTranscribingInterview
+      || isSynthesizingInterview
+      || isSendingInterview
+      || isCompletingOnboarding
+    ) {
+      if (!isRecordingInterview) {
+        interviewPressActiveRef.current = false;
+      }
+      return;
+    }
+
+    setError("");
+    setInfo("");
+
+    if (typeof window === "undefined" || !navigator?.mediaDevices?.getUserMedia) {
+      interviewPressActiveRef.current = false;
+      setError("Microphone is not available in this browser.");
+      return;
+    }
+
+    interviewRecorderStartingRef.current = true;
+    try {
+      stopInterviewPlayback();
+
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      interviewStreamRef.current = stream;
+
+      const mimeTypeCandidates = [
+        "audio/webm;codecs=opus",
+        "audio/webm",
+        "audio/mp4",
+      ];
+      const pickedMimeType = mimeTypeCandidates.find((candidate) =>
+        typeof MediaRecorder !== "undefined" && MediaRecorder.isTypeSupported(candidate),
+      );
+
+      const recorder = pickedMimeType
+        ? new MediaRecorder(stream, { mimeType: pickedMimeType })
+        : new MediaRecorder(stream);
+
+      interviewRecorderRef.current = recorder;
+      interviewChunksRef.current = [];
+
+      recorder.ondataavailable = (event: BlobEvent) => {
+        if (event.data && event.data.size > 0) {
+          interviewChunksRef.current.push(event.data);
+        }
+      };
+
+      recorder.onstop = async () => {
+        const chunks = interviewChunksRef.current;
+        interviewChunksRef.current = [];
+        setIsRecordingInterview(false);
+
+        const blob = new Blob(chunks, { type: recorder.mimeType || "audio/webm" });
+        releaseInterviewMic();
+
+        if (blob.size === 0) {
+          setError("No audio captured. Please try again.");
+          return;
+        }
+
+        setIsTranscribingInterview(true);
+        try {
+          const transcription = await transcribeInterviewAudio({
+            sessionId,
+            audioBlob: blob,
+          });
+          const transcript = transcription.transcriptText.trim();
+          if (!transcript) {
+            setError("Couldn't transcribe that turn. Please try again.");
+            return;
+          }
+
+          await handleInterviewSend(transcript, { speakReply: true });
+        } catch (err) {
+          withError("Voice transcription failed", err);
+        } finally {
+          setIsTranscribingInterview(false);
+        }
+      };
+
+      recorder.onerror = () => {
+        releaseInterviewMic();
+        setError("Recording failed. Please try again.");
+      };
+
+      recorder.start();
+      setIsRecordingInterview(true);
+      setInfo("Recording... release mic to send.");
+      if (!interviewPressActiveRef.current && recorder.state !== "inactive") {
+        recorder.stop();
+      }
+    } catch (err) {
+      releaseInterviewMic();
+      withError(
+        "Microphone permission is required for voice interview turns.",
+        err,
+      );
+    } finally {
+      interviewRecorderStartingRef.current = false;
+    }
+  };
+
+  const handleReplayInterviewAudio = async () => {
+    if (!lastReplyAudioBlob && !lastAssistantReplyText.trim()) {
+      return;
+    }
+
+    setError("");
+    try {
+      if (lastReplyAudioBlob) {
+        await playInterviewAudioBlob(lastReplyAudioBlob);
+        return;
+      }
+      await synthesizeAndPlayInterviewReply(lastAssistantReplyText);
+    } catch (err) {
+      withError("Could not play the latest reply audio", err);
     }
   };
 
@@ -310,10 +550,18 @@ export default function HomePage() {
           isReadyForGeneration={isReadyForGeneration}
           isSending={isSendingInterview}
           isCompleting={isCompletingOnboarding}
+          isRecording={isRecordingInterview}
+          isTranscribing={isTranscribingInterview}
+          isSynthesizing={isSynthesizingInterview}
+          isPlaying={isPlayingInterviewAudio}
+          canReplayLastAudio={Boolean(lastReplyAudioBlob || lastAssistantReplyText.trim())}
           messages={interviewMessages}
           onSend={handleInterviewSend}
           onRefreshStatus={refreshInterviewStatus}
           onComplete={handleComplete}
+          onStartRecording={handleStartInterviewRecording}
+          onStopRecording={handleStopInterviewRecording}
+          onReplayLastAudio={handleReplayInterviewAudio}
         />
       ) : null}
 

@@ -8,27 +8,36 @@ Flow:
 1. POST /interview/start -> Initialize interview session
 2. POST /interview/reply -> User message -> Interview agent response + Extract profile
 3. POST /interview/reply-stream -> User message -> Stream agent response + Extract in parallel
-4. GET /interview/status -> Check profile completeness
-5. POST /interview/complete -> Generate CurrentSelf + return ready for future-self gen
+4. POST /interview/transcribe -> Transcribe recorded voice turn (ElevenLabs STT)
+5. POST /interview/tts -> Synthesize interview reply audio (ElevenLabs TTS)
+6. GET /interview/status -> Check profile completeness
+7. POST /interview/complete -> Generate CurrentSelf + return ready for future-self gen
 """
 
 from __future__ import annotations
 
 import asyncio
+import base64
+import binascii
 import json
 import time
 from pathlib import Path
-from typing import Any, AsyncGenerator
+from typing import Any, AsyncGenerator, Iterator
 
 from fastapi import APIRouter, HTTPException, status
 from fastapi.responses import StreamingResponse
 from mistralai import Mistral
 
+from backend.config.runtime import get_runtime_config
 from backend.config.settings import get_settings
 from backend.engines.avatar_generator import AvatarGenerator
 from backend.engines.current_self_auto_generator import (
     CurrentSelfAutoGeneratorEngine,
     CurrentSelfGenerationContext,
+)
+from backend.engines.elevenlabs_voice import (
+    ElevenLabsInterviewVoiceService,
+    ElevenLabsVoiceError,
 )
 from backend.engines.profile_extractor import (
     ExtractionContext,
@@ -40,6 +49,9 @@ from backend.models.schemas import (
     InterviewReplyRequest,
     InterviewReplyResponse,
     InterviewStartRequest,
+    InterviewTranscribeRequest,
+    InterviewTranscribeResponse,
+    InterviewTtsRequest,
     InterviewStatusResponse,
     SelfCard,
     UserProfile,
@@ -258,6 +270,50 @@ def _apply_handoff_blocker(
     if profile_completeness < 0.5 and _is_handoff_style_message(agent_message):
         return _build_deepening_followup(profile)
     return agent_message
+
+
+def _require_voice_enabled() -> None:
+    if not get_runtime_config().interview_voice.enabled:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Interview voice is disabled in runtime config.",
+        )
+
+
+def _validate_audio_mime(mime_type: str) -> str:
+    normalized = (mime_type or "").strip().lower()
+    if not normalized.startswith("audio/"):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="mimeType must be an audio/* content type.",
+        )
+    return normalized
+
+
+def _decode_audio_base64(audio_base64: str) -> bytes:
+    payload = (audio_base64 or "").strip()
+    if not payload:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="audioBase64 is required.",
+        )
+
+    if payload.startswith("data:"):
+        try:
+            payload = payload.split(",", 1)[1]
+        except IndexError as exc:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Malformed data URL for audioBase64.",
+            ) from exc
+
+    try:
+        return base64.b64decode(payload, validate=True)
+    except (binascii.Error, ValueError) as exc:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid base64 payload in audioBase64.",
+        ) from exc
 
 
 async def _generate_interview_reply(
@@ -645,6 +701,93 @@ async def interview_reply_stream(request: InterviewReplyRequest) -> StreamingRes
             "X-Accel-Buffering": "no",
             "Connection": "keep-alive",
         },
+    )
+
+
+@router.post("/transcribe", response_model=InterviewTranscribeResponse)
+async def interview_transcribe(request: InterviewTranscribeRequest) -> InterviewTranscribeResponse:
+    """
+    Transcribe one recorded interview audio turn using ElevenLabs STT.
+
+    Expects base64 audio from the frontend (raw base64 or data URL).
+    """
+    _require_voice_enabled()
+    runtime_voice = get_runtime_config().interview_voice
+
+    mime_type = _validate_audio_mime(request.mime_type)
+    audio_bytes = _decode_audio_base64(request.audio_base64)
+
+    if len(audio_bytes) > runtime_voice.stt_max_audio_bytes:
+        raise HTTPException(
+            status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+            detail=(
+                f"Audio payload too large ({len(audio_bytes)} bytes). "
+                f"Limit is {runtime_voice.stt_max_audio_bytes} bytes."
+            ),
+        )
+
+    voice_service = ElevenLabsInterviewVoiceService()
+    try:
+        transcript = await asyncio.to_thread(
+            voice_service.transcribe_bytes,
+            audio_bytes,
+            mime_type,
+            request.language_code,
+        )
+    except ElevenLabsVoiceError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail=str(exc),
+        ) from exc
+
+    return InterviewTranscribeResponse(
+        session_id=request.session_id,
+        transcript_text=transcript,
+    )
+
+
+@router.post("/tts")
+async def interview_tts(request: InterviewTtsRequest) -> StreamingResponse:
+    """
+    Synthesize one interview agent reply to speech and stream MP3 audio bytes.
+    """
+    _require_voice_enabled()
+
+    text = request.text.strip()
+    if not text:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="text must not be empty.",
+        )
+
+    voice_service = ElevenLabsInterviewVoiceService()
+    chunk_stream = voice_service.synthesize_stream(text=text, voice_id=request.voice_id)
+
+    try:
+        first_chunk = next(chunk_stream)
+    except StopIteration:
+        first_chunk = b""
+    except ElevenLabsVoiceError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail=str(exc),
+        ) from exc
+
+    def _audio_stream() -> Iterator[bytes]:
+        if first_chunk:
+            yield first_chunk
+        try:
+            for chunk in chunk_stream:
+                if chunk:
+                    yield chunk
+        except ElevenLabsVoiceError:
+            # Stream is best effort once started; terminate silently on upstream failures.
+            return
+
+    return StreamingResponse(
+        _audio_stream(),
+        media_type=voice_service.tts_media_type(),
+        headers={"Cache-Control": "no-store"},
     )
 
 

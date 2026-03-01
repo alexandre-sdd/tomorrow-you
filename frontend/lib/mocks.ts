@@ -52,6 +52,11 @@ export const mockCurrentSelf: SelfCard = {
     "Success only means something if it fits the life I actually want to live with the person I chose.",
   tradeOff:
     "By trying to preserve balance and optionality, I risk staying in uncertainty for too long and avoiding a decisive move.",
+  keyMoments: [
+    "Built strong early-career momentum in New York fintech.",
+    "Marriage became central to how success is evaluated.",
+    "Promotion decision forced a values-vs-ambition confrontation.",
+  ],
   avatarPrompt:
     "A realistic 28-year-old professional man living in New York, thoughtful expression, modern understated business-casual clothing, subtle signs of internal tension, polished urban aesthetic, cinematic portrait, emotionally grounded, premium product style",
   avatarUrl: null,
@@ -80,6 +85,11 @@ export const mockSingaporeSelf: SelfCard = {
     "You do not become who you could be by staying where everything already fits.",
   tradeOff:
     "I gained speed, status, and reinvention, but I gave up familiarity, relational ease, and some short-term emotional safety.",
+  keyMoments: [
+    "Accepted the Singapore promotion and relocated internationally.",
+    "Entered faster leadership track with higher visibility.",
+    "Adapted to emotional distance and a more demanding rhythm.",
+  ],
   avatarPrompt:
     "A realistic 33-year-old professional man living in Singapore after an international promotion, sharper presence, elegant tailored clothing, warm city lights in the background, confident but slightly more distant expression, global executive energy, premium cinematic portrait, sophisticated and emotionally restrained",
   avatarUrl: null,
@@ -110,6 +120,11 @@ export const mockStayInNYCSelf: SelfCard = {
   coreBelief: "Not every meaningful life is built through dramatic moves.",
   tradeOff:
     "I kept closeness, continuity, and a stronger sense of home, but I may always wonder how much further I could have gone.",
+  keyMoments: [
+    "Chose to stay in New York to protect relational stability.",
+    "Built depth through continuity in career and home life.",
+    "Occasional doubt remains about unrealized international upside.",
+  ],
   avatarPrompt:
     "A realistic 33-year-old professional man still living in New York, grounded and emotionally present, refined but relaxed style, warm apartment or city evening lighting, stable and thoughtful expression, premium cinematic portrait, intimate and human",
   avatarUrl: null,
