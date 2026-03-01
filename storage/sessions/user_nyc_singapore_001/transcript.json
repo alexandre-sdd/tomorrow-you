@@ -28,7 +28,7 @@
   },
   {
     "id": "b8a47e073b",
-    "turn": 3,
+    "turn": 4,
     "phase": "selection",
     "role": "system",
     "selfName": null,
@@ -37,7 +37,7 @@
   },
   {
     "id": "76e7b8c36d",
-    "turn": 3,
+    "turn": 5,
     "phase": "selection",
     "role": "system",
     "selfName": null,

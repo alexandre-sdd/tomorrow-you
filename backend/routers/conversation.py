@@ -12,6 +12,7 @@ from backend.engines import (
     MistralChatConfig,
     PromptComposer,
     PromptComposerConfig,
+    append_conversation_turn,
 )
 from backend.engines.context_resolver import ContextResolutionError
 from backend.models.schemas import (
@@ -33,7 +34,8 @@ async def conversation_reply(
 
     Client owns conversation history — send the full history on every call.
     Returns the updated history (original + new user + new assistant turns).
-    Stateless: no conversation state is stored server-side.
+    Request handling stays stateless for turn assembly, while transcript
+    persistence is written as a best-effort side effect.
     """
     # 1. Resolve branch_name from self_id
     resolver = ContextResolver(storage_root=settings.storage_path)
@@ -70,6 +72,21 @@ async def conversation_reply(
         raise HTTPException(status_code=502, detail=f"LLM error: {exc}") from exc
 
     # 6. Return updated history — client replaces its stored copy with this
+    self_name = context.self_card.get("name")
+    try:
+        append_conversation_turn(
+            session_id=request.session_id,
+            storage_root=settings.storage_path,
+            branch_name=branch_name,
+            self_id=request.self_id,
+            self_name=self_name if isinstance(self_name, str) else None,
+            user_text=request.message,
+            assistant_text=reply_text,
+        )
+    except Exception:
+        # Best-effort persistence; do not fail the request if storage write fails.
+        pass
+
     updated_history = [
         *request.history,
         ConversationMessage(role="user", content=request.message),

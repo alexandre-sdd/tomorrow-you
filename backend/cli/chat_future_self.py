@@ -14,6 +14,8 @@ if __package__ in {None, ""}:
 from backend.config.runtime import get_runtime_config
 from backend.config.settings import get_settings
 from backend.engines import (
+    analyze_and_persist_transcript_insights,
+    append_conversation_turn,
     BranchConversationSession,
     ContextResolver,
     MistralChatClient,
@@ -141,9 +143,21 @@ def run(args: argparse.Namespace) -> int:
         try:
             user_text = input("You > ").strip()
         except EOFError:
+            _analyze_branch_insights_on_exit(
+                session_id=args.session_id,
+                storage_root=args.storage_root,
+                session=session,
+                api_key=client.api_key,
+            )
             print("\nExiting.")
             return 0
         except KeyboardInterrupt:
+            _analyze_branch_insights_on_exit(
+                session_id=args.session_id,
+                storage_root=args.storage_root,
+                session=session,
+                api_key=client.api_key,
+            )
             print("\nExiting.")
             return 0
 
@@ -151,6 +165,12 @@ def run(args: argparse.Namespace) -> int:
             continue
 
         if user_text in {"/exit", "/quit"}:
+            _analyze_branch_insights_on_exit(
+                session_id=args.session_id,
+                storage_root=args.storage_root,
+                session=session,
+                api_key=client.api_key,
+            )
             print("Exiting.")
             return 0
 
@@ -172,7 +192,13 @@ def run(args: argparse.Namespace) -> int:
                 print("No previous user prompt available to reprompt.\n")
                 continue
             print(f"Reprompting same message: {last_user_message}")
-            if not _execute_turn(session, last_user_message, no_stream=args.no_stream):
+            if not _execute_turn(
+                session,
+                last_user_message,
+                no_stream=args.no_stream,
+                session_id=args.session_id,
+                storage_root=args.storage_root,
+            ):
                 continue
             print()
             continue
@@ -208,26 +234,50 @@ def run(args: argparse.Namespace) -> int:
             continue
 
         last_user_message = user_text
-        if not _execute_turn(session, user_text, no_stream=args.no_stream):
+        if not _execute_turn(
+            session,
+            user_text,
+            no_stream=args.no_stream,
+            session_id=args.session_id,
+            storage_root=args.storage_root,
+        ):
             continue
         print()
 
 
-def _execute_turn(session: BranchConversationSession, user_text: str, no_stream: bool) -> bool:
+def _execute_turn(
+    session: BranchConversationSession,
+    user_text: str,
+    no_stream: bool,
+    *,
+    session_id: str,
+    storage_root: str,
+) -> bool:
     try:
+        assistant_text = ""
         if no_stream:
-            reply = session.reply(user_text)
-            print(f"Future Self > {reply}")
-            return True
+            assistant_text = session.reply(user_text)
+            print(f"Future Self > {assistant_text}")
+        else:
+            print("Future Self > ", end="", flush=True)
+            chunks: list[str] = []
+            had_output = False
+            for chunk in session.stream_reply(user_text):
+                had_output = True
+                chunks.append(chunk)
+                print(chunk, end="", flush=True)
+            if not had_output:
+                print("[no output]", end="", flush=True)
+            print()
+            assistant_text = "".join(chunks).strip()
 
-        print("Future Self > ", end="", flush=True)
-        had_output = False
-        for chunk in session.stream_reply(user_text):
-            had_output = True
-            print(chunk, end="", flush=True)
-        if not had_output:
-            print("[no output]", end="", flush=True)
-        print()
+        _append_turn_to_transcript(
+            session_id=session_id,
+            storage_root=storage_root,
+            session=session,
+            user_text=user_text,
+            assistant_text=assistant_text,
+        )
         return True
     except KeyboardInterrupt:
         print("\nInterrupted current turn.")
@@ -305,7 +355,13 @@ def _branch_and_choose(
             print("No previous prompt available to reprompt on new branch.")
         else:
             print(f"Reprompting on new branch: {reprompt_text}")
-            _execute_turn(new_session, reprompt_text, no_stream=no_stream)
+            _execute_turn(
+                new_session,
+                reprompt_text,
+                no_stream=no_stream,
+                session_id=session_id,
+                storage_root=str(resolver.storage_root),
+            )
 
     return new_session
 
@@ -367,7 +423,9 @@ def _choose_starting_persona(
     resolver: ContextResolver,
 ) -> SelfCard | None:
     """
-    Prompt the user to pick an existing future-self persona when no --self-id/--branch is supplied.
+    Show current self summary, generate fresh root futures, then prompt selection.
+
+    If generation fails, falls back to existing selectable futures in session.
     """
     session_file = Path(storage_root) / session_id / "session.json"
     if not session_file.exists():
@@ -380,6 +438,55 @@ def _choose_starting_persona(
         print(f"[setup error] Failed to read session data: {exc}")
         return None
 
+    _print_current_self_summary(session_data)
+
+    print(f"Generating {_future_runtime.default_count} future selves from current self...")
+    generated = _generate_root_futures(session_id=session_id)
+    if generated:
+        candidates = generated
+    else:
+        print("[generation warning] Could not generate fresh futures. Falling back to existing options.")
+        candidates = _collect_existing_selectable_futures(
+            session_id=session_id,
+            session_data=session_data,
+            resolver=resolver,
+        )
+
+    if not candidates:
+        print("No selectable future-self personas found in session.")
+        print("Generation failed and no existing personas are available.")
+        return None
+
+    print("Choose a future self to start the conversation:")
+    _print_persona_options(candidates)
+    selected = _prompt_select_option(candidates)
+    if selected is None:
+        print("No persona selected.")
+    return selected
+
+
+def _generate_root_futures(*, session_id: str) -> list[SelfCard]:
+    try:
+        settings = get_settings()
+        request = GenerateFutureSelvesRequest(
+            session_id=session_id,
+            count=_future_runtime.default_count,
+            parent_self_id=None,
+            time_horizon=None,
+        )
+        response = asyncio.run(generate_future_selves(request, settings))
+    except Exception as exc:
+        print(f"[generation error] {exc}")
+        return []
+    return list(response.future_self_options)
+
+
+def _collect_existing_selectable_futures(
+    *,
+    session_id: str,
+    session_data: dict,
+    resolver: ContextResolver,
+) -> list[SelfCard]:
     candidates: list[SelfCard] = []
     seen_ids: set[str] = set()
 
@@ -408,23 +515,37 @@ def _choose_starting_persona(
     if isinstance(full, dict):
         for raw in full.values():
             _try_add(raw)
+    return candidates
 
-    if not candidates:
-        print("No selectable future-self personas found in session.")
-        print("Generate futures first, then start chat with --self-id or rerun this command.")
-        return None
 
-    print("Available personas:")
+def _print_persona_options(candidates: list[SelfCard]) -> None:
     for idx, card in enumerate(candidates, start=1):
         print(f"{idx}. {card.name}")
         print(f"   id: {card.id}")
         print(f"   depth: {card.depth_level}")
         print(f"   goal: {card.optimization_goal}")
 
-    selected = _prompt_select_option(candidates)
-    if selected is None:
-        print("No persona selected.")
-    return selected
+
+def _print_current_self_summary(session_data: dict) -> None:
+    raw = session_data.get("currentSelf")
+    if not isinstance(raw, dict):
+        print("Current self summary unavailable (missing currentSelf).")
+        print()
+        return
+
+    try:
+        current = SelfCard.model_validate(raw)
+    except Exception:
+        print("Current self summary unavailable (invalid currentSelf format).")
+        print()
+        return
+
+    print("Current self summary:")
+    print(f"  name: {current.name}")
+    print(f"  goal: {current.optimization_goal}")
+    print(f"  worldview: {current.worldview}")
+    print(f"  trade-off: {current.trade_off}")
+    print()
 
 
 def _print_banner(session: BranchConversationSession) -> None:
@@ -470,6 +591,53 @@ def _print_context(session: BranchConversationSession) -> None:
     print(f"  memory notes: {info['memory_notes']}")
     print(f"  history messages: {info['history_messages']}")
     print()
+
+
+def _append_turn_to_transcript(
+    *,
+    session_id: str,
+    storage_root: str,
+    session: BranchConversationSession,
+    user_text: str,
+    assistant_text: str,
+) -> None:
+    self_card = session.context.self_card
+    self_id = self_card.get("id")
+    self_name = self_card.get("name")
+    append_conversation_turn(
+        session_id=session_id,
+        storage_root=storage_root,
+        branch_name=session.context.branch_name,
+        self_id=self_id if isinstance(self_id, str) else None,
+        self_name=self_name if isinstance(self_name, str) else None,
+        user_text=user_text,
+        assistant_text=assistant_text,
+    )
+
+
+def _analyze_branch_insights_on_exit(
+    *,
+    session_id: str,
+    storage_root: str,
+    session: BranchConversationSession,
+    api_key: str,
+) -> None:
+    self_card = session.context.self_card
+    self_id = self_card.get("id")
+    self_name = self_card.get("name")
+    try:
+        added = analyze_and_persist_transcript_insights(
+            session_id=session_id,
+            storage_root=storage_root,
+            branch_name=session.context.branch_name,
+            self_id=self_id if isinstance(self_id, str) else None,
+            self_name=self_name if isinstance(self_name, str) else None,
+            api_key=api_key,
+        )
+        if added:
+            print(f"[memory] transcript analyzed: added {len(added)} key element(s).")
+    except Exception as exc:
+        print(f"[memory warning] transcript analysis failed: {exc}")
 
 
 def main() -> int:

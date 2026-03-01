@@ -14,6 +14,9 @@ This project now splits configuration into:
 - profile summary limits (`context_resolver`)
 - future generation defaults (`future_generation`)
 - ancestor context limits (`future_generation_context`)
+- conversation persistence defaults (`conversation_memory`)
+- transcript analysis defaults (`memory_extraction`)
+- transcript/context role inclusion (`memory_extraction.input_roles`, `future_generation_context.include_roles`)
 - CLI defaults (`cli`)
 - app/server/storage defaults used by `Settings` (`app`, `server`, `storage`)
 
@@ -25,7 +28,7 @@ Load path:
 ## Settings (`settings.py`)
 
 `Settings` still loads secrets from environment variables (`.env`), while taking
-non-secret defaults from `runtime.json`.
+non-secret defaults from `runtime.yaml`.
 
 Required secrets:
 

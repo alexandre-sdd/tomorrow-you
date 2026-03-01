@@ -1,0 +1,899 @@
+{
+  "id": "user_nyc_singapore_001",
+  "status": "selection",
+  "transcript": [],
+  "userProfile": {
+    "id": "user_nyc_singapore_002",
+    "coreValues": [
+      "family stability",
+      "career growth",
+      "financial security",
+      "building a strong life with my wife"
+    ],
+    "fears": [
+      "regretting a missed career opportunity",
+      "damaging the balance of my marriage",
+      "feeling isolated far from home",
+      "choosing comfort over long-term growth"
+    ],
+    "hiddenTensions": [
+      "I want rapid career progression, but I also want emotional closeness and routine",
+      "I see myself as ambitious, but I do not want success to come at the expense of family life",
+      "I am drawn to the idea of reinvention abroad, but I am afraid of losing my support system"
+    ],
+    "decisionStyle": "Analytical and forward-looking, but much slower and more conflicted when a decision affects family life.",
+    "selfNarrative": "I am a high-performing young professional who has built strong momentum in New York, but I increasingly judge success by the quality of the life I build with my wife, not just by title or salary.",
+    "currentDilemma": "Should I accept a promotion that moves me from New York to Singapore, knowing it could accelerate my career but significantly reshape my marriage, my routines, and the life we have started building together?"
+  },
+  "currentSelf": {
+    "id": "self_current_001",
+    "type": "current",
+    "name": "Current Self",
+    "optimizationGoal": "Balance career growth, financial upside, marital stability, and long-term life coherence.",
+    "toneOfVoice": "Measured, reflective, articulate, slightly tense, careful with conclusions.",
+    "worldview": "The best decisions are the ones that create momentum without damaging the parts of life that matter most.",
+    "coreBelief": "Success only means something if it fits the life I actually want to live with the person I chose.",
+    "tradeOff": "By trying to preserve balance and optionality, I risk staying in uncertainty for too long and avoiding a decisive move.",
+    "avatarPrompt": "A realistic 28-year-old professional man living in New York, thoughtful expression, modern understated business-casual clothing, subtle signs of internal tension, polished urban aesthetic, cinematic portrait, emotionally grounded, premium product style",
+    "avatarUrl": null,
+    "visualStyle": {
+      "primaryColor": "#1F3A5F",
+      "accentColor": "#D6E4F0",
+      "mood": "calm",
+      "glowIntensity": 0.34
+    },
+    "voiceId": "voice_current_placeholder",
+    "parentSelfId": null,
+    "depthLevel": 0,
+    "childrenIds": [
+      "self_future_singapore_001",
+      "self_future_nyc_001"
+    ]
+  },
+  "futureSelfOptions": [
+    {
+      "id": "aaa3257e01",
+      "type": "future",
+      "name": "Self Who Prioritized Creative Freedom",
+      "optimizationGoal": "Maximize creative expression, personal freedom, and unconventional life experiences.",
+      "toneOfVoice": "Expressive, passionate, unconventional, emotionally vibrant.",
+      "worldview": "Life is too short to follow a script; true fulfillment comes from creating your own path.",
+      "coreBelief": "I believe that the richness of life comes from the experiences we create and the freedom we allow ourselves to explore.",
+      "tradeOff": "I gained creative fulfillment and personal freedom, but I sacrificed financial security and the stability of a traditional career path.",
+      "avatarPrompt": "A realistic 35-year-old artist in a vibrant studio, surrounded by paintings and sculptures, wearing a paint-splattered smock, with a passionate and intense expression. The studio is filled with natural light, and the background shows a bustling cityscape. The photographic style is cinematic and slightly abstract, capturing the essence of creative energy.",
+      "avatarUrl": null,
+      "visualStyle": {
+        "primaryColor": "#8A2BE2",
+        "accentColor": "#E6E6FA",
+        "mood": "ethereal",
+        "glowIntensity": 0.75
+      },
+      "voiceId": "voice_ethereal_001",
+      "parentSelfId": null,
+      "depthLevel": 1,
+      "childrenIds": []
+    },
+    {
+      "id": "a5cd0f6849",
+      "type": "future",
+      "name": "Self Who Built a Quiet Legacy",
+      "optimizationGoal": "Focus on building a quiet, meaningful life centered around family, community, and slow, steady growth.",
+      "toneOfVoice": "Gentle, steady, warm, reflective.",
+      "worldview": "True success is measured by the depth of relationships and the impact you have on those around you.",
+      "coreBelief": "I believe that a life well-lived is one that prioritizes the people you love and the community you build.",
+      "tradeOff": "I gained deep relationships and a sense of belonging, but I sacrificed rapid career advancement and the excitement of a fast-paced life.",
+      "avatarPrompt": "A realistic 35-year-old man in a cozy, small-town setting, wearing casual but neat clothing, with a warm and content expression. The background shows a quiet street with a few houses and trees, and the photographic style is documentary-like, capturing the essence of a peaceful, grounded life.",
+      "avatarUrl": null,
+      "visualStyle": {
+        "primaryColor": "#556B2F",
+        "accentColor": "#F5F5DC",
+        "mood": "grounded",
+        "glowIntensity": 0.35
+      },
+      "voiceId": "voice_grounded_001",
+      "parentSelfId": null,
+      "depthLevel": 1,
+      "childrenIds": []
+    }
+  ],
+  "selectedFutureSelf": null,
+  "memoryHead": "node_root_profile",
+  "memoryBranches": [
+    {
+      "name": "root",
+      "headNodeId": "node_root_profile",
+      "parentBranchName": null
+    },
+    {
+      "name": "727676ff10",
+      "headNodeId": "fea0ddb4f0",
+      "parentBranchName": "root"
+    },
+    {
+      "name": "707c90da0f",
+      "headNodeId": "c0ffe4fbfb",
+      "parentBranchName": "root"
+    },
+    {
+      "name": "d4a52e5da1",
+      "headNodeId": "56e1ab677b",
+      "parentBranchName": "root"
+    },
+    {
+      "name": "b6cc9ea047",
+      "headNodeId": "3e0171813e",
+      "parentBranchName": "root"
+    },
+    {
+      "name": "f04d939165",
+      "headNodeId": "d36980b3f8",
+      "parentBranchName": "d4a52e5da1"
+    },
+    {
+      "name": "101ac3bf55",
+      "headNodeId": "af0098c0dc",
+      "parentBranchName": "d4a52e5da1"
+    },
+    {
+      "name": "ebe1fccdad",
+      "headNodeId": "e9277ede10",
+      "parentBranchName": "101ac3bf55"
+    },
+    {
+      "name": "836b8f4b2e",
+      "headNodeId": "7f1acff704",
+      "parentBranchName": "101ac3bf55"
+    }
+  ],
+  "memoryNodes": [
+    {
+      "id": "node_root_profile",
+      "parentId": null,
+      "branchLabel": "root",
+      "facts": [
+        {
+          "id": "fact_root_001",
+          "fact": "Core values include family stability, career growth, financial security, building a strong life with my wife.",
+          "source": "interview",
+          "extractedAt": 1772335232.552505
+        },
+        {
+          "id": "fact_root_002",
+          "fact": "Current dilemma: Should I accept a promotion that moves me from New York to Singapore, knowing it could accelerate my career but significantly reshape my marriage, my routines, and the life we have started building together?",
+          "source": "interview",
+          "extractedAt": 1772335232.552505
+        },
+        {
+          "id": "fact_root_003",
+          "fact": "Hidden tension: I want rapid career progression, but I also want emotional closeness and routine",
+          "source": "interview",
+          "extractedAt": 1772335232.552505
+        }
+      ],
+      "notes": [
+        "Root node created from profile extraction.",
+        "Seed state before future-self branch selection."
+      ],
+      "selfCard": null,
+      "createdAt": 1772335232.552505
+    },
+    {
+      "id": "c0ffe4fbfb",
+      "parentId": "node_root_profile",
+      "branchLabel": "707c90da0f",
+      "facts": [
+        {
+          "id": "8040a02d93",
+          "fact": "Optimizes for: Prioritize marital stability, local career growth, and deepening family roots.",
+          "source": "interview",
+          "extractedAt": 1772335474.283612
+        }
+      ],
+      "notes": [
+        "Branch node for: Self Who Chose Rooted Growth (parent: root)"
+      ],
+      "selfCard": {
+        "id": "fead6a362b",
+        "type": "future",
+        "name": "Self Who Chose Rooted Growth",
+        "optimizationGoal": "Prioritize marital stability, local career growth, and deepening family roots.",
+        "toneOfVoice": "Warm, steady, thoughtful, emotionally present.",
+        "worldview": "A fulfilling life is built on strong relationships and a sense of belonging.",
+        "coreBelief": "I believe that true success is measured by the strength of my relationships and the depth of my connections.",
+        "tradeOff": "I maintained a close and stable marriage, but I sometimes wonder about the career opportunities I might have missed.",
+        "avatarPrompt": "A 35-year-old man sitting on a park bench in New York, wearing casual but neat clothing, with a content and relaxed expression. His wife sitting beside him, both enjoying a quiet moment together. The photograph is warm and inviting, with soft focus and natural lighting, conveying a sense of comfort and emotional presence.",
+        "avatarUrl": null,
+        "visualStyle": {
+          "primaryColor": "#5A3A1A",
+          "accentColor": "#F3E3D1",
+          "mood": "warm",
+          "glowIntensity": 0.45
+        },
+        "voiceId": "voice_warm_001",
+        "parentSelfId": null,
+        "depthLevel": 1,
+        "childrenIds": []
+      },
+      "createdAt": 1772335474.283612
+    },
+    {
+      "id": "fea0ddb4f0",
+      "parentId": "node_root_profile",
+      "branchLabel": "727676ff10",
+      "facts": [
+        {
+          "id": "79d9d55a9a",
+          "fact": "Optimizes for: Maximize international career growth, financial upside, and global network expansion.",
+          "source": "interview",
+          "extractedAt": 1772335474.283612
+        },
+        {
+          "id": "fact_260fccfa344e",
+          "fact": "He prioritizes his wife's feelings and needs as a core factor in his decision.",
+          "type": "relationship_centrality",
+          "source": "transcript_analysis",
+          "branchName": "727676ff10",
+          "selfId": "e267e4edc7",
+          "extractedAt": 1772339071.985537,
+          "evidence": "\"I don't know how it's gonna go with my wife...\"",
+          "whyItMatters": "Future branches must address relationship dynamics as a primary constraint."
+        },
+        {
+          "id": "fact_03e208ba6d0d",
+          "fact": "He fears losing specific, cherished moments and routines with his wife.",
+          "type": "fear_of_loss",
+          "source": "transcript_analysis",
+          "branchName": "727676ff10",
+          "selfId": "e267e4edc7",
+          "extractedAt": 1772339071.985537,
+          "evidence": "\"What\u2019s the one thing you\u2019re most afraid of losing with her if you go? Not the big abstract stuff\u2014the *specific moment or rhythm* that feels like your anchor right now.\"",
+          "whyItMatters": "Branches should explore ways to preserve or recreate these moments."
+        },
+        {
+          "id": "fact_cad230fb861b",
+          "fact": "He is concerned about making assumptions about his wife's willingness to relocate.",
+          "type": "assumption_risk",
+          "source": "transcript_analysis",
+          "branchName": "727676ff10",
+          "selfId": "e267e4edc7",
+          "extractedAt": 1772339071.985537,
+          "evidence": "\"Wait should I ask her to come ? What did you do ? Can you support us both ?\"",
+          "whyItMatters": "Branches should include explicit communication and joint decision-making processes."
+        },
+        {
+          "id": "fact_196166518612",
+          "fact": "He values the importance of mutual support and teamwork in the relationship.",
+          "type": "support_system",
+          "source": "transcript_analysis",
+          "branchName": "727676ff10",
+          "selfId": "e267e4edc7",
+          "extractedAt": 1772339071.985537,
+          "evidence": "\"It was about whether we were still a team.\"",
+          "whyItMatters": "Branches should emphasize collaborative problem-solving and shared commitment."
+        },
+        {
+          "id": "fact_6f3bae9cdf24",
+          "fact": "He is torn between career opportunities and the potential impact on his relationship.",
+          "type": "career_vs_relationship",
+          "source": "transcript_analysis",
+          "branchName": "727676ff10",
+          "selfId": "e267e4edc7",
+          "extractedAt": 1772339071.985537,
+          "evidence": "\"The career numbers add up, the opportunity is undeniable\u2014but the *her* part of the equation? That\u2019s the variable no spreadsheet can solve.\"",
+          "whyItMatters": "Branches should weigh career benefits against relationship costs."
+        }
+      ],
+      "notes": [
+        "Branch node for: Self Who Embraced the Global Leap (parent: root)",
+        "Transcript insight [relationship_centrality]: He prioritizes his wife's feelings and needs as a core factor in his decision.",
+        "Transcript insight [fear_of_loss]: He fears losing specific, cherished moments and routines with his wife.",
+        "Transcript insight [assumption_risk]: He is concerned about making assumptions about his wife's willingness to relocate.",
+        "Transcript insight [support_system]: He values the importance of mutual support and teamwork in the relationship.",
+        "Transcript insight [career_vs_relationship]: He is torn between career opportunities and the potential impact on his relationship."
+      ],
+      "selfCard": {
+        "id": "e267e4edc7",
+        "type": "future",
+        "name": "Self Who Embraced the Global Leap",
+        "optimizationGoal": "Maximize international career growth, financial upside, and global network expansion.",
+        "toneOfVoice": "Confident, decisive, ambitious, slightly more detached.",
+        "worldview": "True growth often requires stepping out of comfort zones and embracing new challenges.",
+        "coreBelief": "I believe that taking bold steps, even if they are uncomfortable, leads to the most significant personal and professional growth.",
+        "tradeOff": "I gained a high-powered career and financial success, but I sacrificed some of the closeness and routine I had with my wife and family.",
+        "avatarPrompt": "A 35-year-old professional man standing in a high-rise office in Singapore, wearing a tailored suit, with a confident and determined expression. The cityscape visible through the floor-to-ceiling windows behind him, bathed in the warm glow of the setting sun. The photograph is cinematic, with a sharp focus on his face, conveying a sense of ambition and slight detachment.",
+        "avatarUrl": null,
+        "visualStyle": {
+          "primaryColor": "#1A3A5A",
+          "accentColor": "#D1E3F3",
+          "mood": "elevated",
+          "glowIntensity": 0.75
+        },
+        "voiceId": "voice_elevated_001",
+        "parentSelfId": null,
+        "depthLevel": 1,
+        "childrenIds": []
+      },
+      "createdAt": 1772335474.283612
+    },
+    {
+      "id": "3e0171813e",
+      "parentId": "node_root_profile",
+      "branchLabel": "b6cc9ea047",
+      "facts": [
+        {
+          "id": "28bbc9107c",
+          "fact": "Optimizes for: Focus on building a quiet, meaningful life centered around family, community, and slow, steady growth.",
+          "source": "interview",
+          "extractedAt": 1772335678.06252
+        }
+      ],
+      "notes": [
+        "Branch node for: Self Who Built a Quiet Legacy (parent: root)"
+      ],
+      "selfCard": {
+        "id": "a5cd0f6849",
+        "type": "future",
+        "name": "Self Who Built a Quiet Legacy",
+        "optimizationGoal": "Focus on building a quiet, meaningful life centered around family, community, and slow, steady growth.",
+        "toneOfVoice": "Gentle, steady, warm, reflective.",
+        "worldview": "True success is measured by the depth of relationships and the impact you have on those around you.",
+        "coreBelief": "I believe that a life well-lived is one that prioritizes the people you love and the community you build.",
+        "tradeOff": "I gained deep relationships and a sense of belonging, but I sacrificed rapid career advancement and the excitement of a fast-paced life.",
+        "avatarPrompt": "A realistic 35-year-old man in a cozy, small-town setting, wearing casual but neat clothing, with a warm and content expression. The background shows a quiet street with a few houses and trees, and the photographic style is documentary-like, capturing the essence of a peaceful, grounded life.",
+        "avatarUrl": null,
+        "visualStyle": {
+          "primaryColor": "#556B2F",
+          "accentColor": "#F5F5DC",
+          "mood": "grounded",
+          "glowIntensity": 0.35
+        },
+        "voiceId": "voice_grounded_001",
+        "parentSelfId": null,
+        "depthLevel": 1,
+        "childrenIds": []
+      },
+      "createdAt": 1772335678.06252
+    },
+    {
+      "id": "56e1ab677b",
+      "parentId": "node_root_profile",
+      "branchLabel": "d4a52e5da1",
+      "facts": [
+        {
+          "id": "ea1edf7afa",
+          "fact": "Optimizes for: Maximize creative expression, personal freedom, and unconventional life experiences.",
+          "source": "interview",
+          "extractedAt": 1772335678.06252
+        },
+        {
+          "id": "fact_37c6fce677be",
+          "fact": "He prioritizes designing a life that feels meaningful in the long term over conventional career success.",
+          "type": "life_design_priority",
+          "source": "transcript_analysis",
+          "branchName": "d4a52e5da1",
+          "selfId": "aaa3257e01",
+          "extractedAt": 1772339075.4425228,
+          "evidence": "\"What\u2019s the move that\u2019ll make me feel alive when I\u2019m 80, looking back?\"",
+          "whyItMatters": "Future branches should focus on life design and personal fulfillment rather than traditional career metrics."
+        },
+        {
+          "id": "fact_662c519f36cb",
+          "fact": "He values testing life changes through small, reversible experiments before committing.",
+          "type": "experimentation",
+          "source": "transcript_analysis",
+          "branchName": "d4a52e5da1",
+          "selfId": "aaa3257e01",
+          "extractedAt": 1772339075.4425228,
+          "evidence": "Spending a month in Lisbon to test reinvention and three months in Bali to test life abroad.",
+          "whyItMatters": "Future branches should include pilot experiments to validate life decisions before full commitment."
+        },
+        {
+          "id": "fact_08963903869a",
+          "fact": "He involves his partner in major life decisions and experiments.",
+          "type": "partner_integration",
+          "source": "transcript_analysis",
+          "branchName": "d4a52e5da1",
+          "selfId": "aaa3257e01",
+          "extractedAt": 1772339075.4425228,
+          "evidence": "\"We asked ourselves: Could we build something extraordinary together, somewhere new?\"",
+          "whyItMatters": "Branch narratives should include joint decision-making with his partner as a core constraint."
+        },
+        {
+          "id": "fact_962c32ea1902",
+          "fact": "He uses job offers as leverage to negotiate flexible, life-enhancing terms.",
+          "type": "negotiation_strategy",
+          "source": "transcript_analysis",
+          "branchName": "d4a52e5da1",
+          "selfId": "aaa3257e01",
+          "extractedAt": 1772339075.4425228,
+          "evidence": "Negotiated a remote-first role with quarterly trips to Singapore and a 4-day workweek in Lisbon.",
+          "whyItMatters": "Future branches should explore creative negotiation strategies to align career with life goals."
+        },
+        {
+          "id": "fact_4b0835b8b3f3",
+          "fact": "He rejects binary choices and seeks third options that combine elements of different paths.",
+          "type": "binary_thinking_avoidance",
+          "source": "transcript_analysis",
+          "branchName": "d4a52e5da1",
+          "selfId": "aaa3257e01",
+          "extractedAt": 1772339075.4425228,
+          "evidence": "\"What\u2019s the third option you\u2019re not letting yourself imagine yet?\"",
+          "whyItMatters": "Future branches should explore creative alternatives to conventional either/or decisions."
+        }
+      ],
+      "notes": [
+        "Branch node for: Self Who Prioritized Creative Freedom (parent: root)",
+        "Transcript insight [life_design_priority]: He prioritizes designing a life that feels meaningful in the long term over conventional career success.",
+        "Transcript insight [experimentation]: He values testing life changes through small, reversible experiments before committing.",
+        "Transcript insight [partner_integration]: He involves his partner in major life decisions and experiments.",
+        "Transcript insight [negotiation_strategy]: He uses job offers as leverage to negotiate flexible, life-enhancing terms.",
+        "Transcript insight [binary_thinking_avoidance]: He rejects binary choices and seeks third options that combine elements of different paths."
+      ],
+      "selfCard": {
+        "id": "aaa3257e01",
+        "type": "future",
+        "name": "Self Who Prioritized Creative Freedom",
+        "optimizationGoal": "Maximize creative expression, personal freedom, and unconventional life experiences.",
+        "toneOfVoice": "Expressive, passionate, unconventional, emotionally vibrant.",
+        "worldview": "Life is too short to follow a script; true fulfillment comes from creating your own path.",
+        "coreBelief": "I believe that the richness of life comes from the experiences we create and the freedom we allow ourselves to explore.",
+        "tradeOff": "I gained creative fulfillment and personal freedom, but I sacrificed financial security and the stability of a traditional career path.",
+        "avatarPrompt": "A realistic 35-year-old artist in a vibrant studio, surrounded by paintings and sculptures, wearing a paint-splattered smock, with a passionate and intense expression. The studio is filled with natural light, and the background shows a bustling cityscape. The photographic style is cinematic and slightly abstract, capturing the essence of creative energy.",
+        "avatarUrl": null,
+        "visualStyle": {
+          "primaryColor": "#8A2BE2",
+          "accentColor": "#E6E6FA",
+          "mood": "ethereal",
+          "glowIntensity": 0.75
+        },
+        "voiceId": "voice_ethereal_001",
+        "parentSelfId": null,
+        "depthLevel": 1,
+        "childrenIds": []
+      },
+      "createdAt": 1772335678.06252
+    },
+    {
+      "id": "d36980b3f8",
+      "parentId": "56e1ab677b",
+      "branchLabel": "f04d939165",
+      "facts": [
+        {
+          "id": "d33cfe27a0",
+          "fact": "Optimizes for: Maximize creative expression, personal freedom, and unconventional life experiences while maintaining a stable and fulfilling relationship.",
+          "source": "interview",
+          "extractedAt": 1772335846.879342
+        }
+      ],
+      "notes": [
+        "Branch node for: Self Who Prioritized Creative Freedom and Found Unexpected Stability (parent: d4a52e5da1)"
+      ],
+      "selfCard": {
+        "id": "846039b05c",
+        "type": "future",
+        "name": "Self Who Prioritized Creative Freedom and Found Unexpected Stability",
+        "optimizationGoal": "Maximize creative expression, personal freedom, and unconventional life experiences while maintaining a stable and fulfilling relationship.",
+        "toneOfVoice": "Confident, warm, reflective, and grounded.",
+        "worldview": "True fulfillment comes from creating your own path, but stability and deep relationships can coexist with creative freedom.",
+        "coreBelief": "I believe that a life rich in experiences and creativity can also be stable and deeply connected.",
+        "tradeOff": "I gained creative fulfillment and personal freedom, and surprisingly, I also found stability and deepened my relationship, but I had to let go of some financial security and traditional career milestones.",
+        "avatarPrompt": "A realistic 33-year-old man in a cozy, artistic loft, surrounded by creative tools and personal artifacts. He wears casual yet stylish clothing, with a warm and content expression. The setting is a blend of a home studio and living space, filled with natural light and personal touches. His demeanor reflects a sense of accomplishment and emotional richness, captured in a cinematic, documentary-style portrait.",
+        "avatarUrl": null,
+        "visualStyle": {
+          "primaryColor": "#8B4513",
+          "accentColor": "#FFD700",
+          "mood": "warm",
+          "glowIntensity": 0.65
+        },
+        "voiceId": "voice_warm_001",
+        "parentSelfId": "aaa3257e01",
+        "depthLevel": 2,
+        "childrenIds": []
+      },
+      "createdAt": 1772335846.879342
+    },
+    {
+      "id": "af0098c0dc",
+      "parentId": "56e1ab677b",
+      "branchLabel": "101ac3bf55",
+      "facts": [
+        {
+          "id": "173faf3a5a",
+          "fact": "Optimizes for: Maximize creative expression and personal freedom at the cost of relational stability and emotional support.",
+          "source": "interview",
+          "extractedAt": 1772335846.879342
+        },
+        {
+          "id": "fact_38f835a6f6d2",
+          "fact": "He values reversible, experimental approaches to major life decisions.",
+          "type": "experimentation",
+          "source": "transcript_analysis",
+          "branchName": "101ac3bf55",
+          "selfId": "359bd4dea9",
+          "extractedAt": 1772339079.5116742,
+          "evidence": "He turned the Singapore offer into a six-month experiment and negotiated remote weeks and flexible timelines.",
+          "whyItMatters": "Future branches should include trial periods and creative workarounds to mitigate risk."
+        },
+        {
+          "id": "fact_0b6eb3eeb2f6",
+          "fact": "He involves his wife as a co-architect in major life decisions.",
+          "type": "partner_integration",
+          "source": "transcript_analysis",
+          "branchName": "101ac3bf55",
+          "selfId": "359bd4dea9",
+          "extractedAt": 1772339079.5116742,
+          "evidence": "He dragged his wife into the design of the move to Singapore and pitched Lisbon as a reset with her.",
+          "whyItMatters": "Branch narratives should preserve relationship co-design as a core constraint."
+        },
+        {
+          "id": "fact_9e05ea5db17e",
+          "fact": "He uses alternative options as leverage to clarify his priorities.",
+          "type": "shadow_option",
+          "source": "transcript_analysis",
+          "branchName": "101ac3bf55",
+          "selfId": "359bd4dea9",
+          "extractedAt": 1772339079.5116742,
+          "evidence": "He used Barcelona as leverage to ask what he was really chasing in Singapore.",
+          "whyItMatters": "Future branches should consider shadow options to gain clarity on true motivations."
+        },
+        {
+          "id": "fact_ce5cabf2e160",
+          "fact": "He prioritizes the well-being of his wife in his decisions.",
+          "type": "relationship_priorities",
+          "source": "transcript_analysis",
+          "branchName": "101ac3bf55",
+          "selfId": "359bd4dea9",
+          "extractedAt": 1772339079.5116742,
+          "evidence": "He noticed his wife's loneliness in Singapore and pitched Lisbon as a reset for both of them.",
+          "whyItMatters": "Branch narratives should prioritize the emotional and social well-being of his partner."
+        },
+        {
+          "id": "fact_51db20109d12",
+          "fact": "He recognizes the emotional complexity of non-monogamous relationships.",
+          "type": "non_monogamy_complexity",
+          "source": "transcript_analysis",
+          "branchName": "101ac3bf55",
+          "selfId": "359bd4dea9",
+          "extractedAt": 1772339079.5116742,
+          "evidence": "He describes the emotional challenges and eventual breakdown of his relationship with Sofia and Bunny.",
+          "whyItMatters": "Future branches should consider the emotional and relational costs of non-monogamy."
+        },
+        {
+          "id": "fact_942e0d02bfb7",
+          "fact": "He values depth over intensity in relationships.",
+          "type": "intensity_vs_depth",
+          "source": "transcript_analysis",
+          "branchName": "101ac3bf55",
+          "selfId": "359bd4dea9",
+          "extractedAt": 1772339079.5116742,
+          "evidence": "He reflects on trading the depth of a life for the intensity of moments and ultimately chooses Bunny as home.",
+          "whyItMatters": "Branch narratives should prioritize long-term depth over short-term intensity."
+        },
+        {
+          "id": "fact_f17d923fe62d",
+          "fact": "He acknowledges his mistakes and the importance of communication in relationships.",
+          "type": "self_awareness",
+          "source": "transcript_analysis",
+          "branchName": "101ac3bf55",
+          "selfId": "359bd4dea9",
+          "extractedAt": 1772339079.5116742,
+          "evidence": "He admits to treating his relationship with Sofia and Bunny as a conquest and not a collaboration.",
+          "whyItMatters": "Future branches should emphasize open communication and mutual consent in relationships."
+        }
+      ],
+      "notes": [
+        "Branch node for: Self Who Prioritized Creative Freedom and Faced Isolation (parent: d4a52e5da1)",
+        "Transcript insight [experimentation]: He values reversible, experimental approaches to major life decisions.",
+        "Transcript insight [partner_integration]: He involves his wife as a co-architect in major life decisions.",
+        "Transcript insight [shadow_option]: He uses alternative options as leverage to clarify his priorities.",
+        "Transcript insight [relationship_priorities]: He prioritizes the well-being of his wife in his decisions.",
+        "Transcript insight [non_monogamy_complexity]: He recognizes the emotional complexity of non-monogamous relationships.",
+        "Transcript insight [intensity_vs_depth]: He values depth over intensity in relationships.",
+        "Transcript insight [self_awareness]: He acknowledges his mistakes and the importance of communication in relationships."
+      ],
+      "selfCard": {
+        "id": "359bd4dea9",
+        "type": "future",
+        "name": "Self Who Prioritized Creative Freedom and Faced Isolation",
+        "optimizationGoal": "Maximize creative expression and personal freedom at the cost of relational stability and emotional support.",
+        "toneOfVoice": "Introspective, slightly melancholic, articulate, and emotionally raw.",
+        "worldview": "True creative freedom often comes with unexpected loneliness, and the path less traveled can be isolating.",
+        "coreBelief": "I believe that the richness of life comes from the experiences we create, but sometimes the cost is higher than anticipated.",
+        "tradeOff": "I gained unparalleled creative fulfillment and personal freedom, but I lost the emotional safety net of close relationships and the comfort of a stable support system.",
+        "avatarPrompt": "A realistic 33-year-old man in a sparse, modern apartment, surrounded by artistic tools and half-finished projects. He wears casual, slightly disheveled clothing, with a thoughtful and somewhat lonely expression. The setting is minimalistic, with large windows showing a cityscape at dusk. His demeanor reflects a sense of deep introspection and emotional complexity, captured in a cinematic, slightly abstract portrait.",
+        "avatarUrl": null,
+        "visualStyle": {
+          "primaryColor": "#4682B4",
+          "accentColor": "#B0E0E6",
+          "mood": "intense",
+          "glowIntensity": 0.75
+        },
+        "voiceId": "voice_intense_001",
+        "parentSelfId": "aaa3257e01",
+        "depthLevel": 2,
+        "childrenIds": []
+      },
+      "createdAt": 1772335846.879342
+    },
+    {
+      "id": "e9277ede10",
+      "parentId": "af0098c0dc",
+      "branchLabel": "ebe1fccdad",
+      "facts": [
+        {
+          "id": "63d58fbbba",
+          "fact": "Optimizes for: Maximize creative expression, personal freedom, and the development of deep, meaningful relationships.",
+          "source": "interview",
+          "extractedAt": 1772336545.181013
+        }
+      ],
+      "notes": [
+        "Branch node for: Self Who Prioritized Creative Freedom and Found Community (parent: 101ac3bf55)"
+      ],
+      "selfCard": {
+        "id": "d162b62c1e",
+        "type": "future",
+        "name": "Self Who Prioritized Creative Freedom and Found Community",
+        "optimizationGoal": "Maximize creative expression, personal freedom, and the development of deep, meaningful relationships.",
+        "toneOfVoice": "Warm, open, reflective, and inviting.",
+        "worldview": "True creative freedom can coexist with emotional connection if you actively cultivate both.",
+        "coreBelief": "I believe that the richness of life comes from both the experiences we create and the relationships we nurture.",
+        "tradeOff": "I gained unparalleled creative fulfillment, personal freedom, and a strong sense of community, but I had to actively work to maintain these relationships and sometimes compromise on my independence.",
+        "avatarPrompt": "A realistic 35-year-old person standing in a vibrant, artistic community space, surrounded by diverse individuals engaged in creative pursuits. They have a warm, inviting expression, wearing casual yet stylish clothing that reflects their creative spirit. The setting is a cozy, well-lit studio with art on the walls and people collaborating on projects. The photograph is cinematic, capturing the essence of a thriving, connected community.",
+        "avatarUrl": null,
+        "visualStyle": {
+          "primaryColor": "#FF6B35",
+          "accentColor": "#FFD166",
+          "mood": "warm",
+          "glowIntensity": 0.7
+        },
+        "voiceId": "voice_warm_001",
+        "parentSelfId": "359bd4dea9",
+        "depthLevel": 3,
+        "childrenIds": []
+      },
+      "createdAt": 1772336545.181013
+    },
+    {
+      "id": "7f1acff704",
+      "parentId": "af0098c0dc",
+      "branchLabel": "836b8f4b2e",
+      "facts": [
+        {
+          "id": "1b3e4c8baf",
+          "fact": "Optimizes for: Maximize creative expression and personal freedom while navigating significant health issues.",
+          "source": "interview",
+          "extractedAt": 1772336545.181013
+        }
+      ],
+      "notes": [
+        "Branch node for: Self Who Prioritized Creative Freedom and Faced Health Challenges (parent: 101ac3bf55)"
+      ],
+      "selfCard": {
+        "id": "8970d60164",
+        "type": "future",
+        "name": "Self Who Prioritized Creative Freedom and Faced Health Challenges",
+        "optimizationGoal": "Maximize creative expression and personal freedom while navigating significant health issues.",
+        "toneOfVoice": "Resilient, determined, introspective, and slightly weary.",
+        "worldview": "True creative freedom can be tested by life's unexpected challenges, but it also provides the strength to overcome them.",
+        "coreBelief": "I believe that the richness of life comes from the experiences we create, but sometimes these experiences are shaped by challenges we never anticipated.",
+        "tradeOff": "I gained unparalleled creative fulfillment and personal freedom, but I had to face significant health challenges that tested my resilience and forced me to adapt my lifestyle.",
+        "avatarPrompt": "A realistic 35-year-old person sitting in a serene, sunlit room filled with plants and creative tools, reflecting a space of healing and adaptation. They have a determined yet weary expression, wearing comfortable, practical clothing that accommodates their health needs. The setting is a peaceful, well-organized home studio with signs of both creative work and health management. The photograph is cinematic, capturing the essence of resilience and adaptation.",
+        "avatarUrl": null,
+        "visualStyle": {
+          "primaryColor": "#00A8A8",
+          "accentColor": "#8FD8D8",
+          "mood": "calm",
+          "glowIntensity": 0.5
+        },
+        "voiceId": "voice_calm_001",
+        "parentSelfId": "359bd4dea9",
+        "depthLevel": 3,
+        "childrenIds": []
+      },
+      "createdAt": 1772336545.181013
+    }
+  ],
+  "createdAt": 1772294400,
+  "updatedAt": 1772336545.181013,
+  "futureSelvesFull": {
+    "e267e4edc7": {
+      "id": "e267e4edc7",
+      "type": "future",
+      "name": "Self Who Embraced the Global Leap",
+      "optimizationGoal": "Maximize international career growth, financial upside, and global network expansion.",
+      "toneOfVoice": "Confident, decisive, ambitious, slightly more detached.",
+      "worldview": "True growth often requires stepping out of comfort zones and embracing new challenges.",
+      "coreBelief": "I believe that taking bold steps, even if they are uncomfortable, leads to the most significant personal and professional growth.",
+      "tradeOff": "I gained a high-powered career and financial success, but I sacrificed some of the closeness and routine I had with my wife and family.",
+      "avatarPrompt": "A 35-year-old professional man standing in a high-rise office in Singapore, wearing a tailored suit, with a confident and determined expression. The cityscape visible through the floor-to-ceiling windows behind him, bathed in the warm glow of the setting sun. The photograph is cinematic, with a sharp focus on his face, conveying a sense of ambition and slight detachment.",
+      "avatarUrl": null,
+      "visualStyle": {
+        "primaryColor": "#1A3A5A",
+        "accentColor": "#D1E3F3",
+        "mood": "elevated",
+        "glowIntensity": 0.75
+      },
+      "voiceId": "voice_elevated_001",
+      "parentSelfId": null,
+      "depthLevel": 1,
+      "childrenIds": []
+    },
+    "fead6a362b": {
+      "id": "fead6a362b",
+      "type": "future",
+      "name": "Self Who Chose Rooted Growth",
+      "optimizationGoal": "Prioritize marital stability, local career growth, and deepening family roots.",
+      "toneOfVoice": "Warm, steady, thoughtful, emotionally present.",
+      "worldview": "A fulfilling life is built on strong relationships and a sense of belonging.",
+      "coreBelief": "I believe that true success is measured by the strength of my relationships and the depth of my connections.",
+      "tradeOff": "I maintained a close and stable marriage, but I sometimes wonder about the career opportunities I might have missed.",
+      "avatarPrompt": "A 35-year-old man sitting on a park bench in New York, wearing casual but neat clothing, with a content and relaxed expression. His wife sitting beside him, both enjoying a quiet moment together. The photograph is warm and inviting, with soft focus and natural lighting, conveying a sense of comfort and emotional presence.",
+      "avatarUrl": null,
+      "visualStyle": {
+        "primaryColor": "#5A3A1A",
+        "accentColor": "#F3E3D1",
+        "mood": "warm",
+        "glowIntensity": 0.45
+      },
+      "voiceId": "voice_warm_001",
+      "parentSelfId": null,
+      "depthLevel": 1,
+      "childrenIds": []
+    },
+    "aaa3257e01": {
+      "id": "aaa3257e01",
+      "type": "future",
+      "name": "Self Who Prioritized Creative Freedom",
+      "optimizationGoal": "Maximize creative expression, personal freedom, and unconventional life experiences.",
+      "toneOfVoice": "Expressive, passionate, unconventional, emotionally vibrant.",
+      "worldview": "Life is too short to follow a script; true fulfillment comes from creating your own path.",
+      "coreBelief": "I believe that the richness of life comes from the experiences we create and the freedom we allow ourselves to explore.",
+      "tradeOff": "I gained creative fulfillment and personal freedom, but I sacrificed financial security and the stability of a traditional career path.",
+      "avatarPrompt": "A realistic 35-year-old artist in a vibrant studio, surrounded by paintings and sculptures, wearing a paint-splattered smock, with a passionate and intense expression. The studio is filled with natural light, and the background shows a bustling cityscape. The photographic style is cinematic and slightly abstract, capturing the essence of creative energy.",
+      "avatarUrl": null,
+      "visualStyle": {
+        "primaryColor": "#8A2BE2",
+        "accentColor": "#E6E6FA",
+        "mood": "ethereal",
+        "glowIntensity": 0.75
+      },
+      "voiceId": "voice_ethereal_001",
+      "parentSelfId": null,
+      "depthLevel": 1,
+      "childrenIds": [
+        "846039b05c",
+        "359bd4dea9"
+      ]
+    },
+    "a5cd0f6849": {
+      "id": "a5cd0f6849",
+      "type": "future",
+      "name": "Self Who Built a Quiet Legacy",
+      "optimizationGoal": "Focus on building a quiet, meaningful life centered around family, community, and slow, steady growth.",
+      "toneOfVoice": "Gentle, steady, warm, reflective.",
+      "worldview": "True success is measured by the depth of relationships and the impact you have on those around you.",
+      "coreBelief": "I believe that a life well-lived is one that prioritizes the people you love and the community you build.",
+      "tradeOff": "I gained deep relationships and a sense of belonging, but I sacrificed rapid career advancement and the excitement of a fast-paced life.",
+      "avatarPrompt": "A realistic 35-year-old man in a cozy, small-town setting, wearing casual but neat clothing, with a warm and content expression. The background shows a quiet street with a few houses and trees, and the photographic style is documentary-like, capturing the essence of a peaceful, grounded life.",
+      "avatarUrl": null,
+      "visualStyle": {
+        "primaryColor": "#556B2F",
+        "accentColor": "#F5F5DC",
+        "mood": "grounded",
+        "glowIntensity": 0.35
+      },
+      "voiceId": "voice_grounded_001",
+      "parentSelfId": null,
+      "depthLevel": 1,
+      "childrenIds": []
+    },
+    "846039b05c": {
+      "id": "846039b05c",
+      "type": "future",
+      "name": "Self Who Prioritized Creative Freedom and Found Unexpected Stability",
+      "optimizationGoal": "Maximize creative expression, personal freedom, and unconventional life experiences while maintaining a stable and fulfilling relationship.",
+      "toneOfVoice": "Confident, warm, reflective, and grounded.",
+      "worldview": "True fulfillment comes from creating your own path, but stability and deep relationships can coexist with creative freedom.",
+      "coreBelief": "I believe that a life rich in experiences and creativity can also be stable and deeply connected.",
+      "tradeOff": "I gained creative fulfillment and personal freedom, and surprisingly, I also found stability and deepened my relationship, but I had to let go of some financial security and traditional career milestones.",
+      "avatarPrompt": "A realistic 33-year-old man in a cozy, artistic loft, surrounded by creative tools and personal artifacts. He wears casual yet stylish clothing, with a warm and content expression. The setting is a blend of a home studio and living space, filled with natural light and personal touches. His demeanor reflects a sense of accomplishment and emotional richness, captured in a cinematic, documentary-style portrait.",
+      "avatarUrl": null,
+      "visualStyle": {
+        "primaryColor": "#8B4513",
+        "accentColor": "#FFD700",
+        "mood": "warm",
+        "glowIntensity": 0.65
+      },
+      "voiceId": "voice_warm_001",
+      "parentSelfId": "aaa3257e01",
+      "depthLevel": 2,
+      "childrenIds": []
+    },
+    "359bd4dea9": {
+      "id": "359bd4dea9",
+      "type": "future",
+      "name": "Self Who Prioritized Creative Freedom and Faced Isolation",
+      "optimizationGoal": "Maximize creative expression and personal freedom at the cost of relational stability and emotional support.",
+      "toneOfVoice": "Introspective, slightly melancholic, articulate, and emotionally raw.",
+      "worldview": "True creative freedom often comes with unexpected loneliness, and the path less traveled can be isolating.",
+      "coreBelief": "I believe that the richness of life comes from the experiences we create, but sometimes the cost is higher than anticipated.",
+      "tradeOff": "I gained unparalleled creative fulfillment and personal freedom, but I lost the emotional safety net of close relationships and the comfort of a stable support system.",
+      "avatarPrompt": "A realistic 33-year-old man in a sparse, modern apartment, surrounded by artistic tools and half-finished projects. He wears casual, slightly disheveled clothing, with a thoughtful and somewhat lonely expression. The setting is minimalistic, with large windows showing a cityscape at dusk. His demeanor reflects a sense of deep introspection and emotional complexity, captured in a cinematic, slightly abstract portrait.",
+      "avatarUrl": null,
+      "visualStyle": {
+        "primaryColor": "#4682B4",
+        "accentColor": "#B0E0E6",
+        "mood": "intense",
+        "glowIntensity": 0.75
+      },
+      "voiceId": "voice_intense_001",
+      "parentSelfId": "aaa3257e01",
+      "depthLevel": 2,
+      "childrenIds": [
+        "d162b62c1e",
+        "8970d60164"
+      ]
+    },
+    "d162b62c1e": {
+      "id": "d162b62c1e",
+      "type": "future",
+      "name": "Self Who Prioritized Creative Freedom and Found Community",
+      "optimizationGoal": "Maximize creative expression, personal freedom, and the development of deep, meaningful relationships.",
+      "toneOfVoice": "Warm, open, reflective, and inviting.",
+      "worldview": "True creative freedom can coexist with emotional connection if you actively cultivate both.",
+      "coreBelief": "I believe that the richness of life comes from both the experiences we create and the relationships we nurture.",
+      "tradeOff": "I gained unparalleled creative fulfillment, personal freedom, and a strong sense of community, but I had to actively work to maintain these relationships and sometimes compromise on my independence.",
+      "avatarPrompt": "A realistic 35-year-old person standing in a vibrant, artistic community space, surrounded by diverse individuals engaged in creative pursuits. They have a warm, inviting expression, wearing casual yet stylish clothing that reflects their creative spirit. The setting is a cozy, well-lit studio with art on the walls and people collaborating on projects. The photograph is cinematic, capturing the essence of a thriving, connected community.",
+      "avatarUrl": null,
+      "visualStyle": {
+        "primaryColor": "#FF6B35",
+        "accentColor": "#FFD166",
+        "mood": "warm",
+        "glowIntensity": 0.7
+      },
+      "voiceId": "voice_warm_001",
+      "parentSelfId": "359bd4dea9",
+      "depthLevel": 3,
+      "childrenIds": []
+    },
+    "8970d60164": {
+      "id": "8970d60164",
+      "type": "future",
+      "name": "Self Who Prioritized Creative Freedom and Faced Health Challenges",
+      "optimizationGoal": "Maximize creative expression and personal freedom while navigating significant health issues.",
+      "toneOfVoice": "Resilient, determined, introspective, and slightly weary.",
+      "worldview": "True creative freedom can be tested by life's unexpected challenges, but it also provides the strength to overcome them.",
+      "coreBelief": "I believe that the richness of life comes from the experiences we create, but sometimes these experiences are shaped by challenges we never anticipated.",
+      "tradeOff": "I gained unparalleled creative fulfillment and personal freedom, but I had to face significant health challenges that tested my resilience and forced me to adapt my lifestyle.",
+      "avatarPrompt": "A realistic 35-year-old person sitting in a serene, sunlit room filled with plants and creative tools, reflecting a space of healing and adaptation. They have a determined yet weary expression, wearing comfortable, practical clothing that accommodates their health needs. The setting is a peaceful, well-organized home studio with signs of both creative work and health management. The photograph is cinematic, capturing the essence of resilience and adaptation.",
+      "avatarUrl": null,
+      "visualStyle": {
+        "primaryColor": "#00A8A8",
+        "accentColor": "#8FD8D8",
+        "mood": "calm",
+        "glowIntensity": 0.5
+      },
+      "voiceId": "voice_calm_001",
+      "parentSelfId": "359bd4dea9",
+      "depthLevel": 3,
+      "childrenIds": []
+    }
+  },
+  "explorationPaths": {
+    "root": [
+      "e267e4edc7",
+      "fead6a362b",
+      "aaa3257e01",
+      "a5cd0f6849"
+    ],
+    "aaa3257e01": [
+      "846039b05c",
+      "359bd4dea9"
+    ],
+    "359bd4dea9": [
+      "d162b62c1e",
+      "8970d60164"
+    ]
+  }
+}

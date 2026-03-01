@@ -114,8 +114,15 @@ Future Selves Generated → AvatarGenerator.generate(futureSelf) [for each]
   - `userProfile`
   - selected branch `selfCard`
   - merged memory facts/notes from root → head
-  - compact profile summary for prompting
+- compact profile summary for prompting
 - Does not write any session or memory files
+
+### `conversation_memory.py`
+- Persists conversation turns to `transcript.json` (`user`/`assistant`)
+- Runs LLM transcript analysis (few-shot prompt) using configured roles (default: `user` + `assistant`) to extract open-ended key elements at checkpoint events (exit/rebranch)
+- Uses recompute/replace semantics per branch: removes prior `transcript_analysis` facts and prior `Transcript insight [...]` notes/transcript memory, then writes fresh extracted insights
+- Appends extracted insights to current branch node `facts` and `notes`, and adds `memory` entries to transcript
+- Keeps `session.json.memoryNodes` mirror synchronized when present
 
 ### `prompt_composer.py`
 - Builds a branch-grounded system prompt from resolved context
@@ -135,6 +142,8 @@ Future Selves Generated → AvatarGenerator.generate(futureSelf) [for each]
 ### `backend/cli/chat_future_self.py`
 - Terminal REPL for chatting with a selected future-self branch
 - Inputs: `--session-id` plus either `--self-id` or `--branch`, plus model/config flags
+- Persists each successful turn to transcript
+- On exit, analyzes the transcript and commits extracted insights to branch memory
 - Commands:
   - `/context`, `/reset`, `/help`, `/exit`
   - `/branch [2|3] [optional time horizon]` to generate children and pick a new path
@@ -146,9 +155,14 @@ Future Selves Generated → AvatarGenerator.generate(futureSelf) [for each]
 - Supports root-level (`--parent-self-id` omitted) and deeper branching (`--parent-self-id <id>`)
 - Prints generated self IDs so chat can start immediately with `--self-id`
 
+### `backend/cli/backfill_transcript_insights.py`
+- One-off maintenance CLI to recompute transcript-derived branch memory for existing sessions
+- Inputs: `--session-id`, optional `--storage-root`, optional `--branch`
+- Uses the same extraction pipeline as chat/rebranch checkpoints
+
 ### `CONVERSATION_ENGINE_MVP.md`
 - Defines scope and boundaries for the first CLI-only version
-- Excludes storage writes, voice, and UI for this phase
+- Excludes voice and UI for this phase
 
 ## TODO
 

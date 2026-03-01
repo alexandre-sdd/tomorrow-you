@@ -1,4 +1,4 @@
-# ConversationEngine MVP (CLI, No Storage Writes)
+# ConversationEngine MVP (CLI + Memory Persistence)
 
 ## Goal
 Run a fast, natural text conversation in the terminal with a selected future-self branch using Mistral.
@@ -6,14 +6,15 @@ Run a fast, natural text conversation in the terminal with a selected future-sel
 ## In Scope (this phase)
 1. Read-only context resolution from session storage.
 2. Prompt composition for branch-grounded persona conversation.
-3. In-memory conversation session state (no persistence).
+3. In-memory conversation session state.
 4. Mistral API client wrapper with sync + streaming methods.
 5. CLI REPL loop for terminal-only conversations.
+6. Persist conversation transcript per turn.
+7. Extract key memory signals from transcript at checkpoint events (exit/rebranch).
 
 ## Out of Scope (later)
 1. Voice pipeline integration.
-2. Memory extraction/commit writes.
-3. Advanced retry/backoff strategy.
+2. Advanced retry/backoff strategy.
 
 ## Inputs
 - `session_id` (example: `user_nyc_singapore_001`)
@@ -53,8 +54,15 @@ Run a fast, natural text conversation in the terminal with a selected future-sel
 - Stream model output for fast first-token UX.
 
 ## Data Safety
-- Read-only mode for MVP.
-- No writes to `session.json`, `transcript.json`, or memory nodes.
+- Writes are limited to session-local memory artifacts:
+  - append turn data to `transcript.json`
+  - recompute/replace extracted transcript insights on current branch memory node (`facts`/`notes`)
+- No destructive edits and no branch history pruning.
+
+## Transcript Insight Policy
+- Transcript extraction is role-configurable; default input roles are `user` + `assistant`.
+- Rebranch ancestor excerpts are role-configurable; default included roles are `user`, `assistant`, `memory`.
+- Each extraction run for a branch removes prior auto-extracted transcript insights and writes a fresh set.
 
 ## Quick Run
 ```bash
@@ -70,4 +78,10 @@ You can also generate a new batch first:
 python3 -m backend.cli.generate_future_selves \
   --session-id user_nyc_singapore_001 \
   --count 2
+```
+
+Backfill transcript insights for an existing session:
+```bash
+python3 -m backend.cli.backfill_transcript_insights \
+  --session-id user_nyc_singapore_001
 ```

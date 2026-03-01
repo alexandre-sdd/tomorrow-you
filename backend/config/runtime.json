@@ -40,7 +40,8 @@
   },
   "future_generation_context": {
     "max_conversation_excerpts_per_ancestor": 5,
-    "max_total_excerpts": 20
+    "max_total_excerpts": 20,
+    "include_roles": ["user", "assistant", "memory"]
   },
   "cli": {
     "storage_root": "storage/sessions",
@@ -57,5 +58,21 @@
   },
   "storage": {
     "path": "./storage/sessions"
+  },
+  "conversation_memory": {
+    "enabled": true,
+    "max_notes_per_node": 40,
+    "max_facts_per_node": 60,
+    "max_transcript_entries": 2000
+  },
+  "memory_extraction": {
+    "enabled": true,
+    "model": "mistral-small-latest",
+    "temperature": 0.1,
+    "top_p": 1.0,
+    "max_tokens": 900,
+    "timeout_seconds": 30.0,
+    "max_messages_for_analysis": 80,
+    "input_roles": ["user", "assistant"]
   }
 }
