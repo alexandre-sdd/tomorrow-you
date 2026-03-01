@@ -11,7 +11,9 @@ import {
   replyInterview,
   startExploration,
   startInterview,
+  synthesizeConversationAudio,
   synthesizeInterviewAudio,
+  transcribeConversationAudio,
   transcribeInterviewAudio,
   type ConversationHistoryMessage,
   type PipelineStatusResponse,
@@ -74,6 +76,12 @@ export default function HomePage() {
   const [lastAssistantReplyText, setLastAssistantReplyText] = useState("");
   const [isSendingConversation, setIsSendingConversation] = useState(false);
   const [isBranching, setIsBranching] = useState(false);
+  const [isRecordingConversation, setIsRecordingConversation] = useState(false);
+  const [isTranscribingConversation, setIsTranscribingConversation] = useState(false);
+  const [isSynthesizingConversation, setIsSynthesizingConversation] = useState(false);
+  const [isPlayingConversationAudio, setIsPlayingConversationAudio] = useState(false);
+  const [lastConversationReplyAudioBlob, setLastConversationReplyAudioBlob] = useState<Blob | null>(null);
+  const [lastConversationReplyText, setLastConversationReplyText] = useState("");
 
   const [pipelineStatus, setPipelineStatus] = useState<PipelineStatusResponse | null>(null);
   const [error, setError] = useState("");
@@ -86,6 +94,13 @@ export default function HomePage() {
   const interviewAudioUrlRef = useRef<string | null>(null);
   const interviewPressActiveRef = useRef(false);
   const interviewRecorderStartingRef = useRef(false);
+  const conversationRecorderRef = useRef<MediaRecorder | null>(null);
+  const conversationStreamRef = useRef<MediaStream | null>(null);
+  const conversationChunksRef = useRef<Blob[]>([]);
+  const conversationAudioRef = useRef<HTMLAudioElement | null>(null);
+  const conversationAudioUrlRef = useRef<string | null>(null);
+  const conversationPressActiveRef = useRef(false);
+  const conversationRecorderStartingRef = useRef(false);
 
   const activeSelf = useMemo(() => {
     if (!activeSelfId) {
@@ -112,6 +127,19 @@ export default function HomePage() {
     setIsPlayingInterviewAudio(false);
   };
 
+  const stopConversationPlayback = () => {
+    if (conversationAudioRef.current) {
+      conversationAudioRef.current.pause();
+      conversationAudioRef.current.currentTime = 0;
+      conversationAudioRef.current = null;
+    }
+    if (conversationAudioUrlRef.current) {
+      URL.revokeObjectURL(conversationAudioUrlRef.current);
+      conversationAudioUrlRef.current = null;
+    }
+    setIsPlayingConversationAudio(false);
+  };
+
   const releaseInterviewMic = () => {
     interviewPressActiveRef.current = false;
     interviewRecorderStartingRef.current = false;
@@ -124,6 +152,20 @@ export default function HomePage() {
     interviewRecorderRef.current = null;
     interviewChunksRef.current = [];
     setIsRecordingInterview(false);
+  };
+
+  const releaseConversationMic = () => {
+    conversationPressActiveRef.current = false;
+    conversationRecorderStartingRef.current = false;
+    if (conversationStreamRef.current) {
+      for (const track of conversationStreamRef.current.getTracks()) {
+        track.stop();
+      }
+      conversationStreamRef.current = null;
+    }
+    conversationRecorderRef.current = null;
+    conversationChunksRef.current = [];
+    setIsRecordingConversation(false);
   };
 
   const playInterviewAudioBlob = async (blob: Blob) => {
@@ -143,6 +185,25 @@ export default function HomePage() {
 
     await audio.play();
     setIsPlayingInterviewAudio(true);
+  };
+
+  const playConversationAudioBlob = async (blob: Blob) => {
+    stopConversationPlayback();
+
+    const url = URL.createObjectURL(blob);
+    const audio = new Audio(url);
+    conversationAudioRef.current = audio;
+    conversationAudioUrlRef.current = url;
+
+    audio.onended = () => {
+      setIsPlayingConversationAudio(false);
+    };
+    audio.onerror = () => {
+      setIsPlayingConversationAudio(false);
+    };
+
+    await audio.play();
+    setIsPlayingConversationAudio(true);
   };
 
   const synthesizeAndPlayInterviewReply = async (replyText: string) => {
@@ -166,12 +227,46 @@ export default function HomePage() {
     }
   };
 
+  const synthesizeAndPlayConversationReply = async (
+    replyText: string,
+    selfId: string,
+  ) => {
+    if (!sessionId || !replyText.trim()) {
+      return;
+    }
+
+    setLastConversationReplyText(replyText);
+    setIsSynthesizingConversation(true);
+    try {
+      const audioBlob = await synthesizeConversationAudio({
+        sessionId,
+        selfId,
+        text: replyText,
+      });
+      setLastConversationReplyAudioBlob(audioBlob);
+      await playConversationAudioBlob(audioBlob);
+    } catch (err) {
+      withError("Conversation reply generated but voice playback failed", err);
+    } finally {
+      setIsSynthesizingConversation(false);
+    }
+  };
+
   useEffect(() => {
     return () => {
       stopInterviewPlayback();
       releaseInterviewMic();
+      stopConversationPlayback();
+      releaseConversationMic();
     };
   }, []);
+
+  useEffect(() => {
+    stopConversationPlayback();
+    releaseConversationMic();
+    setLastConversationReplyAudioBlob(null);
+    setLastConversationReplyText("");
+  }, [activeSelfId]);
 
   const handleStart = async (params: { sessionId: string; userName: string }) => {
     setError("");
@@ -446,7 +541,10 @@ export default function HomePage() {
     }
   };
 
-  const handleSendConversation = async (message: string) => {
+  const handleSendConversation = async (
+    message: string,
+    options: { speakReply?: boolean } = {},
+  ) => {
     if (!sessionId || !activeSelfId) {
       return;
     }
@@ -455,26 +553,177 @@ export default function HomePage() {
     setInfo("");
     setIsSendingConversation(true);
 
-    const existing = historiesBySelf[activeSelfId] || [];
+    const targetSelfId = activeSelfId;
+    const existing = historiesBySelf[targetSelfId] || [];
+    let assistantMessage = "";
 
     try {
       const response = await replyConversation({
         sessionId,
-        selfId: activeSelfId,
+        selfId: targetSelfId,
         message,
         history: existing,
       });
 
       setHistoriesBySelf((prev) => ({
         ...prev,
-        [activeSelfId]: response.history,
+        [targetSelfId]: response.history,
       }));
+      assistantMessage = response.reply;
+      setLastConversationReplyText(response.reply);
 
       setInfo(response.branchName ? `Branch: ${response.branchName}` : "Response received");
     } catch (err) {
       withError("Conversation request failed", err);
     } finally {
       setIsSendingConversation(false);
+    }
+
+    if (assistantMessage && options.speakReply !== false) {
+      await synthesizeAndPlayConversationReply(assistantMessage, targetSelfId);
+    }
+  };
+
+  const handleStopConversationRecording = async () => {
+    conversationPressActiveRef.current = false;
+    const activeRecorder = conversationRecorderRef.current;
+    if (activeRecorder && activeRecorder.state !== "inactive") {
+      activeRecorder.stop();
+    }
+  };
+
+  const handleStartConversationRecording = async () => {
+    conversationPressActiveRef.current = true;
+    if (
+      !sessionId
+      || !activeSelfId
+      || isRecordingConversation
+      || conversationRecorderStartingRef.current
+      || isTranscribingConversation
+      || isSynthesizingConversation
+      || isSendingConversation
+      || isBranching
+    ) {
+      if (!isRecordingConversation) {
+        conversationPressActiveRef.current = false;
+      }
+      return;
+    }
+
+    setError("");
+    setInfo("");
+
+    if (typeof window === "undefined" || !navigator?.mediaDevices?.getUserMedia) {
+      conversationPressActiveRef.current = false;
+      setError("Microphone is not available in this browser.");
+      return;
+    }
+
+    conversationRecorderStartingRef.current = true;
+    try {
+      stopConversationPlayback();
+
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      conversationStreamRef.current = stream;
+
+      const mimeTypeCandidates = [
+        "audio/webm;codecs=opus",
+        "audio/webm",
+        "audio/mp4",
+      ];
+      const pickedMimeType = mimeTypeCandidates.find((candidate) =>
+        typeof MediaRecorder !== "undefined" && MediaRecorder.isTypeSupported(candidate),
+      );
+
+      const recorder = pickedMimeType
+        ? new MediaRecorder(stream, { mimeType: pickedMimeType })
+        : new MediaRecorder(stream);
+
+      conversationRecorderRef.current = recorder;
+      conversationChunksRef.current = [];
+
+      recorder.ondataavailable = (event: BlobEvent) => {
+        if (event.data && event.data.size > 0) {
+          conversationChunksRef.current.push(event.data);
+        }
+      };
+
+      recorder.onstop = async () => {
+        const chunks = conversationChunksRef.current;
+        conversationChunksRef.current = [];
+        setIsRecordingConversation(false);
+
+        const blob = new Blob(chunks, { type: recorder.mimeType || "audio/webm" });
+        releaseConversationMic();
+
+        if (blob.size === 0) {
+          setError("No audio captured. Please try again.");
+          return;
+        }
+
+        const currentSelfId = activeSelfId;
+        if (!currentSelfId) {
+          setError("No active future self selected.");
+          return;
+        }
+
+        setIsTranscribingConversation(true);
+        try {
+          const transcription = await transcribeConversationAudio({
+            sessionId,
+            selfId: currentSelfId,
+            audioBlob: blob,
+          });
+          const transcript = transcription.transcriptText.trim();
+          if (!transcript) {
+            setError("Couldn't transcribe that turn. Please try again.");
+            return;
+          }
+
+          await handleSendConversation(transcript, { speakReply: true });
+        } catch (err) {
+          withError("Conversation voice transcription failed", err);
+        } finally {
+          setIsTranscribingConversation(false);
+        }
+      };
+
+      recorder.onerror = () => {
+        releaseConversationMic();
+        setError("Recording failed. Please try again.");
+      };
+
+      recorder.start();
+      setIsRecordingConversation(true);
+      setInfo("Recording conversation... release mic to send.");
+      if (!conversationPressActiveRef.current && recorder.state !== "inactive") {
+        recorder.stop();
+      }
+    } catch (err) {
+      releaseConversationMic();
+      withError("Microphone permission is required for voice conversation turns.", err);
+    } finally {
+      conversationRecorderStartingRef.current = false;
+    }
+  };
+
+  const handleReplayConversationAudio = async () => {
+    if (!activeSelfId) {
+      return;
+    }
+    if (!lastConversationReplyAudioBlob && !lastConversationReplyText.trim()) {
+      return;
+    }
+
+    setError("");
+    try {
+      if (lastConversationReplyAudioBlob) {
+        await playConversationAudioBlob(lastConversationReplyAudioBlob);
+        return;
+      }
+      await synthesizeAndPlayConversationReply(lastConversationReplyText, activeSelfId);
+    } catch (err) {
+      withError("Could not play the latest conversation reply audio", err);
     }
   };
 
@@ -593,9 +842,17 @@ export default function HomePage() {
           historiesBySelf={historiesBySelf}
           isSendingMessage={isSendingConversation}
           isBranching={isBranching}
+          isRecording={isRecordingConversation}
+          isTranscribing={isTranscribingConversation}
+          isSynthesizing={isSynthesizingConversation}
+          isPlaying={isPlayingConversationAudio}
+          canReplayLastAudio={Boolean(lastConversationReplyAudioBlob || lastConversationReplyText.trim())}
           onChangeSelf={setActiveSelfId}
           onSendMessage={handleSendConversation}
           onBranch={handleBranch}
+          onStartRecording={handleStartConversationRecording}
+          onStopRecording={handleStopConversationRecording}
+          onReplayLastAudio={handleReplayConversationAudio}
           onBackToSelection={() => setStep("selection")}
         />
       ) : null}

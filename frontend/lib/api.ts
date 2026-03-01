@@ -160,6 +160,12 @@ export interface InterviewTranscribeResponse {
   transcriptText: string;
 }
 
+export interface ConversationTranscribeResponse {
+  sessionId: string;
+  selfId: string;
+  transcriptText: string;
+}
+
 export interface InterviewStatusResponse {
   sessionId: string;
   profileCompleteness: number;
@@ -280,6 +286,72 @@ export async function synthesizeInterviewAudio(params: {
       sessionId: params.sessionId,
       text: params.text,
       voiceId: params.voiceId || undefined,
+    }),
+  });
+
+  if (!response.ok) {
+    let detail = `Request failed: ${response.status}`;
+    try {
+      const payload = (await response.json()) as Dict;
+      const serverDetail = payload.detail;
+      if (typeof serverDetail === "string" && serverDetail.trim()) {
+        detail = serverDetail;
+      }
+    } catch {
+      const rawText = await response.text();
+      if (rawText.trim()) {
+        detail = rawText;
+      }
+    }
+    throw new Error(detail);
+  }
+
+  return response.blob();
+}
+
+export async function transcribeConversationAudio(params: {
+  sessionId: string;
+  selfId: string;
+  audioBlob: Blob;
+  languageCode?: string;
+}): Promise<ConversationTranscribeResponse> {
+  const mimeType = params.audioBlob.type || "audio/webm";
+  const audioBase64 = await blobToBase64(params.audioBlob);
+
+  const raw = await apiFetch<Dict>("/conversation/transcribe", {
+    method: "POST",
+    body: JSON.stringify({
+      sessionId: params.sessionId,
+      selfId: params.selfId,
+      audioBase64,
+      mimeType,
+      languageCode: params.languageCode || undefined,
+    }),
+  });
+
+  return {
+    sessionId: getStr(raw, "sessionId", "session_id") || params.sessionId,
+    selfId: getStr(raw, "selfId", "self_id") || params.selfId,
+    transcriptText: getStr(raw, "transcriptText", "transcript_text"),
+  };
+}
+
+export async function synthesizeConversationAudio(params: {
+  sessionId: string;
+  selfId: string;
+  text: string;
+  voiceId?: string;
+  voiceGender?: "male" | "female";
+}): Promise<Blob> {
+  const response = await fetch(`${API_BASE}/conversation/tts`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      sessionId: params.sessionId,
+      selfId: params.selfId,
+      text: params.text,
+      voiceId: params.voiceId || undefined,
+      voiceGender: params.voiceGender || undefined,
     }),
   });
 

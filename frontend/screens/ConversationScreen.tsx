@@ -16,9 +16,17 @@ interface ConversationScreenProps {
   historiesBySelf: Record<string, ConversationHistoryMessage[]>;
   isSendingMessage: boolean;
   isBranching: boolean;
+  isRecording: boolean;
+  isTranscribing: boolean;
+  isSynthesizing: boolean;
+  isPlaying: boolean;
+  canReplayLastAudio: boolean;
   onChangeSelf: (selfId: string) => void;
   onSendMessage: (message: string) => Promise<void>;
   onBranch: (numFutures: number) => Promise<void>;
+  onStartRecording: () => Promise<void>;
+  onStopRecording: () => Promise<void>;
+  onReplayLastAudio: () => Promise<void>;
   onBackToSelection: () => void;
 }
 
@@ -29,9 +37,17 @@ export function ConversationScreen({
   historiesBySelf,
   isSendingMessage,
   isBranching,
+  isRecording,
+  isTranscribing,
+  isSynthesizing,
+  isPlaying,
+  canReplayLastAudio,
   onChangeSelf,
   onSendMessage,
   onBranch,
+  onStartRecording,
+  onStopRecording,
+  onReplayLastAudio,
   onBackToSelection,
 }: ConversationScreenProps) {
   const [branchCount, setBranchCount] = useState(3);
@@ -51,6 +67,19 @@ export function ConversationScreen({
   }, [activeSelfId, historiesBySelf]);
 
   const horizonLabel = activeSelf ? getTimeHorizonLabel(activeSelf.depthLevel) : "Present";
+  const isVoiceBusy = isTranscribing || isSynthesizing;
+  const inputDisabled = isSendingMessage || isBranching || isVoiceBusy || isRecording;
+  const recordButtonLabel = isRecording ? "■" : "🎙";
+  const recordButtonTitle = isRecording ? "Release to stop" : "Hold to talk";
+  const voiceStatus = isRecording
+    ? "Recording..."
+    : isTranscribing
+      ? "Transcribing..."
+      : isSynthesizing
+        ? "Synthesizing reply..."
+        : isPlaying
+          ? "Playing reply..."
+          : "Voice ready";
 
   if (!activeSelf) {
     return (
@@ -114,6 +143,15 @@ export function ConversationScreen({
           >
             {isBranching ? "Branching..." : "Branch from this conversation"}
           </button>
+          <button
+            type="button"
+            className="ghost-button"
+            onClick={onReplayLastAudio}
+            disabled={!canReplayLastAudio || isRecording || isTranscribing}
+          >
+            Play last reply
+          </button>
+          <p className="voice-status">{voiceStatus}</p>
         </div>
 
         <ChatPanel
@@ -124,7 +162,13 @@ export function ConversationScreen({
         <InputBar
           placeholder="Ask your future self..."
           submitLabel={isSendingMessage ? "Sending..." : "Send"}
-          disabled={isSendingMessage || isBranching}
+          disabled={inputDisabled}
+          secondaryActionLabel={recordButtonLabel}
+          secondaryActionTitle={recordButtonTitle}
+          secondaryActionClassName={isRecording ? "recording-button icon-button" : "ghost-button icon-button"}
+          secondaryActionDisabled={isSendingMessage || isBranching || isVoiceBusy}
+          onSecondaryActionPressStart={onStartRecording}
+          onSecondaryActionPressEnd={onStopRecording}
           onSubmit={onSendMessage}
         />
       </section>

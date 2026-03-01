@@ -49,7 +49,7 @@ class ElevenLabsInterviewVoiceService:
         chosen_voice_id = (voice_id or self._settings.elevenlabs_default_voice_id).strip()
         if not chosen_voice_id:
             raise ElevenLabsVoiceError("No ElevenLabs voice ID configured for interview TTS")
-        if _looks_like_placeholder_voice_id(chosen_voice_id):
+        if looks_like_placeholder_voice_id(chosen_voice_id):
             raise ElevenLabsVoiceError(
                 "Invalid ElevenLabs voice ID configured for interview TTS. "
                 "Set ELEVENLABS_DEFAULT_VOICE_ID in .env to a real ElevenLabs voice ID."
@@ -86,9 +86,11 @@ class ElevenLabsInterviewVoiceService:
         return "application/octet-stream"
 
 
-def _looks_like_placeholder_voice_id(voice_id: str) -> bool:
+def looks_like_placeholder_voice_id(voice_id: str) -> bool:
     normalized = voice_id.strip().lower()
     if not normalized:
+        return True
+    if normalized.startswith("voice_"):
         return True
     placeholder_tokens = ("placeholder", "voice_default", "default_voice", "voice_id_here")
     return any(token in normalized for token in placeholder_tokens)

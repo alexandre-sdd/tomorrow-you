@@ -40,6 +40,9 @@ class Settings(BaseSettings):
     elevenlabs_api_key: str
     # Neutral fallback voice used by the interview agent and as last-resort
     elevenlabs_default_voice_id: str
+    # Optional gendered defaults for conversation TTS when persona voice_id is unset/placeholder.
+    elevenlabs_chat_default_male_voice_id: str = ""
+    elevenlabs_chat_default_female_voice_id: str = ""
 
     # Voice pool — JSON string in .env mapping mood → ElevenLabs voice ID.
     # Example .env value:
