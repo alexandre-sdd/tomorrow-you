@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from pathlib import Path
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -33,7 +35,9 @@ app.include_router(pipeline_router)
 
 # Serve generated avatar images as static files.
 # URL pattern: /avatars/{session_id}/avatars/{self_id}.png
-app.mount("/avatars", StaticFiles(directory=settings.storage_path), name="avatars")
+avatar_storage_dir = Path(settings.storage_root)
+avatar_storage_dir.mkdir(parents=True, exist_ok=True)
+app.mount("/avatars", StaticFiles(directory=str(avatar_storage_dir)), name="avatars")
 
 
 @app.get("/health")
