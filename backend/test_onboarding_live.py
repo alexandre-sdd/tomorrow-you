@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
 import time
 from pathlib import Path
@@ -9,6 +10,18 @@ from typing import Any
 
 if __package__ in {None, ""}:
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
+# Load .env from repository root (works when launched from root or backend/)
+try:
+    from dotenv import load_dotenv
+
+    _repo_root = Path(__file__).resolve().parents[1]
+    _env_path = _repo_root / ".env"
+    if _env_path.exists():
+        load_dotenv(dotenv_path=_env_path, override=False)
+        os.environ.setdefault("ENV_FILE_LOADED", str(_env_path))
+except Exception:
+    pass
 
 from fastapi.testclient import TestClient
 
@@ -123,6 +136,110 @@ def _complete(client: TestClient, session_id: str, dilemma_override: str | None)
     return resp.json()
 
 
+def _start_exploration(client: TestClient, session_id: str, num_futures: int = 3) -> dict[str, Any]:
+    resp = client.post(
+        "/pipeline/start-exploration",
+        json={"session_id": session_id, "num_futures": num_futures},
+        timeout=300,
+    )
+    if resp.status_code != 200:
+        raise RuntimeError(
+            f"/pipeline/start-exploration failed ({resp.status_code}): {resp.text}"
+        )
+    return resp.json()
+
+
+def _pipeline_status(client: TestClient, session_id: str) -> dict[str, Any]:
+    resp = client.get(f"/pipeline/status/{session_id}", timeout=60)
+    if resp.status_code != 200:
+        raise RuntimeError(f"/pipeline/status failed ({resp.status_code}): {resp.text}")
+    return resp.json()
+
+
+def _conversation_reply(
+    client: TestClient,
+    session_id: str,
+    self_id: str,
+    message: str,
+    history: list[dict[str, str]],
+) -> dict[str, Any]:
+    resp = client.post(
+        "/conversation/reply",
+        json={
+            "session_id": session_id,
+            "self_id": self_id,
+            "message": message,
+            "history": history,
+        },
+        timeout=300,
+    )
+    if resp.status_code != 200:
+        raise RuntimeError(f"/conversation/reply failed ({resp.status_code}): {resp.text}")
+    return resp.json()
+
+
+def _branch_from_conversation(
+    client: TestClient,
+    session_id: str,
+    parent_self_id: str,
+    num_futures: int = 3,
+) -> dict[str, Any]:
+    resp = client.post(
+        "/pipeline/branch-conversation",
+        json={
+            "session_id": session_id,
+            "parent_self_id": parent_self_id,
+            "num_futures": num_futures,
+        },
+        timeout=300,
+    )
+    if resp.status_code != 200:
+        raise RuntimeError(
+            f"/pipeline/branch-conversation failed ({resp.status_code}): {resp.text}"
+        )
+    return resp.json()
+
+
+def _get(payload: dict[str, Any], *keys: str, default: Any = None) -> Any:
+    for key in keys:
+        if key in payload:
+            return payload[key]
+    return default
+
+
+def _list_selves(selves: list[dict[str, Any]], current_self_id: str | None = None) -> None:
+    if not selves:
+        print("\nNo future selves available yet.")
+        return
+
+    print("\n=== Available Future Selves ===")
+    for idx, self_card in enumerate(selves, start=1):
+        self_id = str(self_card.get("id", ""))
+        marker = " <- active" if current_self_id == self_id else ""
+        name = str(self_card.get("name", "(unnamed)"))
+        depth = self_card.get("depthLevel", self_card.get("depth_level", "?"))
+        goal = str(
+            self_card.get("optimizationGoal", self_card.get("optimization_goal", ""))
+        )
+        print(f"  [{idx}] {name} (id={self_id}, depth={depth}){marker}")
+        if goal:
+            print(f"      goal: {goal[:140]}")
+
+
+def _print_commands() -> None:
+    print("\nCommands:")
+    print("  /help                      -> show all commands")
+    print("  /status                    -> show status (onboarding or pipeline)")
+    print("  /complete [dilemma text]   -> complete onboarding and auto-generate futures")
+    print("  /selves                    -> list available future selves")
+    print("  /use <index|self_id>       -> select active future self for conversation")
+    print("  /branch [2-5]              -> branch from active self after conversation")
+    print("  /quit                      -> exit")
+    print("\nPlain text behavior:")
+    print("  - During onboarding: sends message to interview agent")
+    print("  - After /complete: sends message to selected future self")
+
+
 def _default_messages() -> list[str]:
     return [
         "I’m 31, married, based in Amsterdam, and I work as a senior product manager in fintech.",
@@ -140,10 +257,12 @@ def run_interactive(client: TestClient, session_id: str, user_name: str, use_str
     print(f"Mode: {'STREAMING' if use_streaming else 'Standard'}")
     print(f"Agent: {started.get('agent_message', '')}")
 
-    print("\nType your messages. Commands:")
-    print("  /status   -> show extraction progress")
-    print("  /complete -> finish onboarding and print userProfile + currentSelf")
-    print("  /quit     -> exit without completing")
+    phase = "onboarding"
+    available_selves: list[dict[str, Any]] = []
+    active_self_id: str | None = None
+    histories_by_self: dict[str, list[dict[str, str]]] = {}
+
+    _print_commands()
 
     while True:
         try:
@@ -156,34 +275,178 @@ def run_interactive(client: TestClient, session_id: str, user_name: str, use_str
             continue
 
         if user_text == "/quit":
-            print("Exiting without completion.")
+            print("Exiting.")
             return
 
+        if user_text == "/help":
+            _print_commands()
+            continue
+
         if user_text == "/status":
-            s = _status(client, session_id)
-            _print_json("Onboarding Status", s)
+            if phase == "onboarding":
+                s = _status(client, session_id)
+                _print_json("Onboarding Status", s)
+            else:
+                s = _pipeline_status(client, session_id)
+                _print_json("Pipeline Status", s)
+            continue
+
+        if user_text == "/selves":
+            _list_selves(available_selves, current_self_id=active_self_id)
+            continue
+
+        if user_text.startswith("/use "):
+            if not available_selves:
+                print("No selves available yet. Run /complete first.")
+                continue
+
+            raw_target = user_text.split(" ", 1)[1].strip()
+            chosen_id: str | None = None
+
+            if raw_target.isdigit():
+                idx = int(raw_target)
+                if 1 <= idx <= len(available_selves):
+                    chosen_id = str(available_selves[idx - 1].get("id", ""))
+            else:
+                candidate_ids = {str(s.get("id", "")) for s in available_selves}
+                if raw_target in candidate_ids:
+                    chosen_id = raw_target
+
+            if not chosen_id:
+                print("Invalid target. Use /selves and pick a valid index or self_id.")
+                continue
+
+            active_self_id = chosen_id
+            if active_self_id not in histories_by_self:
+                histories_by_self[active_self_id] = []
+            _list_selves(available_selves, current_self_id=active_self_id)
+            continue
+
+        if user_text.startswith("/branch"):
+            if phase == "onboarding":
+                print("Complete onboarding first with /complete.")
+                continue
+            if not active_self_id:
+                print("Pick an active self first with /use <index|self_id>.")
+                continue
+
+            parts = user_text.split()
+            branch_count = 3
+            if len(parts) > 1:
+                try:
+                    branch_count = int(parts[1])
+                except ValueError:
+                    print("Invalid branch count. Use /branch [2-5].")
+                    continue
+            if branch_count < 2 or branch_count > 5:
+                print("Branch count must be between 2 and 5.")
+                continue
+
+            try:
+                branch_data = _branch_from_conversation(
+                    client,
+                    session_id,
+                    parent_self_id=active_self_id,
+                    num_futures=branch_count,
+                )
+            except RuntimeError as exc:
+                print(str(exc))
+                continue
+
+            parent_name = _get(branch_data, "parentSelfName", "parent_self_name", default="(unknown)")
+            child_selves = _get(branch_data, "childSelves", "child_selves", default=[])
+            print(f"\nBranched from: {parent_name}")
+            print(f"Generated {len(child_selves)} child selves.")
+
+            for child in child_selves:
+                child_id = str(child.get("id", ""))
+                if child_id not in {str(s.get('id', '')) for s in available_selves}:
+                    available_selves.append(child)
+                    histories_by_self[child_id] = []
+
+            _list_selves(available_selves, current_self_id=active_self_id)
             continue
 
         if user_text.startswith("/complete"):
+            if phase != "onboarding":
+                print("Onboarding already completed. Use /selves, /use, and /branch.")
+                continue
+
             dilemma_override = None
             parts = user_text.split(" ", 1)
             if len(parts) == 2 and parts[1].strip():
                 dilemma_override = parts[1].strip()
 
-            completed = _complete(client, session_id, dilemma_override)
+            try:
+                completed = _complete(client, session_id, dilemma_override)
+            except RuntimeError as exc:
+                print(str(exc))
+                continue
+
             _print_json("Final User Profile", completed.get("userProfile", {}))
             _print_json("Generated Current Self", completed.get("currentSelf", {}))
-            print("\nDone. Branching is intentionally not called in this script.")
-            return
 
-        print("Agent: ", end="", flush=True)
-        reply_fn = _reply_stream if use_streaming else _reply
-        r = reply_fn(client, session_id, user_text)
-        if use_streaming:
-            print()  # Newline after streamed response
+            try:
+                exploration = _start_exploration(client, session_id, num_futures=3)
+            except RuntimeError as exc:
+                print(str(exc))
+                print("Onboarding is complete, but auto-start exploration failed.")
+                continue
+
+            future_selves = _get(exploration, "futureSelves", "future_selves", default=[])
+            available_selves = list(future_selves)
+            phase = "exploration"
+
+            if available_selves:
+                active_self_id = str(available_selves[0].get("id", ""))
+                histories_by_self.setdefault(active_self_id, [])
+
+            print("\nOnboarding complete. Exploration started automatically.")
+            _list_selves(available_selves, current_self_id=active_self_id)
+            print("Start chatting with plain text, switch with /use, and branch with /branch.")
+            continue
+
+        if user_text.startswith("/"):
+            print("Unknown command. Type /help to see available commands.")
+            continue
+
+        if phase == "onboarding":
+            print("Agent: ", end="", flush=True)
+            reply_fn = _reply_stream if use_streaming else _reply
+            r = reply_fn(client, session_id, user_text)
+            if use_streaming:
+                print()
+            else:
+                print(r.get("agentMessage", r.get("agent_message", "")))
+            print(f"Completeness: {r.get('profileCompleteness', r.get('profile_completeness', 0.0)):.2f}")
+            continue
+
+        if not active_self_id:
+            print("No active self selected. Use /selves and /use <index|self_id>.")
+            continue
+
+        history = histories_by_self.get(active_self_id, [])
+        try:
+            response = _conversation_reply(
+                client,
+                session_id=session_id,
+                self_id=active_self_id,
+                message=user_text,
+                history=history,
+            )
+        except RuntimeError as exc:
+            print(str(exc))
+            continue
+
+        reply_text = _get(response, "reply", default="")
+        branch_name = _get(response, "branchName", "branch_name", default="")
+        updated_history = _get(response, "history", default=[])
+        histories_by_self[active_self_id] = updated_history
+
+        if branch_name:
+            print(f"[{branch_name}] {reply_text}")
         else:
-            print(r.get('agentMessage', r.get('agent_message', '')))
-        print(f"Completeness: {r.get('profileCompleteness', r.get('profile_completeness', 0.0)):.2f}")
+            print(reply_text)
 
 
 def run_scripted(client: TestClient, session_id: str, user_name: str, use_streaming: bool = False) -> None:
@@ -210,12 +473,19 @@ def run_scripted(client: TestClient, session_id: str, user_name: str, use_stream
     completed = _complete(client, session_id, dilemma_override=None)
     _print_json("Final User Profile", completed.get("userProfile", {}))
     _print_json("Generated Current Self", completed.get("currentSelf", {}))
-    print("\nDone. Branching is intentionally not called in this script.")
+
+    exploration = _start_exploration(client, session_id, num_futures=3)
+    future_selves = _get(exploration, "futureSelves", "future_selves", default=[])
+    print("\nOnboarding complete. Exploration started automatically.")
+    _list_selves(future_selves)
+    print("Use --mode interactive for live conversation and /branch commands.")
 
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        description="Run full onboarding (live Mistral) and print userProfile + currentSelf without branching."
+        description=(
+            "Single CLI for live onboarding + auto exploration + conversation + branching."
+        )
     )
     parser.add_argument(
         "--session-id",
@@ -242,6 +512,7 @@ def main() -> None:
 
     print("Running onboarding live test...")
     print("This uses real Mistral calls via your configured backend engines.")
+    print("Single-file holistic flow: onboarding -> /complete -> auto exploration -> chat -> /branch")
     if args.streaming:
         print("Using STREAMING endpoint for real-time responses...")
 
