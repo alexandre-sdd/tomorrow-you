@@ -7,6 +7,8 @@ __pycache__/
 *.py[cod]
 venv/
 .venv/
+.claude/
+CLAUDE.md
 
 # Node
 node_modules/
@@ -15,6 +17,10 @@ out/
 
 # Storage (keep structure, ignore session data)
 storage/sessions/*.json
+storage/test_sessions/
+
+# Test results
+test_results_*.txt
 
 # IDE
 .vscode/
