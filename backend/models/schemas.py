@@ -182,6 +182,10 @@ class InterviewReplyRequest(BaseModel):
 
     session_id: str
     user_message: str
+    stream: bool = Field(
+        default=False,
+        description="When true, clients should use /interview/reply-stream for SSE token streaming.",
+    )
 
 
 class InterviewStatusResponse(BaseModel):

@@ -61,6 +61,15 @@ class Settings(BaseSettings):
     # ------------------------------------------------------------------
     storage_path: str = _runtime.storage.path
 
+    @property
+    def storage_root(self) -> str:
+        """Backward-compatible alias used by onboarding/session code."""
+        return self.storage_path
+
+    @storage_root.setter
+    def storage_root(self, value: str) -> None:
+        self.storage_path = value
+
     model_config = {"env_file": ".env", "env_file_encoding": "utf-8"}
 
 
