@@ -1,0 +1,39 @@
+{
+  "id": "a22a516c84",
+  "parentId": "11acc76a1f",
+  "branchLabel": "294e338369",
+  "facts": [
+    {
+      "id": "60dab3bdce",
+      "fact": "Optimizes for: Prioritize health, family stability, and personal well-being while maintaining a sustainable career.",
+      "source": "interview",
+      "extractedAt": 1772331606.010745
+    }
+  ],
+  "notes": [
+    "Branch node for: Self Who Built the Consulting Practice and Faced Health Challenges (parent: b5d7f0674d)"
+  ],
+  "selfCard": {
+    "id": "f146942ff8",
+    "type": "future",
+    "name": "Self Who Built the Consulting Practice and Faced Health Challenges",
+    "optimizationGoal": "Prioritize health, family stability, and personal well-being while maintaining a sustainable career.",
+    "toneOfVoice": "Thoughtful, resilient, grounded, emotionally present.",
+    "worldview": "Life's challenges can reshape our priorities, and true success is measured by our ability to adapt and find balance.",
+    "coreBelief": "Health and family are the foundations of a fulfilling life, and career success must be built around these priorities.",
+    "tradeOff": "I gained a deeper appreciation for health and family, but I had to scale back my career ambitions and accept a slower professional growth.",
+    "avatarPrompt": "A realistic 33-year-old man in a cozy, warmly lit living room, wearing comfortable clothing, with a resilient and thoughtful expression. The room is filled with personal touches, such as family photos and comfortable furniture, conveying a sense of stability and well-being. Cinematic portrait style, capturing a moment of quiet reflection and emotional presence.",
+    "avatarUrl": null,
+    "visualStyle": {
+      "primaryColor": "#8B4513",
+      "accentColor": "#FFDAB9",
+      "mood": "warm",
+      "glowIntensity": 0.45
+    },
+    "voiceId": "voice_warm_001",
+    "parentSelfId": "d1ba69bc0d",
+    "depthLevel": 2,
+    "childrenIds": []
+  },
+  "createdAt": 1772331606.010745
+}

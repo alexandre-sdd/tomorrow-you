@@ -1,6 +1,6 @@
 """Engine modules for Future Selves."""
 
-from .context_resolver import ContextResolver, ResolvedConversationContext
+from .context_resolver import ContextResolver, ContextResolutionError, ResolvedConversationContext
 from .conversation_session import BranchConversationSession
 from .current_self_auto_generator import (
     CurrentSelfAutoGeneratorEngine,
@@ -17,6 +17,7 @@ from .prompt_composer import PromptComposer, PromptComposerConfig
 
 __all__ = [
     "ContextResolver",
+    "ContextResolutionError",
     "ResolvedConversationContext",
     "PromptComposer",
     "PromptComposerConfig",

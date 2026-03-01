@@ -1,0 +1,39 @@
+{
+  "id": "60a707ca8f",
+  "parentId": "11acc76a1f",
+  "branchLabel": "d741757f97",
+  "facts": [
+    {
+      "id": "2e3fe3c9fc",
+      "fact": "Optimizes for: Maximize career growth, financial stability, and professional recognition while maintaining family roots.",
+      "source": "interview",
+      "extractedAt": 1772331606.010745
+    }
+  ],
+  "notes": [
+    "Branch node for: Self Who Built the Consulting Practice and Found Unexpected Success (parent: b5d7f0674d)"
+  ],
+  "selfCard": {
+    "id": "d9920acd63",
+    "type": "future",
+    "name": "Self Who Built the Consulting Practice and Found Unexpected Success",
+    "optimizationGoal": "Maximize career growth, financial stability, and professional recognition while maintaining family roots.",
+    "toneOfVoice": "Confident, ambitious, optimistic, forward-thinking.",
+    "worldview": "Success comes from seizing opportunities and adapting to change, even when it's unexpected.",
+    "coreBelief": "I can achieve both career success and a strong family life by being adaptable and open to new possibilities.",
+    "tradeOff": "I gained financial stability and professional recognition, but I had to adapt quickly to unexpected changes, which sometimes strained my family life.",
+    "avatarPrompt": "A realistic 33-year-old professional man in a modern home office, wearing a sharp but approachable business casual outfit, with a confident and optimistic expression. The room is filled with natural light, and there are subtle hints of professional success, such as awards and certificates on the wall. Cinematic portrait style, conveying a sense of achievement and forward momentum.",
+    "avatarUrl": null,
+    "visualStyle": {
+      "primaryColor": "#0077B6",
+      "accentColor": "#CAF0F8",
+      "mood": "elevated",
+      "glowIntensity": 0.75
+    },
+    "voiceId": "voice_elevated_001",
+    "parentSelfId": "d1ba69bc0d",
+    "depthLevel": 2,
+    "childrenIds": []
+  },
+  "createdAt": 1772331606.010745
+}

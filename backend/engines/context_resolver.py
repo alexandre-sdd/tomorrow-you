@@ -5,7 +5,10 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
+from backend.config.runtime import get_runtime_config
+
 JsonDict = dict[str, Any]
+_runtime = get_runtime_config()
 
 
 class ContextResolutionError(ValueError):
@@ -29,8 +32,9 @@ class ResolvedConversationContext:
 class ContextResolver:
     """Loads session and branch context from storage without writing anything."""
 
-    def __init__(self, storage_root: str | Path = "storage/sessions") -> None:
-        self.storage_root = Path(storage_root)
+    def __init__(self, storage_root: str | Path | None = None) -> None:
+        self.storage_root = Path(storage_root or _runtime.cli.storage_root)
+        self._profile_limits = _runtime.context_resolver.profile_summary_limits
 
     def resolve(self, session_id: str, branch_name: str) -> ResolvedConversationContext:
         session_dir = self.storage_root / session_id
@@ -59,6 +63,43 @@ class ContextResolver:
             memory_notes=notes,
             memory_path_node_ids=[str(node["id"]) for node in path_nodes],
             profile_summary=self._build_profile_summary(user_profile),
+        )
+
+    def find_branch_for_self(self, session_id: str, self_id: str) -> str:
+        """
+        Return the branch name whose headNodeId points to the memory node
+        holding the given self_id as its selfCard.id.
+
+        Raises ContextResolutionError if no matching node or branch is found.
+        """
+        session_dir = self.storage_root / session_id
+        session = self._load_required_json(session_dir / "session.json")
+        nodes_by_id = self._load_nodes(session_dir, session)
+        branches = self._load_branches(session_dir, session)
+
+        target_node_id: str | None = None
+        for node_id, node in nodes_by_id.items():
+            self_card = node.get("selfCard")
+            if isinstance(self_card, dict) and self_card.get("id") == self_id:
+                target_node_id = node_id
+                break
+
+        if target_node_id is None:
+            raise ContextResolutionError(
+                f"No memory node found with selfCard.id == '{self_id}' in session '{session_id}'"
+            )
+
+        for branch in branches:
+            if branch.get("headNodeId") == target_node_id:
+                name = branch.get("name")
+                if isinstance(name, str) and name:
+                    return name
+                raise ContextResolutionError(
+                    f"Branch pointing to node '{target_node_id}' has no valid name"
+                )
+
+        raise ContextResolutionError(
+            f"No branch found with headNodeId == '{target_node_id}' (self_id='{self_id}')"
         )
 
     def _load_branches(self, session_dir: Path, session: JsonDict) -> list[JsonDict]:
@@ -163,9 +204,9 @@ class ContextResolver:
         return notes
 
     def _build_profile_summary(self, profile: JsonDict) -> str:
-        core_values = self._join_str_list(profile.get("coreValues"), 4)
-        fears = self._join_str_list(profile.get("fears"), 4)
-        tensions = self._join_str_list(profile.get("hiddenTensions"), 3)
+        core_values = self._join_str_list(profile.get("coreValues"), self._profile_limits.core_values)
+        fears = self._join_str_list(profile.get("fears"), self._profile_limits.fears)
+        tensions = self._join_str_list(profile.get("hiddenTensions"), self._profile_limits.hidden_tensions)
         decision_style = self._coerce_str(profile.get("decisionStyle"))
         dilemma = self._coerce_str(profile.get("currentDilemma"))
 

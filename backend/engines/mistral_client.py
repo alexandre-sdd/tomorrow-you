@@ -7,6 +7,8 @@ from typing import Any, Iterable, Iterator
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
+from backend.config.runtime import get_runtime_config
+
 from .prompt_composer import ChatMessage
 
 
@@ -16,12 +18,13 @@ class MistralClientError(RuntimeError):
 
 @dataclass(frozen=True)
 class MistralChatConfig:
-    model: str = "mistral-small-latest"
-    temperature: float = 0.7
-    top_p: float = 0.95
-    max_tokens: int = 220
-    timeout_seconds: float = 30.0
-    endpoint: str = "https://api.mistral.ai/v1/chat/completions"
+    _runtime = get_runtime_config().mistral_chat
+    model: str = _runtime.model
+    temperature: float = _runtime.temperature
+    top_p: float = _runtime.top_p
+    max_tokens: int = _runtime.max_tokens
+    timeout_seconds: float = _runtime.timeout_seconds
+    endpoint: str = _runtime.endpoint
 
 
 class MistralChatClient:

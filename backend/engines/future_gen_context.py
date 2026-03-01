@@ -12,6 +12,9 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+from backend.config.runtime import get_runtime_config
+
+_runtime_fg_ctx = get_runtime_config().future_generation_context
 
 # ---------------------------------------------------------------------------
 # Public API
@@ -22,8 +25,8 @@ def resolve_ancestor_context(
     parent_self_id: str,
     storage_path: str,
     *,
-    max_conversation_excerpts_per_ancestor: int = 5,
-    max_total_excerpts: int = 20,
+    max_conversation_excerpts_per_ancestor: int = _runtime_fg_ctx.max_conversation_excerpts_per_ancestor,
+    max_total_excerpts: int = _runtime_fg_ctx.max_total_excerpts,
 ) -> tuple[str, list[str]]:
     """
     Walk from ``parent_self_id`` up to root, collecting ancestor summaries
@@ -138,7 +141,7 @@ def collect_sibling_names(
     full = session_data.get("futureSelvesFull", {})
     child_ids = session_data.get("explorationPaths", {}).get(parent_key, [])
     return [
-        full[cid].get("name", full[cid].get("name", ""))
+        full[cid].get("name", "")
         for cid in child_ids
         if cid in full
     ]

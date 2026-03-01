@@ -134,8 +134,17 @@ Future Selves Generated → AvatarGenerator.generate(futureSelf) [for each]
 
 ### `backend/cli/chat_future_self.py`
 - Terminal REPL for chatting with a selected future-self branch
-- Inputs: `--session-id`, `--branch`, model/config flags
-- Commands: `/context`, `/reset`, `/exit`
+- Inputs: `--session-id` plus either `--self-id` or `--branch`, plus model/config flags
+- Commands:
+  - `/context`, `/reset`, `/help`, `/exit`
+  - `/branch [2|3] [optional time horizon]` to generate children and pick a new path
+  - `/branch-reprompt [2|3] [optional time horizon]` to branch and re-ask the last prompt on the selected path
+  - `/reprompt` to ask the same last user message again on the current path
+
+### `backend/cli/generate_future_selves.py`
+- Terminal helper to run the same generation flow as `POST /future-self/generate`
+- Supports root-level (`--parent-self-id` omitted) and deeper branching (`--parent-self-id <id>`)
+- Prints generated self IDs so chat can start immediately with `--self-id`
 
 ### `CONVERSATION_ENGINE_MVP.md`
 - Defines scope and boundaries for the first CLI-only version

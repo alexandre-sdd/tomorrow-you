@@ -311,48 +311,35 @@ class RawFutureSelvesOutput(BaseModel):
 
 
 # ---------------------------------------------------------------------------
-# Raw models for onboarding Mistral responses
+# Request / Response models for POST /conversation/reply
 # ---------------------------------------------------------------------------
 
-class RawExtractedProfileData(BaseModel):
-    """Parse profile extraction JSON from Mistral."""
-    career: dict = Field(default_factory=dict)
-    career_confidence: float = 0.0
-    
-    financial: dict = Field(default_factory=dict)
-    financial_confidence: float = 0.0
-    
-    personal: dict = Field(default_factory=dict)
-    personal_confidence: float = 0.0
-    
-    health: dict = Field(default_factory=dict)
-    health_confidence: float = 0.0
-    
-    life_situation: dict = Field(default_factory=dict)
-    life_situation_confidence: float = 0.0
-    
-    psychology: dict = Field(default_factory=dict)
-    psychology_confidence: float = 0.0
-    
-    decision_style: str = ""
-    decision_style_confidence: float = 0.0
-    
-    self_narrative: str = ""
-    self_narrative_confidence: float = 0.0
-    
-    current_dilemma: str = ""
-    dilemma_confidence: float = 0.0
+class ConversationMessage(BaseModel):
+    model_config = _camel_config()
+
+    role: Literal["user", "assistant"]
+    content: str
 
 
-class RawCurrentSelfOutput(BaseModel):
-    """Parse current self generation JSON from Mistral."""
-    type: str = "current"
-    name: str = "Current Self"
-    optimization_goal: str
-    tone_of_voice: str
-    worldview: str
-    core_belief: str
-    trade_off: str
-    avatar_prompt: str
-    visual_style: dict  # {primary_color, accent_color, mood, glow_intensity}
-    voice_id: str = "VOICE_ASSIGN_BY_MOOD"
+class ConversationReplyRequest(BaseModel):
+    model_config = _camel_config()
+
+    session_id: str
+    self_id: str
+    message: str
+    history: list[ConversationMessage] = Field(
+        default_factory=list,
+        description="All prior turns, oldest first. Client owns history — send full history on every request.",
+    )
+
+
+class ConversationReplyResponse(BaseModel):
+    model_config = _camel_config()
+
+    session_id: str
+    self_id: str
+    branch_name: str
+    reply: str
+    history: list[ConversationMessage] = Field(
+        description="Updated history including the new user turn and assistant reply. Replace client-side history with this value.",
+    )

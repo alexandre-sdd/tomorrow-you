@@ -1,0 +1,39 @@
+{
+  "id": "11acc76a1f",
+  "parentId": "node_root_profile",
+  "branchLabel": "b5d7f0674d",
+  "facts": [
+    {
+      "id": "a08271a3c9",
+      "fact": "Optimizes for: Maximize career flexibility, local impact, and control over my time while maintaining strong family roots.",
+      "source": "interview",
+      "extractedAt": 1772329488.310515
+    }
+  ],
+  "notes": [
+    "Branch node for: Self Who Built the Consulting Practice (parent: root)"
+  ],
+  "selfCard": {
+    "id": "d1ba69bc0d",
+    "type": "future",
+    "name": "Self Who Built the Consulting Practice",
+    "optimizationGoal": "Maximize career flexibility, local impact, and control over my time while maintaining strong family roots.",
+    "toneOfVoice": "Confident, strategic, warm, and engaging.",
+    "worldview": "Success is not just about climbing the corporate ladder but creating something meaningful on your own terms.",
+    "coreBelief": "I can build a fulfilling career and a strong family life without sacrificing one for the other.",
+    "tradeOff": "I gained independence and local influence, but I gave up the prestige and financial upside of a traditional corporate trajectory.",
+    "avatarPrompt": "A realistic 33-year-old man in a well-tailored but approachable suit, standing in a modern office space with large windows overlooking a bustling city. He has a confident and warm expression, reflecting his entrepreneurial spirit and contentment with his life choices. The setting is professional yet personal, with family photos and books on the shelves, captured in a cinematic, documentary-style portrait.",
+    "avatarUrl": null,
+    "visualStyle": {
+      "primaryColor": "#4A6B8A",
+      "accentColor": "#D4E6F1",
+      "mood": "sharp",
+      "glowIntensity": 0.7
+    },
+    "voiceId": "voice_sharp_001",
+    "parentSelfId": null,
+    "depthLevel": 1,
+    "childrenIds": []
+  },
+  "createdAt": 1772329488.310515
+}
