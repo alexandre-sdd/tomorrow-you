@@ -24,6 +24,50 @@ function getArr(source: Dict, camel: string, snake?: string): unknown[] {
   return Array.isArray(value) ? value : [];
 }
 
+function normalizeAssetUrl(url: string | null | undefined): string | null {
+  if (!url) {
+    return null;
+  }
+
+  const trimmed = url.trim();
+  if (!trimmed) {
+    return null;
+  }
+
+  if (/^https?:\/\//i.test(trimmed)) {
+    return trimmed;
+  }
+
+  if (trimmed.startsWith("/")) {
+    return `${API_BASE}${trimmed}`;
+  }
+
+  return `${API_BASE}/${trimmed}`;
+}
+
+async function blobToBase64(blob: Blob): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+
+    reader.onerror = () => {
+      reject(new Error("Failed to read audio blob."));
+    };
+
+    reader.onload = () => {
+      if (typeof reader.result !== "string") {
+        reject(new Error("Unexpected FileReader result for audio blob."));
+        return;
+      }
+
+      const result = reader.result;
+      const payload = result.includes(",") ? result.split(",", 2)[1] : result;
+      resolve(payload);
+    };
+
+    reader.readAsDataURL(blob);
+  });
+}
+
 async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
   const response = await fetch(`${API_BASE}${path}`, {
     ...init,
@@ -59,6 +103,11 @@ function normalizeVisualStyle(raw: unknown): SelfCard["visualStyle"] {
 
 export function normalizeSelfCard(raw: unknown): SelfCard {
   const obj = asObject(raw);
+  const avatarUrlRaw =
+    (obj.avatarUrl as string | null | undefined) ??
+    (obj.avatar_url as string | null | undefined) ??
+    null;
+
   return {
     id: getStr(obj, "id"),
     type: (getStr(obj, "type") as SelfCard["type"]) || "future",
@@ -68,11 +117,9 @@ export function normalizeSelfCard(raw: unknown): SelfCard {
     worldview: getStr(obj, "worldview"),
     coreBelief: getStr(obj, "coreBelief", "core_belief"),
     tradeOff: getStr(obj, "tradeOff", "trade_off"),
+    keyMoments: getArr(obj, "keyMoments", "key_moments") as string[],
     avatarPrompt: getStr(obj, "avatarPrompt", "avatar_prompt"),
-    avatarUrl:
-      (obj.avatarUrl as string | null | undefined) ??
-      (obj.avatar_url as string | null | undefined) ??
-      null,
+    avatarUrl: normalizeAssetUrl(avatarUrlRaw),
     visualStyle: normalizeVisualStyle(obj.visualStyle ?? obj.visual_style),
     voiceId: getStr(obj, "voiceId", "voice_id"),
     parentSelfId: (obj.parentSelfId as string | null | undefined) ?? (obj.parent_self_id as string | null | undefined) ?? null,
@@ -106,6 +153,11 @@ export interface InterviewReplyResponse {
   agentMessage: string;
   profileCompleteness: number;
   extractedFields: Record<string, boolean>;
+}
+
+export interface InterviewTranscribeResponse {
+  sessionId: string;
+  transcriptText: string;
 }
 
 export interface InterviewStatusResponse {
@@ -190,6 +242,65 @@ export async function replyInterview(
     profileCompleteness: getNum(raw, "profileCompleteness", "profile_completeness"),
     extractedFields: (asObject(raw.extractedFields ?? raw.extracted_fields) as Record<string, boolean>) || {},
   };
+}
+
+export async function transcribeInterviewAudio(params: {
+  sessionId: string;
+  audioBlob: Blob;
+  languageCode?: string;
+}): Promise<InterviewTranscribeResponse> {
+  const mimeType = params.audioBlob.type || "audio/webm";
+  const audioBase64 = await blobToBase64(params.audioBlob);
+
+  const raw = await apiFetch<Dict>("/interview/transcribe", {
+    method: "POST",
+    body: JSON.stringify({
+      sessionId: params.sessionId,
+      audioBase64,
+      mimeType,
+      languageCode: params.languageCode || undefined,
+    }),
+  });
+
+  return {
+    sessionId: getStr(raw, "sessionId", "session_id") || params.sessionId,
+    transcriptText: getStr(raw, "transcriptText", "transcript_text"),
+  };
+}
+
+export async function synthesizeInterviewAudio(params: {
+  sessionId: string;
+  text: string;
+  voiceId?: string;
+}): Promise<Blob> {
+  const response = await fetch(`${API_BASE}/interview/tts`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      sessionId: params.sessionId,
+      text: params.text,
+      voiceId: params.voiceId || undefined,
+    }),
+  });
+
+  if (!response.ok) {
+    let detail = `Request failed: ${response.status}`;
+    try {
+      const payload = (await response.json()) as Dict;
+      const serverDetail = payload.detail;
+      if (typeof serverDetail === "string" && serverDetail.trim()) {
+        detail = serverDetail;
+      }
+    } catch {
+      const rawText = await response.text();
+      if (rawText.trim()) {
+        detail = rawText;
+      }
+    }
+    throw new Error(detail);
+  }
+
+  return response.blob();
 }
 
 export async function getInterviewStatus(sessionId: string): Promise<InterviewStatusResponse> {
@@ -295,6 +406,21 @@ export async function replyConversation(params: {
         content: getStr(item, "content"),
       })),
   };
+}
+
+export async function uploadUserPhoto(sessionId: string, file: File): Promise<void> {
+  const form = new FormData();
+  form.append("file", file);
+
+  const response = await fetch(
+    `${API_BASE}/pipeline/upload-photo/${encodeURIComponent(sessionId)}`,
+    { method: "POST", body: form },
+  );
+
+  if (!response.ok) {
+    const text = await response.text();
+    throw new Error(text || `Photo upload failed: ${response.status}`);
+  }
 }
 
 export async function branchConversation(params: {

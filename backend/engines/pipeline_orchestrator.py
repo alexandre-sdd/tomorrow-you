@@ -18,6 +18,7 @@ from pathlib import Path
 from typing import Any
 
 from backend.config.settings import get_settings
+from backend.engines.avatar_generator import AvatarGenerator
 from backend.engines.current_self_auto_generator import (
     CurrentSelfAutoGeneratorEngine,
     CurrentSelfGenerationContext,
@@ -131,6 +132,16 @@ class PipelineOrchestrator:
         with open(path) as f:
             return json.load(f)
 
+    def _persist_avatar_urls(self, session_id: str, cards: list[SelfCard]) -> None:
+        """Write generated avatar_urls back into the saved session for the given cards."""
+        session_data = self._load_session(session_id)
+        future_selves_full: dict[str, Any] = session_data.get("futureSelvesFull", {})
+        for card in cards:
+            if card.avatar_url and card.id in future_selves_full:
+                future_selves_full[card.id]["avatarUrl"] = card.avatar_url
+        session_data["futureSelvesFull"] = future_selves_full
+        self._save_session(session_id, session_data)
+
     def _calculate_completeness(self, profile: UserProfile) -> float:
         """Calculate profile completeness as 0-1."""
         total_fields = 20
@@ -242,14 +253,19 @@ class PipelineOrchestrator:
                 f"CurrentSelf generation failed: {str(exc)}"
             ) from exc
 
+        # Generate avatar for CurrentSelf
+        avatar_url = await AvatarGenerator().generate(current_self, session_id)
+        if avatar_url:
+            current_self = current_self.model_copy(update={"avatar_url": avatar_url})
+
         # Save to session
         session_data["userProfile"] = profile.model_dump(mode="json")
         session_data["currentSelf"] = current_self.model_dump(mode="json")
         session_data["status"] = "ready_for_future_self_generation"
-        
+
         # Initialize memory tree structure with root node
         self._initialize_memory_tree(session_id, current_self)
-        
+
         self._save_session(session_id, session_data)
 
         return profile, current_self
@@ -295,11 +311,16 @@ class PipelineOrchestrator:
                 ),
                 settings=get_settings(),
             )
-            return response.future_self_options
+            selves = response.future_self_options
         except Exception as exc:
             raise PipelineOrchestratorError(
                 f"Root future self generation failed: {str(exc)}"
             ) from exc
+
+        # Generate avatars in parallel and persist updated URLs to session
+        selves = await AvatarGenerator().generate_all(selves, session_id)
+        self._persist_avatar_urls(session_id, selves)
+        return selves
 
     async def branch_from_conversation(
         self,
@@ -353,11 +374,16 @@ class PipelineOrchestrator:
                 ),
                 settings=get_settings(),
             )
-            return response.future_self_options
+            selves = response.future_self_options
         except Exception as exc:
             raise PipelineOrchestratorError(
                 f"Child future self generation failed: {str(exc)}"
             ) from exc
+
+        # Generate avatars in parallel and persist updated URLs to session
+        selves = await AvatarGenerator().generate_all(selves, session_id)
+        self._persist_avatar_urls(session_id, selves)
+        return selves
 
     def get_pipeline_status(self, session_id: str) -> dict[str, Any]:
         """

@@ -9,6 +9,14 @@ from pydantic_settings import BaseSettings
 from .runtime import get_runtime_config
 
 _runtime = get_runtime_config()
+_PROJECT_ROOT = Path(__file__).resolve().parents[2]
+
+
+def _resolve_storage_path(path_value: str) -> str:
+    path = Path(path_value).expanduser()
+    if path.is_absolute():
+        return str(path.resolve())
+    return str((_PROJECT_ROOT / path).resolve())
 
 
 class Settings(BaseSettings):
@@ -48,6 +56,8 @@ class Settings(BaseSettings):
     # ------------------------------------------------------------------
     avatar_provider: str = _runtime.app.avatar_provider  # "mistral" | "gemini"
     gemini_api_key: str | None = None
+    # Mistral model used for the image generation agent
+    mistral_image_model: str = "mistral-medium-2505"
 
     # ------------------------------------------------------------------
     # Server
@@ -68,9 +78,15 @@ class Settings(BaseSettings):
 
     @storage_root.setter
     def storage_root(self, value: str) -> None:
-        self.storage_path = value
+        self.storage_path = _resolve_storage_path(value)
 
-    model_config = {"env_file": ".env", "env_file_encoding": "utf-8"}
+    def model_post_init(self, __context: object) -> None:
+        self.storage_path = _resolve_storage_path(self.storage_path)
+
+    model_config = {
+        "env_file": str(_PROJECT_ROOT / ".env"),
+        "env_file_encoding": "utf-8",
+    }
 
 
 # Singleton — imported by engines and routers via get_settings()
