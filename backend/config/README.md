@@ -1,46 +1,31 @@
-# Config Overview
+# Backend Config
 
-This project now splits configuration into:
+Configuration is split into:
+- `runtime.yaml` for non-secret runtime defaults
+- `.env` for secrets and agent/voice IDs
 
-- `backend/config/runtime.yaml`: non-secret runtime defaults (primary file)
-- `.env`: secrets and optional overrides (API keys, agent IDs, voice IDs)
+## Runtime Config
+`backend/config/runtime.yaml` contains defaults for:
+- models and generation behavior
+- context/memory limits
+- app/server/storage defaults
 
-## Runtime Config (`runtime.yaml`)
+Override file path with:
+- `RUNTIME_CONFIG_PATH=/path/to/runtime.yaml`
 
-`runtime.yaml` is the single source of truth for non-secret knobs such as:
-
-- chat model and sampling defaults (`mistral_chat`)
-- prompt clipping limits (`prompt_composer`)
-- profile summary limits (`context_resolver`)
-- future generation defaults (`future_generation`)
-- ancestor context limits (`future_generation_context`)
-- conversation persistence defaults (`conversation_memory`)
-- transcript analysis defaults (`memory_extraction`)
-- transcript/context role inclusion (`memory_extraction.input_roles`, `future_generation_context.include_roles`)
-- CLI defaults (`cli`)
-- app/server/storage defaults used by `Settings` (`app`, `server`, `storage`)
-
-Load path:
-
-- default: `backend/config/runtime.yaml` (falls back to `runtime.json` if YAML is missing)
-- override: set `RUNTIME_CONFIG_PATH=/path/to/runtime.yaml` (or `.json`)
-
-## Settings (`settings.py`)
-
-`Settings` still loads secrets from environment variables (`.env`), while taking
-non-secret defaults from `runtime.yaml`.
-
-Required secrets:
-
+## Environment Variables
+Required:
 - `MISTRAL_API_KEY`
 - `MISTRAL_AGENT_ID_FUTURE_SELF`
 - `ELEVENLABS_API_KEY`
 - `ELEVENLABS_DEFAULT_VOICE_ID`
 
-Optional secret:
-
+Optional:
+- `MISTRAL_AGENT_ID_INTERVIEW`
+- `MISTRAL_AGENT_ID_PROFILE_EXTRACTION`
+- `MISTRAL_AGENT_ID_CURRENT_SELF_GENERATION`
+- `ELEVENLABS_VOICE_POOL_JSON`
 - `GEMINI_API_KEY`
 
-Optional override:
-
-- `ELEVENLABS_VOICE_POOL_JSON`
+## Loading Behavior
+`backend/config/settings.py` loads `.env` values and merges runtime defaults from `runtime.yaml`.

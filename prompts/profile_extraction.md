@@ -78,15 +78,15 @@ Extract into:
 - `core_values`: deeply held principles (not surface-level wants)
   - Examples: "family comes first", "doing work that matters", "continuous growth", "integrity", "adventure"
   - These are *non-negotiable* to them
-  
+
 - `fears`: what they're afraid of losing or experiencing
   - Examples: "failing at marriage", "missing my kids' childhood", "becoming irrelevant", "never reaching my potential"
   - These are *motivators* for their dilemma
-  
+
 - `hidden_tensions`: contradictions or competing values
   - Examples: "I want rapid advancement but also stability", "I'm ambitious but I don't want to sacrifice family time"
   - These are often the *source* of the dilemma
-  
+
 - `decision_style`: how they typically make decisions
   - "analytical" (pros/cons lists, data-driven)
   - "intuitive" (gut feeling)
@@ -111,7 +111,7 @@ For each user message in the interview:
 2. **Update fields** where new information exists
 3. **Rate confidence** for each piece of data (0-1 scale)
 4. **Flag contradictions** to psychology / hidden_tensions
-5. **Calculate overall profile_completeness**: 
+5. **Calculate overall profile_completeness**:
    - (# fields with confidence > 0.5) / (# total extractable fields) = %
    - Return 0-1 decimal
 6. **Return extracted_fields dict**: {field_name: is_extracted} for UI feedback
@@ -135,7 +135,7 @@ You will output JSON matching this structure (always):
     "main_challenges": ["..."]
   },
   "career_confidence": 0.0,
-  
+
   "financial": {
     "income_level": "...",
     "financial_goals": ["..."],
@@ -144,7 +144,7 @@ You will output JSON matching this structure (always):
     "main_financial_concern": "..."
   },
   "financial_confidence": 0.0,
-  
+
   "personal": {
     "hobbies": ["..."],
     "daily_routines": ["..."],
@@ -154,7 +154,7 @@ You will output JSON matching this structure (always):
     "personal_values": ["..."]
   },
   "personal_confidence": 0.0,
-  
+
   "health": {
     "physical_health": "...",
     "mental_health": "...",
@@ -164,7 +164,7 @@ You will output JSON matching this structure (always):
     "health_goals": ["..."]
   },
   "health_confidence": 0.0,
-  
+
   "life_situation": {
     "current_location": "...",
     "life_stage": "...",
@@ -173,20 +173,20 @@ You will output JSON matching this structure (always):
     "upcoming_changes": ["..."]
   },
   "life_situation_confidence": 0.0,
-  
+
   "psychology": {
     "core_values": ["..."],
     "fears": ["..."],
     "hidden_tensions": ["..."]
   },
   "psychology_confidence": 0.0,
-  
+
   "decision_style": "...",
   "decision_style_confidence": 0.0,
-  
+
   "self_narrative": "...",
   "self_narrative_confidence": 0.0,
-  
+
   "current_dilemma": "...",
   "dilemma_confidence": 0.0
 }
