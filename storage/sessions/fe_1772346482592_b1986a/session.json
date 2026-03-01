@@ -1,0 +1,238 @@
+{
+  "id": "fe_1772346482592_b1986a",
+  "status": "ready_for_future_self_generation",
+  "transcript": [
+    {
+      "id": "te_000",
+      "turn": 1,
+      "phase": "interview",
+      "role": "assistant",
+      "content": "Hello User! I'm here to get to know you and understand what brought you here today. Tell me\u2014what's going on in your life right now that made you come to Tomorrow You?",
+      "timestamp": 1772346788.320798
+    },
+    {
+      "id": "te_001",
+      "turn": 2,
+      "phase": "interview",
+      "role": "user",
+      "content": "I am a finance guy working in JP Morgan in NYC but I am burning out, I am hesitating to move into a cabin in ontario in the woods",
+      "timestamp": 1772346788.320802
+    },
+    {
+      "id": "te_002",
+      "turn": 3,
+      "phase": "interview",
+      "role": "assistant",
+      "content": "That sounds like a big transition \u2014 what's making you consider leaving the city and your career behind? And what's your living situation like right now in NYC?",
+      "timestamp": 1772346788.3208032
+    },
+    {
+      "id": "te_003",
+      "turn": 4,
+      "phase": "interview",
+      "role": "user",
+      "content": "I make a good living but the working hours are daunting and I never get to see my siblings who work over there",
+      "timestamp": 1772346788.320804
+    },
+    {
+      "id": "te_004",
+      "turn": 5,
+      "phase": "interview",
+      "role": "assistant",
+      "content": "Got it \u2014 so you're torn between stability and family. What's your income range, roughly? And what's the hardest part about the hours?",
+      "timestamp": 1772346788.3208058
+    },
+    {
+      "id": "te_005",
+      "turn": 6,
+      "phase": "interview",
+      "role": "user",
+      "content": "I make a good living but the working hours are daunting and I never get to see my siblings who work over there",
+      "timestamp": 1772346788.320807
+    },
+    {
+      "id": "te_006",
+      "turn": 7,
+      "phase": "interview",
+      "role": "assistant",
+      "content": "You're making enough to be comfortable, but the hours are draining you. What's the hardest part about the hours?",
+      "timestamp": 1772346788.320808
+    },
+    {
+      "id": "te_007",
+      "turn": 8,
+      "phase": "interview",
+      "role": "user",
+      "content": "I come home at 3 in the morning most days and go to work at 8, I barely sleep",
+      "timestamp": 1772346788.320809
+    },
+    {
+      "id": "te_008",
+      "turn": 9,
+      "phase": "interview",
+      "role": "assistant",
+      "content": "That sounds brutal. What scares you most about making a big change? And how are you actually doing \u2014 stress, energy, sleep?",
+      "timestamp": 1772346788.320811
+    },
+    {
+      "id": "te_009",
+      "turn": 10,
+      "phase": "interview",
+      "role": "user",
+      "content": "I am doing poorly, sleep deprived and stressed out but I\u2019m afraid I won\u2019t be able to have the same lifestyle if I become a forest guard in Ontario",
+      "timestamp": 1772346788.320812
+    },
+    {
+      "id": "te_010",
+      "turn": 11,
+      "phase": "interview",
+      "role": "assistant",
+      "content": "It sounds like you're torn between your current lifestyle and your well-being, with family ties pulling you toward Ontario. What's really at stake for you in this decision? Is it more about freedom, stability, or something else?",
+      "timestamp": 1772346788.3208141
+    },
+    {
+      "id": "te_011",
+      "turn": 12,
+      "phase": "interview",
+      "role": "user",
+      "content": "Stability",
+      "timestamp": 1772346788.320815
+    },
+    {
+      "id": "te_012",
+      "turn": 13,
+      "phase": "interview",
+      "role": "assistant",
+      "content": "Got it. What does stability mean to you in this context? Is it financial security, routine, or something else?",
+      "timestamp": 1772346788.320816
+    },
+    {
+      "id": "te_013",
+      "turn": 14,
+      "phase": "interview",
+      "role": "user",
+      "content": "It\u2019s financial security",
+      "timestamp": 1772346788.320818
+    },
+    {
+      "id": "te_014",
+      "turn": 15,
+      "phase": "interview",
+      "role": "assistant",
+      "content": "I see. How do you feel about taking financial risks? Are you someone who prefers to play it safe or are you open to some uncertainty?",
+      "timestamp": 1772346788.320819
+    },
+    {
+      "id": "te_015",
+      "turn": 16,
+      "phase": "interview",
+      "role": "user",
+      "content": "I like to keep some uncertainty",
+      "timestamp": 1772346788.3208199
+    },
+    {
+      "id": "te_016",
+      "turn": 17,
+      "phase": "interview",
+      "role": "assistant",
+      "content": "Got it. What's the story you tell yourself about why you're still at JP Morgan despite feeling burned out?",
+      "timestamp": 1772346788.320821
+    }
+  ],
+  "userProfile": {
+    "id": "",
+    "core_values": [
+      "family connections",
+      "work-life balance"
+    ],
+    "fears": [
+      "regretting a career change",
+      "losing financial stability"
+    ],
+    "hidden_tensions": [
+      "financial security vs. personal well-being",
+      "career burnout vs. desire for a radical lifestyle change"
+    ],
+    "decision_style": "avoidant",
+    "self_narrative": "A finance professional seeking balance between career and personal life",
+    "current_dilemma": "Should I leave my career and city life for a cabin in the woods?",
+    "career": {
+      "job_title": "finance professional",
+      "industry": "finance",
+      "seniority_level": "mid",
+      "years_experience": 0,
+      "current_company": "JP Morgan",
+      "career_goal": "",
+      "job_satisfaction": "burning out",
+      "main_challenges": [
+        "long working hours",
+        "lack of work-life balance"
+      ]
+    },
+    "financial": {
+      "income_level": "comfortable",
+      "financial_goals": [],
+      "money_mindset": "security-focused",
+      "risk_tolerance": "low",
+      "main_financial_concern": "losing financial stability with a career change"
+    },
+    "personal": {
+      "hobbies": [],
+      "daily_routines": [
+        "working late hours"
+      ],
+      "main_interests": [],
+      "relationships": "single",
+      "key_relationships": [
+        "siblings"
+      ],
+      "personal_values": [
+        "family connections"
+      ]
+    },
+    "health": {
+      "physical_health": "needs attention",
+      "mental_health": "burnout",
+      "sleep_quality": "very poor",
+      "exercise_frequency": "none",
+      "stress_level": "high",
+      "health_goals": [
+        "improving sleep quality",
+        "reducing stress"
+      ]
+    },
+    "life_situation": {
+      "current_location": "NYC",
+      "life_stage": "mid-career pivot",
+      "major_responsibilities": [],
+      "recent_transitions": [],
+      "upcoming_changes": [
+        "moving to a cabin in Ontario"
+      ]
+    }
+  },
+  "currentSelf": {
+    "id": "self_current_4a8b4fc6",
+    "type": "current",
+    "name": "Current Self",
+    "optimization_goal": "Balance financial security and personal well-being while evaluating a career change",
+    "tone_of_voice": "Measured and slightly tense, with an undercurrent of restlessness; analytical but hesitant to commit",
+    "worldview": "Life decisions should be made with great prudence to avoid regret, but security must sometimes be challenged for true fulfillment",
+    "core_belief": "Stability is a necessity, but happiness requires occasional risk",
+    "trade_off": "Optimizing for emotional freedom vs. sacrificing financial certainty",
+    "avatar_prompt": "A mid-30s finance professional in a NYC apartment, wearing a tailored but slightly loosened suit, staring out the window at the city skyline. Face shows quiet conflict\u2014eyes focused but brows slightly furrowed, shoulders tense. Soft afternoon light casts shadows, emphasizing the weight of decision. Cinematic portrait with a touch of urban grit and introspection, premium product photography style.",
+    "avatar_url": null,
+    "visual_style": {
+      "primary_color": "#3A506B",
+      "accent_color": "#D4A5A5",
+      "mood": "sharp",
+      "glow_intensity": 0.4
+    },
+    "voice_id": "voice_sharp_001",
+    "parent_self_id": null,
+    "depth_level": 0,
+    "children_ids": []
+  },
+  "createdAt": 1772346482.601321,
+  "updatedAt": 1772346797.501478
+}

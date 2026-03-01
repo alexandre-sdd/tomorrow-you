@@ -1,0 +1,278 @@
+{
+  "id": "fe_1772344105474_892afb",
+  "status": "ready_for_future_self_generation",
+  "transcript": [
+    {
+      "id": "te_000",
+      "turn": 1,
+      "phase": "interview",
+      "role": "assistant",
+      "content": "Hello User! I'm here to get to know you and understand what brought you here today. Tell me\u2014what's going on in your life right now that made you come to Tomorrow You?",
+      "timestamp": 1772344386.904712
+    },
+    {
+      "id": "te_001",
+      "turn": 2,
+      "phase": "interview",
+      "role": "user",
+      "content": "Im lost",
+      "timestamp": 1772344386.904715
+    },
+    {
+      "id": "te_002",
+      "turn": 3,
+      "phase": "interview",
+      "role": "assistant",
+      "content": "I hear you. Let's start with the basics. What's your current living situation and what stage of life are you in?",
+      "timestamp": 1772344386.904717
+    },
+    {
+      "id": "te_003",
+      "turn": 4,
+      "phase": "interview",
+      "role": "user",
+      "content": "I am an alcoholic student living under a bridge",
+      "timestamp": 1772344386.9047182
+    },
+    {
+      "id": "te_004",
+      "turn": 5,
+      "phase": "interview",
+      "role": "assistant",
+      "content": "That sounds incredibly tough. How long have you been living under the bridge, and what's your current relationship with school?",
+      "timestamp": 1772344386.904719
+    },
+    {
+      "id": "te_005",
+      "turn": 6,
+      "phase": "interview",
+      "role": "user",
+      "content": "I am a senior and I lived there for three weeks now",
+      "timestamp": 1772344386.9047198
+    },
+    {
+      "id": "te_006",
+      "turn": 7,
+      "phase": "interview",
+      "role": "assistant",
+      "content": "Got it. What's your financial situation like right now? Are you getting any support from family, friends, or school resources?",
+      "timestamp": 1772344386.904722
+    },
+    {
+      "id": "te_007",
+      "turn": 8,
+      "phase": "interview",
+      "role": "user",
+      "content": "I have a few savings and I bathe dogs for a dime, school ressources are food",
+      "timestamp": 1772344386.904723
+    },
+    {
+      "id": "te_008",
+      "turn": 9,
+      "phase": "interview",
+      "role": "assistant",
+      "content": "I see. How are you feeling emotionally and physically with all this going on? What's the hardest part about your current situation?",
+      "timestamp": 1772344386.904724
+    },
+    {
+      "id": "te_009",
+      "turn": 10,
+      "phase": "interview",
+      "role": "user",
+      "content": "hmm feeling fine all things considered",
+      "timestamp": 1772344386.904725
+    },
+    {
+      "id": "te_010",
+      "turn": 11,
+      "phase": "interview",
+      "role": "assistant",
+      "content": "Got it. What's the main thing you're wrestling with right now? Is it more about finding a stable place to live, getting back on track with school, or something else?",
+      "timestamp": 1772344386.904727
+    },
+    {
+      "id": "te_011",
+      "turn": 12,
+      "phase": "interview",
+      "role": "user",
+      "content": "alcohol man",
+      "timestamp": 1772344386.9047282
+    },
+    {
+      "id": "te_012",
+      "turn": 13,
+      "phase": "interview",
+      "role": "assistant",
+      "content": "I hear you. What scares you most about your relationship with alcohol right now?",
+      "timestamp": 1772344386.9047291
+    },
+    {
+      "id": "te_013",
+      "turn": 14,
+      "phase": "interview",
+      "role": "user",
+      "content": "I fear that I will naver be able to stop and that I wont be able to get a job",
+      "timestamp": 1772344386.90473
+    },
+    {
+      "id": "te_014",
+      "turn": 15,
+      "phase": "interview",
+      "role": "assistant",
+      "content": "It sounds like you're torn between your struggle with alcohol and the fear of not being able to build a stable future. Does that capture it, or am I missing something?",
+      "timestamp": 1772344386.9047308
+    },
+    {
+      "id": "te_015",
+      "turn": 16,
+      "phase": "interview",
+      "role": "user",
+      "content": "No you got it",
+      "timestamp": 1772344386.904733
+    },
+    {
+      "id": "te_016",
+      "turn": 17,
+      "phase": "interview",
+      "role": "assistant",
+      "content": "Got it. What's the main thing holding you back from making a change right now? Is it fear, lack of support, or something else?",
+      "timestamp": 1772344386.904735
+    },
+    {
+      "id": "te_017",
+      "turn": 18,
+      "phase": "interview",
+      "role": "user",
+      "content": "It\u2019s lack of support I think",
+      "timestamp": 1772344386.904736
+    },
+    {
+      "id": "te_018",
+      "turn": 19,
+      "phase": "interview",
+      "role": "assistant",
+      "content": "Before I hand this off, one key piece is still missing. What matters most to you in this decision right now\u2014security, growth, stability, impact, or something else?",
+      "timestamp": 1772344386.904737
+    },
+    {
+      "id": "te_019",
+      "turn": 20,
+      "phase": "interview",
+      "role": "user",
+      "content": "I would say security",
+      "timestamp": 1772344386.904738
+    },
+    {
+      "id": "te_020",
+      "turn": 21,
+      "phase": "interview",
+      "role": "assistant",
+      "content": "Before I hand this off, one key piece is still missing. What matters most to you in this decision right now\u2014security, growth, stability, impact, or something else?",
+      "timestamp": 1772344386.9047391
+    },
+    {
+      "id": "te_021",
+      "turn": 22,
+      "phase": "interview",
+      "role": "user",
+      "content": "growth",
+      "timestamp": 1772344386.904741
+    },
+    {
+      "id": "te_022",
+      "turn": 23,
+      "phase": "interview",
+      "role": "assistant",
+      "content": "Before I hand this off, one key piece is still missing. What matters most to you in this decision right now\u2014security, growth, stability, impact, or something else?",
+      "timestamp": 1772344386.904742
+    }
+  ],
+  "userProfile": {
+    "id": "",
+    "core_values": [],
+    "fears": [
+      "never being able to stop drinking",
+      "not being able to get a job",
+      "instability",
+      "failure"
+    ],
+    "hidden_tensions": [
+      "desire for stability vs. current instability",
+      "struggle with alcohol vs. desire for a stable future"
+    ],
+    "decision_style": "avoidant",
+    "self_narrative": "lost and struggling",
+    "current_dilemma": "struggle with alcohol addiction",
+    "career": {
+      "job_title": "",
+      "industry": "",
+      "seniority_level": "",
+      "years_experience": 0,
+      "current_company": "",
+      "career_goal": "",
+      "job_satisfaction": "",
+      "main_challenges": []
+    },
+    "financial": {
+      "income_level": "0-50k",
+      "financial_goals": [],
+      "money_mindset": "survival",
+      "risk_tolerance": "low",
+      "main_financial_concern": "basic needs"
+    },
+    "personal": {
+      "hobbies": [],
+      "daily_routines": [
+        "bathing dogs"
+      ],
+      "main_interests": [],
+      "relationships": "single",
+      "key_relationships": [],
+      "personal_values": []
+    },
+    "health": {
+      "physical_health": "needs attention",
+      "mental_health": "managing stress",
+      "sleep_quality": "poor",
+      "exercise_frequency": "none",
+      "stress_level": "high",
+      "health_goals": [
+        "sobriety",
+        "stable housing"
+      ]
+    },
+    "life_situation": {
+      "current_location": "under a bridge",
+      "life_stage": "early adulthood crisis",
+      "major_responsibilities": [],
+      "recent_transitions": [
+        "homelessness"
+      ],
+      "upcoming_changes": []
+    }
+  },
+  "currentSelf": {
+    "id": "self_current_29e75823",
+    "type": "current",
+    "name": "Current Self",
+    "optimization_goal": "Balance immediate survival needs with the desire for long-term stability, while avoiding the pull of alcohol",
+    "tone_of_voice": "Guarded and restless, with moments of vulnerability. Speaks in short, cautious phrases, voice slightly hoarse",
+    "worldview": "The world is unstable and unpredictable, but survival depends on small, consistent choices that defy immediate impulses",
+    "core_belief": "I can't trust my own cravings to make good decisions",
+    "trade_off": "Optimizing for momentary relief from alcohol cravings vs. sacrificing the foundation for a stable future",
+    "avatar_prompt": "A young adult (early 20s) in worn-out clothes, sitting on the rough ground under a bridge in an urban area, knees drawn up. Dark circles under eyes, unshaven face, hands clutching a bottle. Expression is weary but with a flicker of self-awareness. Cool blue lighting casts shadows on face, highlighting tension. Cinematic portrait with shallow depth of field, gritty but humanizing details.",
+    "avatar_url": null,
+    "visual_style": {
+      "primary_color": "#2A3E54",
+      "accent_color": "#E84A5F",
+      "mood": "intense",
+      "glow_intensity": 0.4
+    },
+    "voice_id": "voice_intense_001",
+    "parent_self_id": null,
+    "depth_level": 0,
+    "children_ids": []
+  },
+  "createdAt": 1772344105.4972851,
+  "updatedAt": 1772344393.573648
+}
