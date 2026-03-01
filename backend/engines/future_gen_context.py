@@ -138,7 +138,7 @@ def collect_sibling_names(
     full = session_data.get("futureSelvesFull", {})
     child_ids = session_data.get("explorationPaths", {}).get(parent_key, [])
     return [
-        full[cid].get("name", full[cid].get("name", ""))
+        full[cid].get("name", "")
         for cid in child_ids
         if cid in full
     ]

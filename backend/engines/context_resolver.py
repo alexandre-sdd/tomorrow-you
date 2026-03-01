@@ -61,6 +61,43 @@ class ContextResolver:
             profile_summary=self._build_profile_summary(user_profile),
         )
 
+    def find_branch_for_self(self, session_id: str, self_id: str) -> str:
+        """
+        Return the branch name whose headNodeId points to the memory node
+        holding the given self_id as its selfCard.id.
+
+        Raises ContextResolutionError if no matching node or branch is found.
+        """
+        session_dir = self.storage_root / session_id
+        session = self._load_required_json(session_dir / "session.json")
+        nodes_by_id = self._load_nodes(session_dir, session)
+        branches = self._load_branches(session_dir, session)
+
+        target_node_id: str | None = None
+        for node_id, node in nodes_by_id.items():
+            self_card = node.get("selfCard")
+            if isinstance(self_card, dict) and self_card.get("id") == self_id:
+                target_node_id = node_id
+                break
+
+        if target_node_id is None:
+            raise ContextResolutionError(
+                f"No memory node found with selfCard.id == '{self_id}' in session '{session_id}'"
+            )
+
+        for branch in branches:
+            if branch.get("headNodeId") == target_node_id:
+                name = branch.get("name")
+                if isinstance(name, str) and name:
+                    return name
+                raise ContextResolutionError(
+                    f"Branch pointing to node '{target_node_id}' has no valid name"
+                )
+
+        raise ContextResolutionError(
+            f"No branch found with headNodeId == '{target_node_id}' (self_id='{self_id}')"
+        )
+
     def _load_branches(self, session_dir: Path, session: JsonDict) -> list[JsonDict]:
         branches_path = session_dir / "memory" / "branches.json"
         if branches_path.exists():

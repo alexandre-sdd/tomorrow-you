@@ -129,3 +129,38 @@ class RawSelfCard(BaseModel):
 
 class RawFutureSelvesOutput(BaseModel):
     future_selves: list[RawSelfCard]
+
+
+# ---------------------------------------------------------------------------
+# Request / Response models for POST /conversation/reply
+# ---------------------------------------------------------------------------
+
+class ConversationMessage(BaseModel):
+    model_config = _camel_config()
+
+    role: Literal["user", "assistant"]
+    content: str
+
+
+class ConversationReplyRequest(BaseModel):
+    model_config = _camel_config()
+
+    session_id: str
+    self_id: str
+    message: str
+    history: list[ConversationMessage] = Field(
+        default_factory=list,
+        description="All prior turns, oldest first. Client owns history — send full history on every request.",
+    )
+
+
+class ConversationReplyResponse(BaseModel):
+    model_config = _camel_config()
+
+    session_id: str
+    self_id: str
+    branch_name: str
+    reply: str
+    history: list[ConversationMessage] = Field(
+        description="Updated history including the new user turn and assistant reply. Replace client-side history with this value.",
+    )

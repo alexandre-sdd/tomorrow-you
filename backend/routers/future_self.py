@@ -7,6 +7,8 @@ from pathlib import Path
 from fastapi import APIRouter, Depends, HTTPException
 
 from backend.config.settings import Settings, get_settings
+from backend.engines import ContextResolver
+from backend.engines.context_resolver import ContextResolutionError
 from backend.engines.future_gen_context import (
     collect_sibling_names,
     resolve_ancestor_context,
@@ -242,9 +244,16 @@ async def generate_future_selves(
         parent_node_id = _find_node_id_for_self(
             request.session_id, settings.storage_path, request.parent_self_id
         )
-        # Use hashed branch name (deterministic, collision-safe)
-        now_for_branch = time.time()
-        parent_branch_name = hash_id(parent_self.name, "branch", now_for_branch)
+        # Look up the branch name that was stored when this self was generated
+        try:
+            _res = ContextResolver(storage_root=settings.storage_path)
+            parent_branch_name = _res.find_branch_for_self(
+                request.session_id, request.parent_self_id
+            )
+        except ContextResolutionError as exc:
+            raise HTTPException(
+                status_code=500, detail=f"Cannot resolve parent branch: {exc}"
+            ) from exc
         level_desc = f"from '{parent_self.name}'"
 
         # Resolve ancestor chain + conversation excerpts
