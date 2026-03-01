@@ -128,18 +128,27 @@ def _create_memory_branches(
 
         node_id = hash_id(self_card.id, parent_node_id, now)
 
+        facts_list = [
+            {
+                "id": hash_id(self_card.optimization_goal, node_id, now),
+                "fact": f"Optimizes for: {self_card.optimization_goal}",
+                "source": "interview",
+                "extractedAt": now,
+            }
+        ]
+        for moment in self_card.key_moments:
+            facts_list.append({
+                "id": hash_id(moment, node_id, now),
+                "fact": moment,
+                "source": "interview",
+                "extractedAt": now,
+            })
+
         node_data = {
             "id": node_id,
             "parentId": parent_node_id,
             "branchLabel": branch_name,
-            "facts": [
-                {
-                    "id": hash_id(self_card.optimization_goal, node_id, now),
-                    "fact": f"Optimizes for: {self_card.optimization_goal}",
-                    "source": "interview",
-                    "extractedAt": now,
-                }
-            ],
+            "facts": facts_list,
             "notes": [f"Branch node for: {self_card.name} (parent: {parent_branch_name})"],
             "selfCard": self_card.model_dump(by_alias=True),
             "createdAt": now,

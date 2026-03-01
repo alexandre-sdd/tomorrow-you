@@ -47,6 +47,8 @@ export interface SelfCard {
   worldview: string;
   coreBelief: string;
   tradeOff: string;
+  /** 2-3 concrete past events that ground the persona in conversation (prevents LLM hallucination) */
+  keyMoments: string[];
   avatarPrompt: string;
   avatarUrl: string | null;
   visualStyle: VisualStyle;

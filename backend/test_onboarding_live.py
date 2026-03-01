@@ -410,6 +410,22 @@ def run_interactive(client: TestClient, session_id: str, user_name: str, use_str
             print("Unknown command. Type /help to see available commands.")
             continue
 
+        # Bare integer during exploration = implicit /use <n>
+        if phase == "exploration" and user_text.isdigit():
+            if not available_selves:
+                print("No selves available yet. Run /complete first.")
+                continue
+            idx = int(user_text)
+            if 1 <= idx <= len(available_selves):
+                chosen_id = str(available_selves[idx - 1].get("id", ""))
+                active_self_id = chosen_id
+                histories_by_self.setdefault(active_self_id, [])
+                _list_selves(available_selves, current_self_id=active_self_id)
+                print(f"Switched to self [{idx}]. Start chatting or use /branch to go deeper.")
+            else:
+                print(f"Invalid selection. Choose 1–{len(available_selves)}.")
+            continue
+
         if phase == "onboarding":
             print("Agent: ", end="", flush=True)
             reply_fn = _reply_stream if use_streaming else _reply

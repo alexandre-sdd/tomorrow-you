@@ -40,6 +40,10 @@ class SelfCard(BaseModel):
     worldview: str
     core_belief: str
     trade_off: str
+    key_moments: list[str] = Field(
+        default_factory=list,
+        description="2-3 concrete grounding events: short first-person past-tense sentences."
+    )
     avatar_prompt: str = ""
     avatar_url: str | None = None
     visual_style: VisualStyle
@@ -350,6 +354,7 @@ class RawSelfCard(BaseModel):
     worldview: str
     core_belief: str
     trade_off: str
+    key_moments: list[str]  # 2-3 grounding events, required from Mistral output
     avatar_prompt: str
     avatar_url: None  # enforced null from Mistral output
     visual_style: RawVisualStyle

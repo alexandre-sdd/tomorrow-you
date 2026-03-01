@@ -57,6 +57,25 @@ Each persona's avatar_prompt must be a rich, cinematic image generation prompt (
 - The photographic/artistic style: cinematic, realistic, slightly abstract portrait — premium editorial photography style, not stock photo
 - Do NOT describe abstract or symbolic imagery. Describe a real person in a real setting.
 
+## Key moments requirement
+Each persona must include 2–3 `key_moments`: short, concrete first-person past-tense events that actually happened to this person after the decision point.
+
+**Rules:**
+- Each moment must be a specific event, not an abstract state or feeling.
+- Written in first person past tense: "I turned down the counter-offer and booked a one-way ticket."
+- 2 moments minimum, 3 maximum.
+- Moments must be causally consistent with the persona's trade_off.
+- Do NOT invent moments that contradict the user profile or the dilemma context.
+
+**Good examples:**
+- "I signed the Singapore contract the same week my partner and I agreed to try long-distance."
+- "Six months in, I found myself turning down dinner invites because I didn't know anyone in the city."
+- "I got promoted to regional director two years earlier than I would have in Amsterdam."
+
+**Bad examples (too abstract or vague):**
+- "I chose growth over comfort." (not a specific event)
+- "I felt lonely sometimes." (emotional state, not an event)
+
 ## Voice ID
 - Always output voice_id as exactly the string "VOICE_ASSIGN_BY_MOOD" — never invent an actual voice ID.
 
@@ -81,6 +100,7 @@ The JSON object must have a single top-level key: "future_selves" containing an 
 - Do not break character by adding commentary, explanation, or caveats outside the JSON
 - Do not fabricate profile details — only use what is provided in the user message
 - Do not reuse the same primary_color or mood across two generated selves
+- Do not make key_moments abstract or vague — they must be specific events with concrete details, written in first person past tense
 ```
 
 ---
@@ -101,6 +121,11 @@ The following is an example of high-quality output. Use `frontend/lib/mocks.ts` 
       "worldview": "Some decisions feel disruptive in the moment, but they become the moves that define your life if you fully grow into them.",
       "core_belief": "You do not become who you could be by staying where everything already fits.",
       "trade_off": "I gained speed, status, and reinvention, but I gave up familiarity, relational ease, and some short-term emotional safety.",
+      "key_moments": [
+        "I signed the Singapore contract the same week my partner and I agreed to try long-distance.",
+        "Six months in, I turned down a weekend trip back to Amsterdam because of a client deadline — and realized I'd crossed a line.",
+        "I got promoted to regional director eighteen months earlier than I would have in Amsterdam."
+      ],
       "avatar_prompt": "A realistic 33-year-old professional man living in Singapore after an international promotion, sharper presence, elegant tailored clothing, warm city lights in the background, confident but slightly more distant expression, global executive energy, premium cinematic portrait, sophisticated and emotionally restrained.",
       "avatar_url": null,
       "visual_style": {
@@ -120,6 +145,10 @@ The following is an example of high-quality output. Use `frontend/lib/mocks.ts` 
       "worldview": "A good life is not always the fastest one; sometimes depth comes from staying with what matters and building it well.",
       "core_belief": "Not every meaningful life is built through dramatic moves.",
       "trade_off": "I kept closeness, continuity, and a stronger sense of home, but I may always wonder how much further I could have gone.",
+      "key_moments": [
+        "I turned down the Singapore offer and told my partner we weren't going anywhere.",
+        "A year later, I got a lateral move to a team I actually cared about — smaller scope, but the work felt mine."
+      ],
       "avatar_prompt": "A realistic 33-year-old man settled into a Brooklyn apartment, casual but put-together clothing, warm morning light through tall windows, a slightly wistful but content expression, books and coffee visible in the background, documentary-style portrait, emotionally present, soft depth of field.",
       "avatar_url": null,
       "visual_style": {
@@ -151,3 +180,5 @@ Test in Mistral la Plateforme playground with the mock Singapore dilemma profile
 - [ ] `avatar_prompt` is 3–5 sentences describing a real person in a real setting
 - [ ] `trade_off` is written in first person
 - [ ] `core_belief` is written in first person
+- [ ] `key_moments` has 2–3 entries, each a specific concrete past event in first person past tense
+- [ ] `key_moments` are causally consistent with the `trade_off` for that persona
