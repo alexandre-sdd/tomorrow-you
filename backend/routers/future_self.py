@@ -9,6 +9,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from backend.config.runtime import get_runtime_config
 from backend.config.settings import Settings, get_settings
 from backend.engines import ContextResolver
+from backend.engines.avatar_generator import AvatarGenerator
 from backend.engines.conversation_memory import analyze_and_persist_transcript_insights
 from backend.engines.context_resolver import ContextResolutionError
 from backend.engines.future_gen_context import (
@@ -312,6 +313,10 @@ async def generate_future_selves(
         future_selves = await _get_generator().generate(ctx)
     except ValueError as exc:
         raise HTTPException(status_code=500, detail=str(exc)) from exc
+
+    # 5b. Generate avatars for all future selves
+    avatar_gen = AvatarGenerator()
+    future_selves = await avatar_gen.generate_all(future_selves, request.session_id)
 
     # 6. Update parent's children_ids (non-root only)
     if request.parent_self_id and request.parent_self_id in session_data["futureSelvesFull"]:

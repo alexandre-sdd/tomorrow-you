@@ -567,6 +567,7 @@ export default function HomePage() {
 
       {step === "profile" && userProfile && currentSelf ? (
         <ProfileRevealScreen
+          sessionId={sessionId}
           profile={userProfile}
           currentSelf={currentSelf}
           onContinue={() => setStep("selection")}

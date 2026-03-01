@@ -517,6 +517,93 @@ button:disabled {
   color: #fff;
   font-size: 16px;
   font-weight: 700;
+  flex-shrink: 0;
+}
+
+.avatar-image {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.15);
+  flex-shrink: 0;
+}
+
+/* Photo upload section on ProfileRevealScreen */
+.photo-upload-section {
+  display: grid;
+  gap: 12px;
+  padding: 20px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.photo-upload-label {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.photo-upload-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.photo-preview {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  flex-shrink: 0;
+}
+
+.photo-preview-placeholder {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  border: 2px dashed rgba(255, 255, 255, 0.2);
+  display: grid;
+  place-items: center;
+  color: var(--muted);
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.photo-upload-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.photo-status {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.photo-status-ok {
+  color: #6fcf97;
+}
+
+.photo-status-err {
+  color: #eb5757;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 .conversation-layout {

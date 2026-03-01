@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 from backend.config.settings import get_settings
 from backend.routers.conversation import router as conversation_router
@@ -29,6 +30,10 @@ app.include_router(onboarding_router)
 app.include_router(future_self_router)
 app.include_router(conversation_router)
 app.include_router(pipeline_router)
+
+# Serve generated avatar images as static files.
+# URL pattern: /avatars/{session_id}/avatars/{self_id}.png
+app.mount("/avatars", StaticFiles(directory=settings.storage_path), name="avatars")
 
 
 @app.get("/health")
