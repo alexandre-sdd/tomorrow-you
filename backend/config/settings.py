@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from pathlib import Path
 
 from pydantic import Field
 from pydantic_settings import BaseSettings
@@ -14,7 +15,12 @@ class Settings(BaseSettings):
     mistral_model: str = "mistral-large-latest"
 
     # Mistral Agent IDs — one per agent created on la Plateforme
+    # Create agents at https://console.mistral.ai/agents
+    # Paste system prompts from prompts/<agent_name>.md into agent builder
     mistral_agent_id_future_self: str  # e.g. ag:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+    mistral_agent_id_interview: str = ""  # Optional: for interview agent (can use base model)
+    mistral_agent_id_profile_extraction: str = ""  # For incremental profile extraction
+    mistral_agent_id_current_self_generation: str = ""  # For CurrentSelf auto-generation
 
     # ------------------------------------------------------------------
     # ElevenLabs
@@ -49,9 +55,14 @@ class Settings(BaseSettings):
     # ------------------------------------------------------------------
     # Storage
     # ------------------------------------------------------------------
-    storage_path: str = "./storage/sessions"
+    storage_root: str = "./storage/sessions"
+    storage_path: str = "./storage/sessions"  # Alias for backward compat
+    project_root: str = "."  # Root directory of the project (for prompts/)
 
-    model_config = {"env_file": ".env", "env_file_encoding": "utf-8"}
+    model_config = {
+        "env_file": str(Path(__file__).resolve().parents[2] / ".env"),
+        "env_file_encoding": "utf-8",
+    }
 
 
 # Singleton — imported by engines and routers via get_settings()
