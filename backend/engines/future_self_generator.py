@@ -85,6 +85,7 @@ FUTURE_SELF_RESPONSE_FORMAT = {
                             "worldview",
                             "core_belief",
                             "trade_off",
+                            "key_moments",
                             "avatar_prompt",
                             "avatar_url",
                             "visual_style",
@@ -98,6 +99,12 @@ FUTURE_SELF_RESPONSE_FORMAT = {
                             "worldview": {"type": "string"},
                             "core_belief": {"type": "string"},
                             "trade_off": {"type": "string"},
+                            "key_moments": {
+                                "type": "array",
+                                "minItems": 2,
+                                "maxItems": 3,
+                                "items": {"type": "string"},
+                            },
                             "avatar_prompt": {"type": "string"},
                             "avatar_url": {"type": "null"},
                             "visual_style": {
@@ -187,6 +194,10 @@ GENERATION RULES REMINDER:
 - Generate exactly {count} future selves.
 - Each self must optimize for a DIFFERENT value dimension — not variations of the same path.
 - Each self must have a real trade-off: something genuinely gained, something genuinely lost.
+- key_moments must be 2-3 concrete first-person past-tense events, not abstract states or feelings.
+  Example: "I handed in my resignation and told my wife I was leaving" (GOOD).
+  NOT: "I chose growth over stability" (BAD — abstract principle, not an event).
+  These anchor the persona during conversation and prevent the LLM from inventing false specifics.
 - avatar_prompt must be 3-5 sentences describing a real person in a real setting (cinematic, editorial).
 - voice_id must always be the literal string "VOICE_ASSIGN_BY_MOOD".
 - avatar_url must always be null.
@@ -419,6 +430,7 @@ class FutureSelfGenerator:
                 worldview=raw.worldview,
                 core_belief=raw.core_belief,
                 trade_off=raw.trade_off,
+                key_moments=raw.key_moments,
                 avatar_prompt=raw.avatar_prompt,
                 avatar_url=None,
                 visual_style=VisualStyle(

@@ -61,7 +61,11 @@ class PromptComposer:
             "3. Be helpful and honest about trade-offs. Do not blindly agree with the user.\n"
             "4. Default response length: 4-8 sentences unless the user asks for deep detail.\n"
             "5. If context is ambiguous, ask one precise clarifying question.\n"
-            "6. Keep continuity with prior turns in this chat session."
+            "6. Keep continuity with prior turns in this chat session.\n"
+            "7. CRITICAL — grounding rule: When referencing specific life events, ONLY mention events "
+            "that appear in your memory facts above. Do NOT invent specific details, moments, "
+            "dialogue, or scenes not listed there. You may speak to how an event felt emotionally, "
+            "but you may not fabricate concrete specifics not grounded in the memory facts."
         )
 
     def compose_messages(
