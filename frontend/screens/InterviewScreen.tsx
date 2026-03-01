@@ -25,7 +25,8 @@ interface InterviewScreenProps {
   onSend: (text: string) => Promise<void>;
   onRefreshStatus: () => Promise<void>;
   onComplete: () => Promise<void>;
-  onToggleRecording: () => Promise<void>;
+  onStartRecording: () => Promise<void>;
+  onStopRecording: () => Promise<void>;
   onReplayLastAudio: () => Promise<void>;
 }
 
@@ -44,7 +45,8 @@ export function InterviewScreen({
   onSend,
   onRefreshStatus,
   onComplete,
-  onToggleRecording,
+  onStartRecording,
+  onStopRecording,
   onReplayLastAudio,
 }: InterviewScreenProps) {
   const completionPct = profileCompleteness * 100;
@@ -52,7 +54,7 @@ export function InterviewScreen({
   const isVoiceBusy = isTranscribing || isSynthesizing;
   const inputDisabled = isSending || isCompleting || isVoiceBusy || isRecording;
   const recordButtonLabel = isRecording ? "■" : "🎙";
-  const recordButtonTitle = isRecording ? "Stop recording" : "Start recording";
+  const recordButtonTitle = isRecording ? "Release to stop" : "Hold to talk";
   const voiceStatus = isRecording
     ? "Recording..."
     : isTranscribing
@@ -128,7 +130,8 @@ export function InterviewScreen({
         secondaryActionTitle={recordButtonTitle}
         secondaryActionClassName={isRecording ? "recording-button icon-button" : "ghost-button icon-button"}
         secondaryActionDisabled={isCompleting || isSending || isVoiceBusy}
-        onSecondaryAction={onToggleRecording}
+        onSecondaryActionPressStart={onStartRecording}
+        onSecondaryActionPressEnd={onStopRecording}
         onSubmit={onSend}
       />
     </section>

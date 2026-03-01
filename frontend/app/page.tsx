@@ -84,6 +84,8 @@ export default function HomePage() {
   const interviewChunksRef = useRef<Blob[]>([]);
   const interviewAudioRef = useRef<HTMLAudioElement | null>(null);
   const interviewAudioUrlRef = useRef<string | null>(null);
+  const interviewPressActiveRef = useRef(false);
+  const interviewRecorderStartingRef = useRef(false);
 
   const activeSelf = useMemo(() => {
     if (!activeSelfId) {
@@ -111,6 +113,8 @@ export default function HomePage() {
   };
 
   const releaseInterviewMic = () => {
+    interviewPressActiveRef.current = false;
+    interviewRecorderStartingRef.current = false;
     if (interviewStreamRef.current) {
       for (const track of interviewStreamRef.current.getTracks()) {
         track.stop();
@@ -173,6 +177,7 @@ export default function HomePage() {
     setError("");
     setInfo("");
     setIsStarting(true);
+    interviewPressActiveRef.current = false;
     stopInterviewPlayback();
     releaseInterviewMic();
     setLastReplyAudioBlob(null);
@@ -249,15 +254,27 @@ export default function HomePage() {
     }
   };
 
-  const handleToggleInterviewRecording = async () => {
-    if (!sessionId) {
-      return;
+  const handleStopInterviewRecording = async () => {
+    interviewPressActiveRef.current = false;
+    const activeRecorder = interviewRecorderRef.current;
+    if (activeRecorder && activeRecorder.state !== "inactive") {
+      activeRecorder.stop();
     }
+  };
 
-    if (isRecordingInterview) {
-      const activeRecorder = interviewRecorderRef.current;
-      if (activeRecorder && activeRecorder.state !== "inactive") {
-        activeRecorder.stop();
+  const handleStartInterviewRecording = async () => {
+    interviewPressActiveRef.current = true;
+    if (
+      !sessionId
+      || isRecordingInterview
+      || interviewRecorderStartingRef.current
+      || isTranscribingInterview
+      || isSynthesizingInterview
+      || isSendingInterview
+      || isCompletingOnboarding
+    ) {
+      if (!isRecordingInterview) {
+        interviewPressActiveRef.current = false;
       }
       return;
     }
@@ -266,10 +283,12 @@ export default function HomePage() {
     setInfo("");
 
     if (typeof window === "undefined" || !navigator?.mediaDevices?.getUserMedia) {
+      interviewPressActiveRef.current = false;
       setError("Microphone is not available in this browser.");
       return;
     }
 
+    interviewRecorderStartingRef.current = true;
     try {
       stopInterviewPlayback();
 
@@ -338,13 +357,18 @@ export default function HomePage() {
 
       recorder.start();
       setIsRecordingInterview(true);
-      setInfo("Recording... click stop when finished.");
+      setInfo("Recording... release mic to send.");
+      if (!interviewPressActiveRef.current && recorder.state !== "inactive") {
+        recorder.stop();
+      }
     } catch (err) {
       releaseInterviewMic();
       withError(
         "Microphone permission is required for voice interview turns.",
         err,
       );
+    } finally {
+      interviewRecorderStartingRef.current = false;
     }
   };
 
@@ -535,7 +559,8 @@ export default function HomePage() {
           onSend={handleInterviewSend}
           onRefreshStatus={refreshInterviewStatus}
           onComplete={handleComplete}
-          onToggleRecording={handleToggleInterviewRecording}
+          onStartRecording={handleStartInterviewRecording}
+          onStopRecording={handleStopInterviewRecording}
           onReplayLastAudio={handleReplayInterviewAudio}
         />
       ) : null}
