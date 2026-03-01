@@ -68,6 +68,7 @@ export function normalizeSelfCard(raw: unknown): SelfCard {
     worldview: getStr(obj, "worldview"),
     coreBelief: getStr(obj, "coreBelief", "core_belief"),
     tradeOff: getStr(obj, "tradeOff", "trade_off"),
+    keyMoments: getArr(obj, "keyMoments", "key_moments") as string[],
     avatarPrompt: getStr(obj, "avatarPrompt", "avatar_prompt"),
     avatarUrl:
       (obj.avatarUrl as string | null | undefined) ??
