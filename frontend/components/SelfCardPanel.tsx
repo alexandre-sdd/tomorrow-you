@@ -19,11 +19,19 @@ export function SelfCardPanel({ selfCard, isActive, onClick }: SelfCardPanelProp
       onClick={onClick}
     >
       <div className="self-card-top">
-        <AvatarPlaceholder
-          name={selfCard.name}
-          primaryColor={selfCard.visualStyle.primaryColor}
-          accentColor={selfCard.visualStyle.accentColor}
-        />
+        {selfCard.avatarUrl ? (
+          <img
+            src={selfCard.avatarUrl}
+            alt={selfCard.name}
+            className="avatar-image"
+          />
+        ) : (
+          <AvatarPlaceholder
+            name={selfCard.name}
+            primaryColor={selfCard.visualStyle.primaryColor}
+            accentColor={selfCard.visualStyle.accentColor}
+          />
+        )}
         <div>
           <h3>{selfCard.name}</h3>
           <p className="self-meta">

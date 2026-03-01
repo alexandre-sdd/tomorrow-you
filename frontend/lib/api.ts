@@ -24,6 +24,27 @@ function getArr(source: Dict, camel: string, snake?: string): unknown[] {
   return Array.isArray(value) ? value : [];
 }
 
+function normalizeAssetUrl(url: string | null | undefined): string | null {
+  if (!url) {
+    return null;
+  }
+
+  const trimmed = url.trim();
+  if (!trimmed) {
+    return null;
+  }
+
+  if (/^https?:\/\//i.test(trimmed)) {
+    return trimmed;
+  }
+
+  if (trimmed.startsWith("/")) {
+    return `${API_BASE}${trimmed}`;
+  }
+
+  return `${API_BASE}/${trimmed}`;
+}
+
 async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
   const response = await fetch(`${API_BASE}${path}`, {
     ...init,
@@ -59,6 +80,11 @@ function normalizeVisualStyle(raw: unknown): SelfCard["visualStyle"] {
 
 export function normalizeSelfCard(raw: unknown): SelfCard {
   const obj = asObject(raw);
+  const avatarUrlRaw =
+    (obj.avatarUrl as string | null | undefined) ??
+    (obj.avatar_url as string | null | undefined) ??
+    null;
+
   return {
     id: getStr(obj, "id"),
     type: (getStr(obj, "type") as SelfCard["type"]) || "future",
@@ -69,10 +95,7 @@ export function normalizeSelfCard(raw: unknown): SelfCard {
     coreBelief: getStr(obj, "coreBelief", "core_belief"),
     tradeOff: getStr(obj, "tradeOff", "trade_off"),
     avatarPrompt: getStr(obj, "avatarPrompt", "avatar_prompt"),
-    avatarUrl:
-      (obj.avatarUrl as string | null | undefined) ??
-      (obj.avatar_url as string | null | undefined) ??
-      null,
+    avatarUrl: normalizeAssetUrl(avatarUrlRaw),
     visualStyle: normalizeVisualStyle(obj.visualStyle ?? obj.visual_style),
     voiceId: getStr(obj, "voiceId", "voice_id"),
     parentSelfId: (obj.parentSelfId as string | null | undefined) ?? (obj.parent_self_id as string | null | undefined) ?? null,
@@ -295,6 +318,21 @@ export async function replyConversation(params: {
         content: getStr(item, "content"),
       })),
   };
+}
+
+export async function uploadUserPhoto(sessionId: string, file: File): Promise<void> {
+  const form = new FormData();
+  form.append("file", file);
+
+  const response = await fetch(
+    `${API_BASE}/pipeline/upload-photo/${encodeURIComponent(sessionId)}`,
+    { method: "POST", body: form },
+  );
+
+  if (!response.ok) {
+    const text = await response.text();
+    throw new Error(text || `Photo upload failed: ${response.status}`);
+  }
 }
 
 export async function branchConversation(params: {

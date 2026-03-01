@@ -25,6 +25,7 @@ from fastapi.responses import StreamingResponse
 from mistralai import Mistral
 
 from backend.config.settings import get_settings
+from backend.engines.avatar_generator import AvatarGenerator
 from backend.engines.current_self_auto_generator import (
     CurrentSelfAutoGeneratorEngine,
     CurrentSelfGenerationContext,
@@ -832,6 +833,14 @@ async def complete_interview(request: InterviewCompleteRequest) -> InterviewComp
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"CurrentSelf generation error: {str(exc)}"
         )
+    
+    # Generate avatar for currentSelf
+    avatar_gen = AvatarGenerator()
+    updated_selves = await avatar_gen.generate_all([gen_result.current_self], request.session_id)
+    
+    # Use the updated self with avatar URL
+    if updated_selves:
+        gen_result.current_self = updated_selves[0]
     
     # Save to session
     session_data["userProfile"] = profile.model_dump(mode="json")

@@ -48,6 +48,8 @@ class Settings(BaseSettings):
     # ------------------------------------------------------------------
     avatar_provider: str = _runtime.app.avatar_provider  # "mistral" | "gemini"
     gemini_api_key: str | None = None
+    # Mistral model used for the image generation agent
+    mistral_image_model: str = "mistral-medium-2505"
 
     # ------------------------------------------------------------------
     # Server
