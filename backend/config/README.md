@@ -1,50 +1,43 @@
-# Config — Environment & Application Configuration
+# Config Overview
 
-## Purpose
-Centralized configuration management. API keys, service URLs, and feature flags are loaded from environment variables and exposed through a typed config object.
+This project now splits configuration into:
 
-## Files
+- `backend/config/runtime.yaml`: non-secret runtime defaults (primary file)
+- `.env`: secrets and optional overrides (API keys, agent IDs, voice IDs)
 
-### `settings.py`
-Pydantic Settings class that loads from `.env`:
-```python
-class Settings(BaseSettings):
-    # Mistral
-    mistral_api_key: str
-    mistral_model: str = "mistral-large-latest"
+## Runtime Config (`runtime.yaml`)
 
-    # ElevenLabs
-    elevenlabs_api_key: str
-    elevenlabs_default_voice_id: str
+`runtime.yaml` is the single source of truth for non-secret knobs such as:
 
-    # Avatar Generation
-    avatar_provider: str = "mistral"  # "mistral" (Pixtral) or "gemini"
-    gemini_api_key: str | None = None
+- chat model and sampling defaults (`mistral_chat`)
+- prompt clipping limits (`prompt_composer`)
+- profile summary limits (`context_resolver`)
+- future generation defaults (`future_generation`)
+- ancestor context limits (`future_generation_context`)
+- CLI defaults (`cli`)
+- app/server/storage defaults used by `Settings` (`app`, `server`, `storage`)
 
-    # Server
-    host: str = "0.0.0.0"
-    port: int = 8000
-    cors_origins: list[str] = ["http://localhost:3000"]
+Load path:
 
-    # Storage
-    storage_path: str = "./storage/sessions"
+- default: `backend/config/runtime.yaml` (falls back to `runtime.json` if YAML is missing)
+- override: set `RUNTIME_CONFIG_PATH=/path/to/runtime.yaml` (or `.json`)
 
-    class Config:
-        env_file = ".env"
-```
+## Settings (`settings.py`)
 
-### `.env.example`
-Template for required environment variables (committed to git, no real keys):
-```
-MISTRAL_API_KEY=
-ELEVENLABS_API_KEY=
-ELEVENLABS_DEFAULT_VOICE_ID=
-AVATAR_PROVIDER=mistral
-GEMINI_API_KEY=
-```
+`Settings` still loads secrets from environment variables (`.env`), while taking
+non-secret defaults from `runtime.json`.
 
-## TODO
-- [ ] Create Settings Pydantic model
-- [ ] Create .env.example with all required variables
-- [ ] Add settings dependency injection for FastAPI
-- [ ] Document which API keys are required vs optional
+Required secrets:
+
+- `MISTRAL_API_KEY`
+- `MISTRAL_AGENT_ID_FUTURE_SELF`
+- `ELEVENLABS_API_KEY`
+- `ELEVENLABS_DEFAULT_VOICE_ID`
+
+Optional secret:
+
+- `GEMINI_API_KEY`
+
+Optional override:
+
+- `ELEVENLABS_VOICE_POOL_JSON`

@@ -5,13 +5,17 @@ import json
 from pydantic import Field
 from pydantic_settings import BaseSettings
 
+from .runtime import get_runtime_config
+
+_runtime = get_runtime_config()
+
 
 class Settings(BaseSettings):
     # ------------------------------------------------------------------
     # Mistral
     # ------------------------------------------------------------------
     mistral_api_key: str
-    mistral_model: str = "mistral-large-latest"
+    mistral_model: str = _runtime.app.mistral_model
 
     # Mistral Agent IDs — one per agent created on la Plateforme
     mistral_agent_id_future_self: str  # e.g. ag:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -36,20 +40,20 @@ class Settings(BaseSettings):
     # ------------------------------------------------------------------
     # Avatar generation
     # ------------------------------------------------------------------
-    avatar_provider: str = "mistral"  # "mistral" | "gemini"
+    avatar_provider: str = _runtime.app.avatar_provider  # "mistral" | "gemini"
     gemini_api_key: str | None = None
 
     # ------------------------------------------------------------------
     # Server
     # ------------------------------------------------------------------
-    host: str = "0.0.0.0"
-    port: int = 8000
-    cors_origins: list[str] = ["http://localhost:3000"]
+    host: str = _runtime.server.host
+    port: int = _runtime.server.port
+    cors_origins: list[str] = Field(default_factory=lambda: list(_runtime.server.cors_origins))
 
     # ------------------------------------------------------------------
     # Storage
     # ------------------------------------------------------------------
-    storage_path: str = "./storage/sessions"
+    storage_path: str = _runtime.storage.path
 
     model_config = {"env_file": ".env", "env_file_encoding": "utf-8"}
 

@@ -6,6 +6,7 @@ from dataclasses import dataclass, field
 
 from mistralai import Mistral
 
+from backend.config.runtime import get_runtime_config
 from backend.config.settings import get_settings
 from backend.models.schemas import (
     RawFutureSelvesOutput,
@@ -15,6 +16,7 @@ from backend.models.schemas import (
     VisualStyle,
 )
 
+_runtime_fg = get_runtime_config().future_generation
 
 # ---------------------------------------------------------------------------
 # Content-hashed ID generation
@@ -55,7 +57,7 @@ class GenerationContext:
 
     # Derived / overridable
     depth: int = 0
-    time_horizon: str = "5 years"
+    time_horizon: str = _runtime_fg.default_time_horizon
 
 # ---------------------------------------------------------------------------
 # JSON schema enforced via Mistral's response_format
@@ -249,22 +251,10 @@ class FutureSelfGenerator:
     """
 
     # Adjacent moods to try when the primary mood voice is already in use
-    MOOD_FALLBACK_CHAINS: dict[str, list[str]] = {
-        "elevated":  ["sharp", "intense", "calm"],
-        "warm":      ["grounded", "calm", "ethereal"],
-        "sharp":     ["elevated", "intense", "grounded"],
-        "grounded":  ["warm", "calm", "sharp"],
-        "ethereal":  ["calm", "warm", "elevated"],
-        "intense":   ["sharp", "elevated", "grounded"],
-        "calm":      ["grounded", "warm", "ethereal"],
-    }
+    MOOD_FALLBACK_CHAINS: dict[str, list[str]] = _runtime_fg.mood_fallback_chains
 
     # Default time horizons by depth (overridable via GenerationContext)
-    DEFAULT_TIME_HORIZONS: dict[int, str] = {
-        0: "5 years",
-        1: "5 years",
-        2: "2-3 years",
-    }
+    DEFAULT_TIME_HORIZONS: dict[int, str] = _runtime_fg.default_time_horizons_by_depth
 
     def __init__(self) -> None:
         self.settings = get_settings()

@@ -1,0 +1,61 @@
+{
+  "mistral_chat": {
+    "model": "mistral-small-latest",
+    "temperature": 0.7,
+    "top_p": 0.95,
+    "max_tokens": 220,
+    "timeout_seconds": 30.0,
+    "endpoint": "https://api.mistral.ai/v1/chat/completions"
+  },
+  "prompt_composer": {
+    "max_memory_facts": 10,
+    "max_memory_notes": 6,
+    "max_history_turns": 8
+  },
+  "context_resolver": {
+    "profile_summary_limits": {
+      "core_values": 4,
+      "fears": 4,
+      "hidden_tensions": 3
+    }
+  },
+  "future_generation": {
+    "default_count": 2,
+    "allowed_counts": [2, 3],
+    "default_time_horizon": "5 years",
+    "default_time_horizons_by_depth": {
+      "0": "5 years",
+      "1": "5 years",
+      "2": "2-3 years"
+    },
+    "mood_fallback_chains": {
+      "elevated": ["sharp", "intense", "calm"],
+      "warm": ["grounded", "calm", "ethereal"],
+      "sharp": ["elevated", "intense", "grounded"],
+      "grounded": ["warm", "calm", "sharp"],
+      "ethereal": ["calm", "warm", "elevated"],
+      "intense": ["sharp", "elevated", "grounded"],
+      "calm": ["grounded", "warm", "ethereal"]
+    }
+  },
+  "future_generation_context": {
+    "max_conversation_excerpts_per_ancestor": 5,
+    "max_total_excerpts": 20
+  },
+  "cli": {
+    "storage_root": "storage/sessions",
+    "branch_default_count": 2
+  },
+  "app": {
+    "mistral_model": "mistral-large-latest",
+    "avatar_provider": "mistral"
+  },
+  "server": {
+    "host": "0.0.0.0",
+    "port": 8000,
+    "cors_origins": ["http://localhost:3000"]
+  },
+  "storage": {
+    "path": "./storage/sessions"
+  }
+}

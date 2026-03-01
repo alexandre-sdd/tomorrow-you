@@ -16,5 +16,32 @@
     "selfName": null,
     "content": "Future self options generated: Self Who Took the Singapore Move, Self Who Stayed in New York.",
     "timestamp": 1772294410
+  },
+  {
+    "id": "13b0624068",
+    "turn": 3,
+    "phase": "selection",
+    "role": "system",
+    "selfName": null,
+    "content": "Generated 2 futures (root level): Self Who Built the Consulting Practice, Self Who Prioritized Family and Community",
+    "timestamp": 1772329488.310515
+  },
+  {
+    "id": "b8a47e073b",
+    "turn": 3,
+    "phase": "selection",
+    "role": "system",
+    "selfName": null,
+    "content": "Generated 2 futures (from 'Self Who Prioritized Family and Community'): Self Who Prioritized Family and Community and Found Unexpected Career Growth, Self Who Prioritized Family and Community and Faced Health Challenges",
+    "timestamp": 1772330320.0092149
+  },
+  {
+    "id": "76e7b8c36d",
+    "turn": 3,
+    "phase": "selection",
+    "role": "system",
+    "selfName": null,
+    "content": "Generated 2 futures (from 'Self Who Built the Consulting Practice'): Self Who Built the Consulting Practice and Found Unexpected Success, Self Who Built the Consulting Practice and Faced Health Challenges",
+    "timestamp": 1772331606.010745
   }
 ]

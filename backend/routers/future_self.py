@@ -6,6 +6,7 @@ from pathlib import Path
 
 from fastapi import APIRouter, Depends, HTTPException
 
+from backend.config.runtime import get_runtime_config
 from backend.config.settings import Settings, get_settings
 from backend.engines import ContextResolver
 from backend.engines.context_resolver import ContextResolutionError
@@ -26,9 +27,18 @@ from backend.models.schemas import (
 )
 
 router = APIRouter(prefix="/future-self", tags=["future-self"])
+_runtime_fg = get_runtime_config().future_generation
 
-# Module-level engine instance (stateless — safe to share across requests)
-_generator = FutureSelfGenerator()
+# Lazily initialized engine instance (constructed only when generation is called).
+# This avoids failing imports/CLI help when env keys are not loaded yet.
+_generator: FutureSelfGenerator | None = None
+
+
+def _get_generator() -> FutureSelfGenerator:
+    global _generator
+    if _generator is None:
+        _generator = FutureSelfGenerator()
+    return _generator
 
 
 # ---------------------------------------------------------------------------
@@ -227,7 +237,7 @@ async def generate_future_selves(
             count=request.count,
             parent_self=None,
             depth=0,
-            time_horizon=request.time_horizon or "5 years",
+            time_horizon=request.time_horizon or _runtime_fg.default_time_horizon,
             sibling_names=collect_sibling_names(session_data, parent_key),
         )
     else:
@@ -262,8 +272,8 @@ async def generate_future_selves(
         )
 
         # Default time horizon adapts by depth
-        default_horizon = FutureSelfGenerator.DEFAULT_TIME_HORIZONS.get(
-            parent_self.depth_level + 1, "1-2 years"
+        default_horizon = _runtime_fg.default_time_horizons_by_depth.get(
+            parent_self.depth_level + 1, _runtime_fg.default_time_horizon
         )
 
         ctx = GenerationContext(
@@ -280,7 +290,7 @@ async def generate_future_selves(
 
     # 5. Generate
     try:
-        future_selves = await _generator.generate(ctx)
+        future_selves = await _get_generator().generate(ctx)
     except ValueError as exc:
         raise HTTPException(status_code=500, detail=str(exc)) from exc
 

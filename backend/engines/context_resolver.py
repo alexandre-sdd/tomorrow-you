@@ -5,7 +5,10 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
+from backend.config.runtime import get_runtime_config
+
 JsonDict = dict[str, Any]
+_runtime = get_runtime_config()
 
 
 class ContextResolutionError(ValueError):
@@ -29,8 +32,9 @@ class ResolvedConversationContext:
 class ContextResolver:
     """Loads session and branch context from storage without writing anything."""
 
-    def __init__(self, storage_root: str | Path = "storage/sessions") -> None:
-        self.storage_root = Path(storage_root)
+    def __init__(self, storage_root: str | Path | None = None) -> None:
+        self.storage_root = Path(storage_root or _runtime.cli.storage_root)
+        self._profile_limits = _runtime.context_resolver.profile_summary_limits
 
     def resolve(self, session_id: str, branch_name: str) -> ResolvedConversationContext:
         session_dir = self.storage_root / session_id
@@ -200,9 +204,9 @@ class ContextResolver:
         return notes
 
     def _build_profile_summary(self, profile: JsonDict) -> str:
-        core_values = self._join_str_list(profile.get("coreValues"), 4)
-        fears = self._join_str_list(profile.get("fears"), 4)
-        tensions = self._join_str_list(profile.get("hiddenTensions"), 3)
+        core_values = self._join_str_list(profile.get("coreValues"), self._profile_limits.core_values)
+        fears = self._join_str_list(profile.get("fears"), self._profile_limits.fears)
+        tensions = self._join_str_list(profile.get("hiddenTensions"), self._profile_limits.hidden_tensions)
         decision_style = self._coerce_str(profile.get("decisionStyle"))
         dilemma = self._coerce_str(profile.get("currentDilemma"))
 

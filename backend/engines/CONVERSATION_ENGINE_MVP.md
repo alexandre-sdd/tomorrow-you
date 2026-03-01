@@ -41,6 +41,9 @@ Run a fast, natural text conversation in the terminal with a selected future-sel
 ## CLI Commands
 - `/context` prints active persona and branch context.
 - `/reset` clears in-memory turn history.
+- `/branch [2|3] [optional time horizon]` generates children from current self and lets the user pick a path.
+- `/branch-reprompt [2|3] [optional time horizon]` branches and automatically re-asks the latest user prompt on the selected path.
+- `/reprompt` re-sends the last user message on the current path.
 - `/exit` exits the chat session.
 
 ## Performance Constraints
@@ -57,7 +60,14 @@ Run a fast, natural text conversation in the terminal with a selected future-sel
 ```bash
 python3 -m backend.cli.chat_future_self \
   --session-id user_nyc_singapore_001 \
-  --branch self-who-stayed-in-new-york
+  --self-id self_future_nyc_001
 ```
 
 If `MISTRAL_API_KEY` is not set in your shell, pass `--api-key <key>`.
+
+You can also generate a new batch first:
+```bash
+python3 -m backend.cli.generate_future_selves \
+  --session-id user_nyc_singapore_001 \
+  --count 2
+```

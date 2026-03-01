@@ -64,49 +64,52 @@
     "voiceId": "voice_current_placeholder",
     "parentSelfId": null,
     "depthLevel": 0,
-    "childrenIds": ["self_future_singapore_001", "self_future_nyc_001"]
+    "childrenIds": [
+      "self_future_singapore_001",
+      "self_future_nyc_001"
+    ]
   },
   "futureSelfOptions": [
     {
-      "id": "self_future_singapore_001",
+      "id": "d1ba69bc0d",
       "type": "future",
-      "name": "Self Who Took the Singapore Move",
-      "optimizationGoal": "Maximize career acceleration, international exposure, leadership trajectory, and long-term upside.",
-      "toneOfVoice": "Calm, confident, precise, more decisive, emotionally controlled.",
-      "worldview": "Some decisions feel disruptive in the moment, but they become the moves that define your life if you fully grow into them.",
-      "coreBelief": "You do not become who you could be by staying where everything already fits.",
-      "tradeOff": "I gained speed, status, and reinvention, but I gave up familiarity, relational ease, and some short-term emotional safety.",
-      "avatarPrompt": "A realistic 33-year-old professional man living in Singapore after an international promotion, sharper presence, elegant tailored clothing, warm city lights in the background, confident but slightly more distant expression, global executive energy, premium cinematic portrait, sophisticated and emotionally restrained",
+      "name": "Self Who Built the Consulting Practice",
+      "optimizationGoal": "Maximize career flexibility, local impact, and control over my time while maintaining strong family roots.",
+      "toneOfVoice": "Confident, strategic, warm, and engaging.",
+      "worldview": "Success is not just about climbing the corporate ladder but creating something meaningful on your own terms.",
+      "coreBelief": "I can build a fulfilling career and a strong family life without sacrificing one for the other.",
+      "tradeOff": "I gained independence and local influence, but I gave up the prestige and financial upside of a traditional corporate trajectory.",
+      "avatarPrompt": "A realistic 33-year-old man in a well-tailored but approachable suit, standing in a modern office space with large windows overlooking a bustling city. He has a confident and warm expression, reflecting his entrepreneurial spirit and contentment with his life choices. The setting is professional yet personal, with family photos and books on the shelves, captured in a cinematic, documentary-style portrait.",
       "avatarUrl": null,
       "visualStyle": {
-        "primaryColor": "#0E5E6F",
-        "accentColor": "#D8F3DC",
-        "mood": "elevated",
-        "glowIntensity": 0.58
+        "primaryColor": "#4A6B8A",
+        "accentColor": "#D4E6F1",
+        "mood": "sharp",
+        "glowIntensity": 0.7
       },
-      "voiceId": "voice_future_singapore_placeholder",
+      "voiceId": "voice_sharp_001",
       "parentSelfId": null,
       "depthLevel": 1,
       "childrenIds": []
     },
     {
-      "id": "self_future_nyc_001",
+      "id": "f9312d6e73",
       "type": "future",
-      "name": "Self Who Stayed in New York",
-      "optimizationGoal": "Preserve relational stability, continuity, local momentum, and a more grounded long-term life path.",
-      "toneOfVoice": "Warm, steady, thoughtful, reassuring, emotionally available.",
-      "worldview": "A good life is not always the fastest one; sometimes depth comes from staying with what matters and building it well.",
-      "coreBelief": "Not every meaningful life is built through dramatic moves.",
-      "tradeOff": "I kept closeness, continuity, and a stronger sense of home, but I may always wonder how much further I could have gone.",
-      "avatarPrompt": "A realistic 33-year-old professional man still living in New York, grounded and emotionally present, refined but relaxed style, warm apartment or city evening lighting, stable and thoughtful expression, premium cinematic portrait, intimate and human",
+      "name": "Self Who Prioritized Family and Community",
+      "optimizationGoal": "Maximize family stability, community involvement, and personal well-being while maintaining a steady career.",
+      "toneOfVoice": "Gentle, thoughtful, grounded, and reassuring.",
+      "worldview": "A fulfilling life is built on strong relationships and a sense of belonging, not just career achievements.",
+      "coreBelief": "True success is measured by the quality of my relationships and the impact I have on my community.",
+      "tradeOff": "I gained a deep sense of belonging and emotional security, but I may have missed out on some career opportunities and financial growth.",
+      "avatarPrompt": "A realistic 33-year-old man in casual yet put-together clothing, standing in a community garden with his family. He has a warm and content expression, reflecting his happiness and fulfillment. The setting is lively and vibrant, with greenery and people engaging in various activities, captured in a cinematic, documentary-style portrait.",
       "avatarUrl": null,
       "visualStyle": {
-        "primaryColor": "#7A4E2D",
-        "accentColor": "#F3E9DC",
-        "mood": "warm",
-        "glowIntensity": 0.42
+        "primaryColor": "#5E8C61",
+        "accentColor": "#E8F5E9",
+        "mood": "grounded",
+        "glowIntensity": 0.4
       },
-      "voiceId": "voice_future_nyc_placeholder",
+      "voiceId": "voice_grounded_001",
       "parentSelfId": null,
       "depthLevel": 1,
       "childrenIds": []
@@ -129,6 +132,36 @@
       "name": "self-who-stayed-in-new-york",
       "headNodeId": "node_branch_nyc_001",
       "parentBranchName": "root"
+    },
+    {
+      "name": "b5d7f0674d",
+      "headNodeId": "11acc76a1f",
+      "parentBranchName": "root"
+    },
+    {
+      "name": "08245673bf",
+      "headNodeId": "f64f97c1b1",
+      "parentBranchName": "root"
+    },
+    {
+      "name": "3a0c75a3df",
+      "headNodeId": "991e638b90",
+      "parentBranchName": "08245673bf"
+    },
+    {
+      "name": "c47072b926",
+      "headNodeId": "61a70b891c",
+      "parentBranchName": "08245673bf"
+    },
+    {
+      "name": "d741757f97",
+      "headNodeId": "60a707ca8f",
+      "parentBranchName": "b5d7f0674d"
+    },
+    {
+      "name": "294e338369",
+      "headNodeId": "a22a516c84",
+      "parentBranchName": "b5d7f0674d"
     }
   ],
   "memoryNodes": [
@@ -240,10 +273,244 @@
         "childrenIds": []
       },
       "createdAt": 1772294420
+    },
+    {
+      "id": "f64f97c1b1",
+      "parentId": "node_root_profile",
+      "branchLabel": "08245673bf",
+      "facts": [
+        {
+          "id": "56d76867c8",
+          "fact": "Optimizes for: Maximize family stability, community involvement, and personal well-being while maintaining a steady career.",
+          "source": "interview",
+          "extractedAt": 1772329488.310515
+        }
+      ],
+      "notes": [
+        "Branch node for: Self Who Prioritized Family and Community (parent: root)"
+      ],
+      "selfCard": {
+        "id": "f9312d6e73",
+        "type": "future",
+        "name": "Self Who Prioritized Family and Community",
+        "optimizationGoal": "Maximize family stability, community involvement, and personal well-being while maintaining a steady career.",
+        "toneOfVoice": "Gentle, thoughtful, grounded, and reassuring.",
+        "worldview": "A fulfilling life is built on strong relationships and a sense of belonging, not just career achievements.",
+        "coreBelief": "True success is measured by the quality of my relationships and the impact I have on my community.",
+        "tradeOff": "I gained a deep sense of belonging and emotional security, but I may have missed out on some career opportunities and financial growth.",
+        "avatarPrompt": "A realistic 33-year-old man in casual yet put-together clothing, standing in a community garden with his family. He has a warm and content expression, reflecting his happiness and fulfillment. The setting is lively and vibrant, with greenery and people engaging in various activities, captured in a cinematic, documentary-style portrait.",
+        "avatarUrl": null,
+        "visualStyle": {
+          "primaryColor": "#5E8C61",
+          "accentColor": "#E8F5E9",
+          "mood": "grounded",
+          "glowIntensity": 0.4
+        },
+        "voiceId": "voice_grounded_001",
+        "parentSelfId": null,
+        "depthLevel": 1,
+        "childrenIds": []
+      },
+      "createdAt": 1772329488.310515
+    },
+    {
+      "id": "11acc76a1f",
+      "parentId": "node_root_profile",
+      "branchLabel": "b5d7f0674d",
+      "facts": [
+        {
+          "id": "a08271a3c9",
+          "fact": "Optimizes for: Maximize career flexibility, local impact, and control over my time while maintaining strong family roots.",
+          "source": "interview",
+          "extractedAt": 1772329488.310515
+        }
+      ],
+      "notes": [
+        "Branch node for: Self Who Built the Consulting Practice (parent: root)"
+      ],
+      "selfCard": {
+        "id": "d1ba69bc0d",
+        "type": "future",
+        "name": "Self Who Built the Consulting Practice",
+        "optimizationGoal": "Maximize career flexibility, local impact, and control over my time while maintaining strong family roots.",
+        "toneOfVoice": "Confident, strategic, warm, and engaging.",
+        "worldview": "Success is not just about climbing the corporate ladder but creating something meaningful on your own terms.",
+        "coreBelief": "I can build a fulfilling career and a strong family life without sacrificing one for the other.",
+        "tradeOff": "I gained independence and local influence, but I gave up the prestige and financial upside of a traditional corporate trajectory.",
+        "avatarPrompt": "A realistic 33-year-old man in a well-tailored but approachable suit, standing in a modern office space with large windows overlooking a bustling city. He has a confident and warm expression, reflecting his entrepreneurial spirit and contentment with his life choices. The setting is professional yet personal, with family photos and books on the shelves, captured in a cinematic, documentary-style portrait.",
+        "avatarUrl": null,
+        "visualStyle": {
+          "primaryColor": "#4A6B8A",
+          "accentColor": "#D4E6F1",
+          "mood": "sharp",
+          "glowIntensity": 0.7
+        },
+        "voiceId": "voice_sharp_001",
+        "parentSelfId": null,
+        "depthLevel": 1,
+        "childrenIds": []
+      },
+      "createdAt": 1772329488.310515
+    },
+    {
+      "id": "61a70b891c",
+      "parentId": "f64f97c1b1",
+      "branchLabel": "c47072b926",
+      "facts": [
+        {
+          "id": "a8a87bb5cb",
+          "fact": "Optimizes for: Maximize family stability and personal well-being while navigating health challenges.",
+          "source": "interview",
+          "extractedAt": 1772330320.0092149
+        }
+      ],
+      "notes": [
+        "Branch node for: Self Who Prioritized Family and Community and Faced Health Challenges (parent: 08245673bf)"
+      ],
+      "selfCard": {
+        "id": "c83b7a2990",
+        "type": "future",
+        "name": "Self Who Prioritized Family and Community and Faced Health Challenges",
+        "optimizationGoal": "Maximize family stability and personal well-being while navigating health challenges.",
+        "toneOfVoice": "Reflective, resilient, and deeply appreciative.",
+        "worldview": "Health challenges can reshape your priorities and show you what truly matters in life.",
+        "coreBelief": "Facing health issues made me realize the importance of the support system I have built and the strength of my family bonds.",
+        "tradeOff": "I gained a profound appreciation for my family and community, but I had to put some of my career aspirations on hold to focus on my health.",
+        "avatarPrompt": "A realistic 33-year-old man in a serene home setting, wearing comfortable clothing, soft light creating a calm atmosphere, a resilient and reflective expression, family photos and personal mementos in the background, cinematic portrait style, emotionally deep and grounded.",
+        "avatarUrl": null,
+        "visualStyle": {
+          "primaryColor": "#3A5F8E",
+          "accentColor": "#A8C3E8",
+          "mood": "calm",
+          "glowIntensity": 0.45
+        },
+        "voiceId": "voice_calm_001",
+        "parentSelfId": "f9312d6e73",
+        "depthLevel": 2,
+        "childrenIds": []
+      },
+      "createdAt": 1772330320.0092149
+    },
+    {
+      "id": "991e638b90",
+      "parentId": "f64f97c1b1",
+      "branchLabel": "3a0c75a3df",
+      "facts": [
+        {
+          "id": "dafe59ae44",
+          "fact": "Optimizes for: Maximize family stability, community involvement, and unexpected career opportunities.",
+          "source": "interview",
+          "extractedAt": 1772330320.0092149
+        }
+      ],
+      "notes": [
+        "Branch node for: Self Who Prioritized Family and Community and Found Unexpected Career Growth (parent: 08245673bf)"
+      ],
+      "selfCard": {
+        "id": "4aac1bd245",
+        "type": "future",
+        "name": "Self Who Prioritized Family and Community and Found Unexpected Career Growth",
+        "optimizationGoal": "Maximize family stability, community involvement, and unexpected career opportunities.",
+        "toneOfVoice": "Warm, optimistic, grateful, and slightly surprised.",
+        "worldview": "Sometimes the path you choose for personal reasons leads to unexpected professional fulfillment.",
+        "coreBelief": "I believed that staying close to home would mean sacrificing career growth, but I found opportunities I never expected.",
+        "tradeOff": "I gained a deep sense of belonging and unexpected career growth, but I sometimes feel the pressure to keep up with both personal and professional demands.",
+        "avatarPrompt": "A realistic 33-year-old professional man in a cozy home office, wearing a casual yet professional outfit, warm light filtering through the window, a content and slightly surprised expression, books and family photos on the shelves, cinematic portrait style, emotionally present and engaged.",
+        "avatarUrl": null,
+        "visualStyle": {
+          "primaryColor": "#4E7C46",
+          "accentColor": "#B8D8B8",
+          "mood": "warm",
+          "glowIntensity": 0.65
+        },
+        "voiceId": "voice_warm_001",
+        "parentSelfId": "f9312d6e73",
+        "depthLevel": 2,
+        "childrenIds": []
+      },
+      "createdAt": 1772330320.0092149
+    },
+    {
+      "id": "60a707ca8f",
+      "parentId": "11acc76a1f",
+      "branchLabel": "d741757f97",
+      "facts": [
+        {
+          "id": "2e3fe3c9fc",
+          "fact": "Optimizes for: Maximize career growth, financial stability, and professional recognition while maintaining family roots.",
+          "source": "interview",
+          "extractedAt": 1772331606.010745
+        }
+      ],
+      "notes": [
+        "Branch node for: Self Who Built the Consulting Practice and Found Unexpected Success (parent: b5d7f0674d)"
+      ],
+      "selfCard": {
+        "id": "d9920acd63",
+        "type": "future",
+        "name": "Self Who Built the Consulting Practice and Found Unexpected Success",
+        "optimizationGoal": "Maximize career growth, financial stability, and professional recognition while maintaining family roots.",
+        "toneOfVoice": "Confident, ambitious, optimistic, forward-thinking.",
+        "worldview": "Success comes from seizing opportunities and adapting to change, even when it's unexpected.",
+        "coreBelief": "I can achieve both career success and a strong family life by being adaptable and open to new possibilities.",
+        "tradeOff": "I gained financial stability and professional recognition, but I had to adapt quickly to unexpected changes, which sometimes strained my family life.",
+        "avatarPrompt": "A realistic 33-year-old professional man in a modern home office, wearing a sharp but approachable business casual outfit, with a confident and optimistic expression. The room is filled with natural light, and there are subtle hints of professional success, such as awards and certificates on the wall. Cinematic portrait style, conveying a sense of achievement and forward momentum.",
+        "avatarUrl": null,
+        "visualStyle": {
+          "primaryColor": "#0077B6",
+          "accentColor": "#CAF0F8",
+          "mood": "elevated",
+          "glowIntensity": 0.75
+        },
+        "voiceId": "voice_elevated_001",
+        "parentSelfId": "d1ba69bc0d",
+        "depthLevel": 2,
+        "childrenIds": []
+      },
+      "createdAt": 1772331606.010745
+    },
+    {
+      "id": "a22a516c84",
+      "parentId": "11acc76a1f",
+      "branchLabel": "294e338369",
+      "facts": [
+        {
+          "id": "60dab3bdce",
+          "fact": "Optimizes for: Prioritize health, family stability, and personal well-being while maintaining a sustainable career.",
+          "source": "interview",
+          "extractedAt": 1772331606.010745
+        }
+      ],
+      "notes": [
+        "Branch node for: Self Who Built the Consulting Practice and Faced Health Challenges (parent: b5d7f0674d)"
+      ],
+      "selfCard": {
+        "id": "f146942ff8",
+        "type": "future",
+        "name": "Self Who Built the Consulting Practice and Faced Health Challenges",
+        "optimizationGoal": "Prioritize health, family stability, and personal well-being while maintaining a sustainable career.",
+        "toneOfVoice": "Thoughtful, resilient, grounded, emotionally present.",
+        "worldview": "Life's challenges can reshape our priorities, and true success is measured by our ability to adapt and find balance.",
+        "coreBelief": "Health and family are the foundations of a fulfilling life, and career success must be built around these priorities.",
+        "tradeOff": "I gained a deeper appreciation for health and family, but I had to scale back my career ambitions and accept a slower professional growth.",
+        "avatarPrompt": "A realistic 33-year-old man in a cozy, warmly lit living room, wearing comfortable clothing, with a resilient and thoughtful expression. The room is filled with personal touches, such as family photos and comfortable furniture, conveying a sense of stability and well-being. Cinematic portrait style, capturing a moment of quiet reflection and emotional presence.",
+        "avatarUrl": null,
+        "visualStyle": {
+          "primaryColor": "#8B4513",
+          "accentColor": "#FFDAB9",
+          "mood": "warm",
+          "glowIntensity": 0.45
+        },
+        "voiceId": "voice_warm_001",
+        "parentSelfId": "d1ba69bc0d",
+        "depthLevel": 2,
+        "childrenIds": []
+      },
+      "createdAt": 1772331606.010745
     }
   ],
   "createdAt": 1772294400,
-  "updatedAt": 1772294420,
+  "updatedAt": 1772331606.010745,
   "futureSelvesFull": {
     "self_future_singapore_001": {
       "id": "self_future_singapore_001",
@@ -288,9 +555,160 @@
       "parentSelfId": null,
       "depthLevel": 1,
       "childrenIds": []
+    },
+    "d1ba69bc0d": {
+      "id": "d1ba69bc0d",
+      "type": "future",
+      "name": "Self Who Built the Consulting Practice",
+      "optimizationGoal": "Maximize career flexibility, local impact, and control over my time while maintaining strong family roots.",
+      "toneOfVoice": "Confident, strategic, warm, and engaging.",
+      "worldview": "Success is not just about climbing the corporate ladder but creating something meaningful on your own terms.",
+      "coreBelief": "I can build a fulfilling career and a strong family life without sacrificing one for the other.",
+      "tradeOff": "I gained independence and local influence, but I gave up the prestige and financial upside of a traditional corporate trajectory.",
+      "avatarPrompt": "A realistic 33-year-old man in a well-tailored but approachable suit, standing in a modern office space with large windows overlooking a bustling city. He has a confident and warm expression, reflecting his entrepreneurial spirit and contentment with his life choices. The setting is professional yet personal, with family photos and books on the shelves, captured in a cinematic, documentary-style portrait.",
+      "avatarUrl": null,
+      "visualStyle": {
+        "primaryColor": "#4A6B8A",
+        "accentColor": "#D4E6F1",
+        "mood": "sharp",
+        "glowIntensity": 0.7
+      },
+      "voiceId": "voice_sharp_001",
+      "parentSelfId": null,
+      "depthLevel": 1,
+      "childrenIds": [
+        "d9920acd63",
+        "f146942ff8"
+      ]
+    },
+    "f9312d6e73": {
+      "id": "f9312d6e73",
+      "type": "future",
+      "name": "Self Who Prioritized Family and Community",
+      "optimizationGoal": "Maximize family stability, community involvement, and personal well-being while maintaining a steady career.",
+      "toneOfVoice": "Gentle, thoughtful, grounded, and reassuring.",
+      "worldview": "A fulfilling life is built on strong relationships and a sense of belonging, not just career achievements.",
+      "coreBelief": "True success is measured by the quality of my relationships and the impact I have on my community.",
+      "tradeOff": "I gained a deep sense of belonging and emotional security, but I may have missed out on some career opportunities and financial growth.",
+      "avatarPrompt": "A realistic 33-year-old man in casual yet put-together clothing, standing in a community garden with his family. He has a warm and content expression, reflecting his happiness and fulfillment. The setting is lively and vibrant, with greenery and people engaging in various activities, captured in a cinematic, documentary-style portrait.",
+      "avatarUrl": null,
+      "visualStyle": {
+        "primaryColor": "#5E8C61",
+        "accentColor": "#E8F5E9",
+        "mood": "grounded",
+        "glowIntensity": 0.4
+      },
+      "voiceId": "voice_grounded_001",
+      "parentSelfId": null,
+      "depthLevel": 1,
+      "childrenIds": [
+        "4aac1bd245",
+        "c83b7a2990"
+      ]
+    },
+    "4aac1bd245": {
+      "id": "4aac1bd245",
+      "type": "future",
+      "name": "Self Who Prioritized Family and Community and Found Unexpected Career Growth",
+      "optimizationGoal": "Maximize family stability, community involvement, and unexpected career opportunities.",
+      "toneOfVoice": "Warm, optimistic, grateful, and slightly surprised.",
+      "worldview": "Sometimes the path you choose for personal reasons leads to unexpected professional fulfillment.",
+      "coreBelief": "I believed that staying close to home would mean sacrificing career growth, but I found opportunities I never expected.",
+      "tradeOff": "I gained a deep sense of belonging and unexpected career growth, but I sometimes feel the pressure to keep up with both personal and professional demands.",
+      "avatarPrompt": "A realistic 33-year-old professional man in a cozy home office, wearing a casual yet professional outfit, warm light filtering through the window, a content and slightly surprised expression, books and family photos on the shelves, cinematic portrait style, emotionally present and engaged.",
+      "avatarUrl": null,
+      "visualStyle": {
+        "primaryColor": "#4E7C46",
+        "accentColor": "#B8D8B8",
+        "mood": "warm",
+        "glowIntensity": 0.65
+      },
+      "voiceId": "voice_warm_001",
+      "parentSelfId": "f9312d6e73",
+      "depthLevel": 2,
+      "childrenIds": []
+    },
+    "c83b7a2990": {
+      "id": "c83b7a2990",
+      "type": "future",
+      "name": "Self Who Prioritized Family and Community and Faced Health Challenges",
+      "optimizationGoal": "Maximize family stability and personal well-being while navigating health challenges.",
+      "toneOfVoice": "Reflective, resilient, and deeply appreciative.",
+      "worldview": "Health challenges can reshape your priorities and show you what truly matters in life.",
+      "coreBelief": "Facing health issues made me realize the importance of the support system I have built and the strength of my family bonds.",
+      "tradeOff": "I gained a profound appreciation for my family and community, but I had to put some of my career aspirations on hold to focus on my health.",
+      "avatarPrompt": "A realistic 33-year-old man in a serene home setting, wearing comfortable clothing, soft light creating a calm atmosphere, a resilient and reflective expression, family photos and personal mementos in the background, cinematic portrait style, emotionally deep and grounded.",
+      "avatarUrl": null,
+      "visualStyle": {
+        "primaryColor": "#3A5F8E",
+        "accentColor": "#A8C3E8",
+        "mood": "calm",
+        "glowIntensity": 0.45
+      },
+      "voiceId": "voice_calm_001",
+      "parentSelfId": "f9312d6e73",
+      "depthLevel": 2,
+      "childrenIds": []
+    },
+    "d9920acd63": {
+      "id": "d9920acd63",
+      "type": "future",
+      "name": "Self Who Built the Consulting Practice and Found Unexpected Success",
+      "optimizationGoal": "Maximize career growth, financial stability, and professional recognition while maintaining family roots.",
+      "toneOfVoice": "Confident, ambitious, optimistic, forward-thinking.",
+      "worldview": "Success comes from seizing opportunities and adapting to change, even when it's unexpected.",
+      "coreBelief": "I can achieve both career success and a strong family life by being adaptable and open to new possibilities.",
+      "tradeOff": "I gained financial stability and professional recognition, but I had to adapt quickly to unexpected changes, which sometimes strained my family life.",
+      "avatarPrompt": "A realistic 33-year-old professional man in a modern home office, wearing a sharp but approachable business casual outfit, with a confident and optimistic expression. The room is filled with natural light, and there are subtle hints of professional success, such as awards and certificates on the wall. Cinematic portrait style, conveying a sense of achievement and forward momentum.",
+      "avatarUrl": null,
+      "visualStyle": {
+        "primaryColor": "#0077B6",
+        "accentColor": "#CAF0F8",
+        "mood": "elevated",
+        "glowIntensity": 0.75
+      },
+      "voiceId": "voice_elevated_001",
+      "parentSelfId": "d1ba69bc0d",
+      "depthLevel": 2,
+      "childrenIds": []
+    },
+    "f146942ff8": {
+      "id": "f146942ff8",
+      "type": "future",
+      "name": "Self Who Built the Consulting Practice and Faced Health Challenges",
+      "optimizationGoal": "Prioritize health, family stability, and personal well-being while maintaining a sustainable career.",
+      "toneOfVoice": "Thoughtful, resilient, grounded, emotionally present.",
+      "worldview": "Life's challenges can reshape our priorities, and true success is measured by our ability to adapt and find balance.",
+      "coreBelief": "Health and family are the foundations of a fulfilling life, and career success must be built around these priorities.",
+      "tradeOff": "I gained a deeper appreciation for health and family, but I had to scale back my career ambitions and accept a slower professional growth.",
+      "avatarPrompt": "A realistic 33-year-old man in a cozy, warmly lit living room, wearing comfortable clothing, with a resilient and thoughtful expression. The room is filled with personal touches, such as family photos and comfortable furniture, conveying a sense of stability and well-being. Cinematic portrait style, capturing a moment of quiet reflection and emotional presence.",
+      "avatarUrl": null,
+      "visualStyle": {
+        "primaryColor": "#8B4513",
+        "accentColor": "#FFDAB9",
+        "mood": "warm",
+        "glowIntensity": 0.45
+      },
+      "voiceId": "voice_warm_001",
+      "parentSelfId": "d1ba69bc0d",
+      "depthLevel": 2,
+      "childrenIds": []
     }
   },
   "explorationPaths": {
-    "root": ["self_future_singapore_001", "self_future_nyc_001"]
+    "root": [
+      "self_future_singapore_001",
+      "self_future_nyc_001",
+      "d1ba69bc0d",
+      "f9312d6e73"
+    ],
+    "f9312d6e73": [
+      "4aac1bd245",
+      "c83b7a2990"
+    ],
+    "d1ba69bc0d": [
+      "d9920acd63",
+      "f146942ff8"
+    ]
   }
 }

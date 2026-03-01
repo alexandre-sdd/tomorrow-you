@@ -1,0 +1,39 @@
+{
+  "id": "61a70b891c",
+  "parentId": "f64f97c1b1",
+  "branchLabel": "c47072b926",
+  "facts": [
+    {
+      "id": "a8a87bb5cb",
+      "fact": "Optimizes for: Maximize family stability and personal well-being while navigating health challenges.",
+      "source": "interview",
+      "extractedAt": 1772330320.0092149
+    }
+  ],
+  "notes": [
+    "Branch node for: Self Who Prioritized Family and Community and Faced Health Challenges (parent: 08245673bf)"
+  ],
+  "selfCard": {
+    "id": "c83b7a2990",
+    "type": "future",
+    "name": "Self Who Prioritized Family and Community and Faced Health Challenges",
+    "optimizationGoal": "Maximize family stability and personal well-being while navigating health challenges.",
+    "toneOfVoice": "Reflective, resilient, and deeply appreciative.",
+    "worldview": "Health challenges can reshape your priorities and show you what truly matters in life.",
+    "coreBelief": "Facing health issues made me realize the importance of the support system I have built and the strength of my family bonds.",
+    "tradeOff": "I gained a profound appreciation for my family and community, but I had to put some of my career aspirations on hold to focus on my health.",
+    "avatarPrompt": "A realistic 33-year-old man in a serene home setting, wearing comfortable clothing, soft light creating a calm atmosphere, a resilient and reflective expression, family photos and personal mementos in the background, cinematic portrait style, emotionally deep and grounded.",
+    "avatarUrl": null,
+    "visualStyle": {
+      "primaryColor": "#3A5F8E",
+      "accentColor": "#A8C3E8",
+      "mood": "calm",
+      "glowIntensity": 0.45
+    },
+    "voiceId": "voice_calm_001",
+    "parentSelfId": "f9312d6e73",
+    "depthLevel": 2,
+    "childrenIds": []
+  },
+  "createdAt": 1772330320.0092149
+}

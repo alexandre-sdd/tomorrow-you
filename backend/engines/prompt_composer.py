@@ -3,6 +3,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Iterable, Literal, TypedDict
 
+from backend.config.runtime import get_runtime_config
+
 from .context_resolver import ResolvedConversationContext
 
 
@@ -13,9 +15,10 @@ class ChatMessage(TypedDict):
 
 @dataclass(frozen=True)
 class PromptComposerConfig:
-    max_memory_facts: int = 10
-    max_memory_notes: int = 6
-    max_history_turns: int = 8
+    _runtime = get_runtime_config().prompt_composer
+    max_memory_facts: int = _runtime.max_memory_facts
+    max_memory_notes: int = _runtime.max_memory_notes
+    max_history_turns: int = _runtime.max_history_turns
 
 
 class PromptComposer:
