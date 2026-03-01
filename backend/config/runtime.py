@@ -74,6 +74,15 @@ class StorageRuntimeConfig(BaseModel):
     path: str
 
 
+class ConversationMemoryRuntimeConfig(BaseModel):
+    enabled: bool
+    max_insights_per_turn: int = Field(ge=1)
+    max_notes_per_node: int = Field(ge=1)
+    max_facts_per_node: int = Field(ge=1)
+    max_transcript_entries: int = Field(ge=1)
+    min_message_length_for_extraction: int = Field(ge=1)
+
+
 class RuntimeConfig(BaseModel):
     mistral_chat: MistralChatRuntimeConfig
     prompt_composer: PromptComposerRuntimeConfig
@@ -84,6 +93,7 @@ class RuntimeConfig(BaseModel):
     app: AppRuntimeConfig
     server: ServerRuntimeConfig
     storage: StorageRuntimeConfig
+    conversation_memory: ConversationMemoryRuntimeConfig
 
     @model_validator(mode="after")
     def _validate_cli_branch_default(self) -> RuntimeConfig:

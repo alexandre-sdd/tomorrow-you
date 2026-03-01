@@ -54,3 +54,11 @@ server:
 
 storage:
   path: ./storage/sessions
+
+conversation_memory:
+  enabled: true
+  max_insights_per_turn: 3
+  max_notes_per_node: 40
+  max_facts_per_node: 60
+  max_transcript_entries: 2000
+  min_message_length_for_extraction: 24

@@ -1,4 +1,4 @@
-# ConversationEngine MVP (CLI, No Storage Writes)
+# ConversationEngine MVP (CLI + Memory Persistence)
 
 ## Goal
 Run a fast, natural text conversation in the terminal with a selected future-self branch using Mistral.
@@ -6,14 +6,14 @@ Run a fast, natural text conversation in the terminal with a selected future-sel
 ## In Scope (this phase)
 1. Read-only context resolution from session storage.
 2. Prompt composition for branch-grounded persona conversation.
-3. In-memory conversation session state (no persistence).
+3. In-memory conversation session state.
 4. Mistral API client wrapper with sync + streaming methods.
 5. CLI REPL loop for terminal-only conversations.
+6. Persist conversation transcript and extract key memory signals per turn.
 
 ## Out of Scope (later)
 1. Voice pipeline integration.
-2. Memory extraction/commit writes.
-3. Advanced retry/backoff strategy.
+2. Advanced retry/backoff strategy.
 
 ## Inputs
 - `session_id` (example: `user_nyc_singapore_001`)
@@ -53,8 +53,10 @@ Run a fast, natural text conversation in the terminal with a selected future-sel
 - Stream model output for fast first-token UX.
 
 ## Data Safety
-- Read-only mode for MVP.
-- No writes to `session.json`, `transcript.json`, or memory nodes.
+- Writes are limited to session-local memory artifacts:
+  - append turn data to `transcript.json`
+  - append extracted user signals to current branch memory node (`facts`/`notes`)
+- No destructive edits and no branch history pruning.
 
 ## Quick Run
 ```bash

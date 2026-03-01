@@ -114,8 +114,14 @@ Future Selves Generated → AvatarGenerator.generate(futureSelf) [for each]
   - `userProfile`
   - selected branch `selfCard`
   - merged memory facts/notes from root → head
-  - compact profile summary for prompting
+- compact profile summary for prompting
 - Does not write any session or memory files
+
+### `conversation_memory.py`
+- Persists conversation turns to `transcript.json` (`user`/`assistant` + derived `memory` entries)
+- Extracts lightweight key signals from user messages (relationship, aspirations, fears, values, tension)
+- Appends extracted signals to current branch node `facts` and `notes`
+- Keeps `session.json.memoryNodes` mirror synchronized when present
 
 ### `prompt_composer.py`
 - Builds a branch-grounded system prompt from resolved context
@@ -135,6 +141,7 @@ Future Selves Generated → AvatarGenerator.generate(futureSelf) [for each]
 ### `backend/cli/chat_future_self.py`
 - Terminal REPL for chatting with a selected future-self branch
 - Inputs: `--session-id` plus either `--self-id` or `--branch`, plus model/config flags
+- Persists each successful turn to transcript + branch memory signals
 - Commands:
   - `/context`, `/reset`, `/help`, `/exit`
   - `/branch [2|3] [optional time horizon]` to generate children and pick a new path
@@ -148,7 +155,7 @@ Future Selves Generated → AvatarGenerator.generate(futureSelf) [for each]
 
 ### `CONVERSATION_ENGINE_MVP.md`
 - Defines scope and boundaries for the first CLI-only version
-- Excludes storage writes, voice, and UI for this phase
+- Excludes voice and UI for this phase
 
 ## TODO
 

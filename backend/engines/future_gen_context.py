@@ -107,6 +107,7 @@ def resolve_ancestor_context(
             for entry in transcript
             if entry.get("phase") == "conversation"
             and entry.get("selfName") in ancestor_names
+            and entry.get("role") in {"user", "memory"}
         ]
 
         # Take most recent entries, grouped by ancestor

@@ -20,6 +20,7 @@ from backend.engines import (
     MistralChatConfig,
     PromptComposer,
     PromptComposerConfig,
+    record_conversation_turn_and_memory,
 )
 from backend.models.schemas import GenerateFutureSelvesRequest, SelfCard
 from backend.routers.future_self import generate_future_selves
@@ -172,7 +173,13 @@ def run(args: argparse.Namespace) -> int:
                 print("No previous user prompt available to reprompt.\n")
                 continue
             print(f"Reprompting same message: {last_user_message}")
-            if not _execute_turn(session, last_user_message, no_stream=args.no_stream):
+            if not _execute_turn(
+                session,
+                last_user_message,
+                no_stream=args.no_stream,
+                session_id=args.session_id,
+                storage_root=args.storage_root,
+            ):
                 continue
             print()
             continue
@@ -208,26 +215,50 @@ def run(args: argparse.Namespace) -> int:
             continue
 
         last_user_message = user_text
-        if not _execute_turn(session, user_text, no_stream=args.no_stream):
+        if not _execute_turn(
+            session,
+            user_text,
+            no_stream=args.no_stream,
+            session_id=args.session_id,
+            storage_root=args.storage_root,
+        ):
             continue
         print()
 
 
-def _execute_turn(session: BranchConversationSession, user_text: str, no_stream: bool) -> bool:
+def _execute_turn(
+    session: BranchConversationSession,
+    user_text: str,
+    no_stream: bool,
+    *,
+    session_id: str,
+    storage_root: str,
+) -> bool:
     try:
+        assistant_text = ""
         if no_stream:
-            reply = session.reply(user_text)
-            print(f"Future Self > {reply}")
-            return True
+            assistant_text = session.reply(user_text)
+            print(f"Future Self > {assistant_text}")
+        else:
+            print("Future Self > ", end="", flush=True)
+            chunks: list[str] = []
+            had_output = False
+            for chunk in session.stream_reply(user_text):
+                had_output = True
+                chunks.append(chunk)
+                print(chunk, end="", flush=True)
+            if not had_output:
+                print("[no output]", end="", flush=True)
+            print()
+            assistant_text = "".join(chunks).strip()
 
-        print("Future Self > ", end="", flush=True)
-        had_output = False
-        for chunk in session.stream_reply(user_text):
-            had_output = True
-            print(chunk, end="", flush=True)
-        if not had_output:
-            print("[no output]", end="", flush=True)
-        print()
+        _persist_turn_memory(
+            session_id=session_id,
+            storage_root=storage_root,
+            session=session,
+            user_text=user_text,
+            assistant_text=assistant_text,
+        )
         return True
     except KeyboardInterrupt:
         print("\nInterrupted current turn.")
@@ -305,7 +336,13 @@ def _branch_and_choose(
             print("No previous prompt available to reprompt on new branch.")
         else:
             print(f"Reprompting on new branch: {reprompt_text}")
-            _execute_turn(new_session, reprompt_text, no_stream=no_stream)
+            _execute_turn(
+                new_session,
+                reprompt_text,
+                no_stream=no_stream,
+                session_id=session_id,
+                storage_root=str(resolver.storage_root),
+            )
 
     return new_session
 
@@ -470,6 +507,30 @@ def _print_context(session: BranchConversationSession) -> None:
     print(f"  memory notes: {info['memory_notes']}")
     print(f"  history messages: {info['history_messages']}")
     print()
+
+
+def _persist_turn_memory(
+    *,
+    session_id: str,
+    storage_root: str,
+    session: BranchConversationSession,
+    user_text: str,
+    assistant_text: str,
+) -> None:
+    self_card = session.context.self_card
+    self_id = self_card.get("id")
+    self_name = self_card.get("name")
+    insights = record_conversation_turn_and_memory(
+        session_id=session_id,
+        storage_root=storage_root,
+        branch_name=session.context.branch_name,
+        self_id=self_id if isinstance(self_id, str) else None,
+        self_name=self_name if isinstance(self_name, str) else None,
+        user_text=user_text,
+        assistant_text=assistant_text,
+    )
+    if insights:
+        print(f"[memory] captured {len(insights)} key signal(s).")
 
 
 def main() -> int:
