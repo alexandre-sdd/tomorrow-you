@@ -14,13 +14,14 @@ if __package__ in {None, ""}:
 from backend.config.runtime import get_runtime_config
 from backend.config.settings import get_settings
 from backend.engines import (
+    analyze_and_persist_transcript_insights,
+    append_conversation_turn,
     BranchConversationSession,
     ContextResolver,
     MistralChatClient,
     MistralChatConfig,
     PromptComposer,
     PromptComposerConfig,
-    record_conversation_turn_and_memory,
 )
 from backend.models.schemas import GenerateFutureSelvesRequest, SelfCard
 from backend.routers.future_self import generate_future_selves
@@ -142,9 +143,21 @@ def run(args: argparse.Namespace) -> int:
         try:
             user_text = input("You > ").strip()
         except EOFError:
+            _analyze_branch_insights_on_exit(
+                session_id=args.session_id,
+                storage_root=args.storage_root,
+                session=session,
+                api_key=client.api_key,
+            )
             print("\nExiting.")
             return 0
         except KeyboardInterrupt:
+            _analyze_branch_insights_on_exit(
+                session_id=args.session_id,
+                storage_root=args.storage_root,
+                session=session,
+                api_key=client.api_key,
+            )
             print("\nExiting.")
             return 0
 
@@ -152,6 +165,12 @@ def run(args: argparse.Namespace) -> int:
             continue
 
         if user_text in {"/exit", "/quit"}:
+            _analyze_branch_insights_on_exit(
+                session_id=args.session_id,
+                storage_root=args.storage_root,
+                session=session,
+                api_key=client.api_key,
+            )
             print("Exiting.")
             return 0
 
@@ -252,7 +271,7 @@ def _execute_turn(
             print()
             assistant_text = "".join(chunks).strip()
 
-        _persist_turn_memory(
+        _append_turn_to_transcript(
             session_id=session_id,
             storage_root=storage_root,
             session=session,
@@ -509,7 +528,7 @@ def _print_context(session: BranchConversationSession) -> None:
     print()
 
 
-def _persist_turn_memory(
+def _append_turn_to_transcript(
     *,
     session_id: str,
     storage_root: str,
@@ -520,7 +539,7 @@ def _persist_turn_memory(
     self_card = session.context.self_card
     self_id = self_card.get("id")
     self_name = self_card.get("name")
-    insights = record_conversation_turn_and_memory(
+    append_conversation_turn(
         session_id=session_id,
         storage_root=storage_root,
         branch_name=session.context.branch_name,
@@ -529,8 +548,31 @@ def _persist_turn_memory(
         user_text=user_text,
         assistant_text=assistant_text,
     )
-    if insights:
-        print(f"[memory] captured {len(insights)} key signal(s).")
+
+
+def _analyze_branch_insights_on_exit(
+    *,
+    session_id: str,
+    storage_root: str,
+    session: BranchConversationSession,
+    api_key: str,
+) -> None:
+    self_card = session.context.self_card
+    self_id = self_card.get("id")
+    self_name = self_card.get("name")
+    try:
+        added = analyze_and_persist_transcript_insights(
+            session_id=session_id,
+            storage_root=storage_root,
+            branch_name=session.context.branch_name,
+            self_id=self_id if isinstance(self_id, str) else None,
+            self_name=self_name if isinstance(self_name, str) else None,
+            api_key=api_key,
+        )
+        if added:
+            print(f"[memory] transcript analyzed: added {len(added)} key element(s).")
+    except Exception as exc:
+        print(f"[memory warning] transcript analysis failed: {exc}")
 
 
 def main() -> int:

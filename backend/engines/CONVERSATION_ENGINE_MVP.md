@@ -9,7 +9,8 @@ Run a fast, natural text conversation in the terminal with a selected future-sel
 3. In-memory conversation session state.
 4. Mistral API client wrapper with sync + streaming methods.
 5. CLI REPL loop for terminal-only conversations.
-6. Persist conversation transcript and extract key memory signals per turn.
+6. Persist conversation transcript per turn.
+7. Extract key memory signals from transcript at checkpoint events (exit/rebranch).
 
 ## Out of Scope (later)
 1. Voice pipeline integration.
@@ -55,7 +56,7 @@ Run a fast, natural text conversation in the terminal with a selected future-sel
 ## Data Safety
 - Writes are limited to session-local memory artifacts:
   - append turn data to `transcript.json`
-  - append extracted user signals to current branch memory node (`facts`/`notes`)
+  - append extracted transcript insights to current branch memory node (`facts`/`notes`)
 - No destructive edits and no branch history pruning.
 
 ## Quick Run

@@ -12,7 +12,7 @@ from backend.engines import (
     MistralChatConfig,
     PromptComposer,
     PromptComposerConfig,
-    record_conversation_turn_and_memory,
+    append_conversation_turn,
 )
 from backend.engines.context_resolver import ContextResolutionError
 from backend.models.schemas import (
@@ -34,7 +34,8 @@ async def conversation_reply(
 
     Client owns conversation history — send the full history on every call.
     Returns the updated history (original + new user + new assistant turns).
-    Stateless: no conversation state is stored server-side.
+    Request handling stays stateless for turn assembly, while transcript
+    persistence is written as a best-effort side effect.
     """
     # 1. Resolve branch_name from self_id
     resolver = ContextResolver(storage_root=settings.storage_path)
@@ -73,7 +74,7 @@ async def conversation_reply(
     # 6. Return updated history — client replaces its stored copy with this
     self_name = context.self_card.get("name")
     try:
-        record_conversation_turn_and_memory(
+        append_conversation_turn(
             session_id=request.session_id,
             storage_root=settings.storage_path,
             branch_name=branch_name,

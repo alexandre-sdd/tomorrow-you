@@ -76,11 +76,19 @@ class StorageRuntimeConfig(BaseModel):
 
 class ConversationMemoryRuntimeConfig(BaseModel):
     enabled: bool
-    max_insights_per_turn: int = Field(ge=1)
     max_notes_per_node: int = Field(ge=1)
     max_facts_per_node: int = Field(ge=1)
     max_transcript_entries: int = Field(ge=1)
-    min_message_length_for_extraction: int = Field(ge=1)
+
+
+class MemoryExtractionRuntimeConfig(BaseModel):
+    enabled: bool
+    model: str
+    temperature: float
+    top_p: float
+    max_tokens: int = Field(ge=1)
+    timeout_seconds: float = Field(gt=0)
+    max_messages_for_analysis: int = Field(ge=2)
 
 
 class RuntimeConfig(BaseModel):
@@ -94,6 +102,7 @@ class RuntimeConfig(BaseModel):
     server: ServerRuntimeConfig
     storage: StorageRuntimeConfig
     conversation_memory: ConversationMemoryRuntimeConfig
+    memory_extraction: MemoryExtractionRuntimeConfig
 
     @model_validator(mode="after")
     def _validate_cli_branch_default(self) -> RuntimeConfig:

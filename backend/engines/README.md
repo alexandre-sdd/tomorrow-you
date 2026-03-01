@@ -118,9 +118,9 @@ Future Selves Generated → AvatarGenerator.generate(futureSelf) [for each]
 - Does not write any session or memory files
 
 ### `conversation_memory.py`
-- Persists conversation turns to `transcript.json` (`user`/`assistant` + derived `memory` entries)
-- Extracts lightweight key signals from user messages (relationship, aspirations, fears, values, tension)
-- Appends extracted signals to current branch node `facts` and `notes`
+- Persists conversation turns to `transcript.json` (`user`/`assistant`)
+- Runs LLM transcript analysis (few-shot prompt) to extract open-ended key elements at checkpoint events (exit/rebranch)
+- Appends extracted insights to current branch node `facts` and `notes`, and adds `memory` entries to transcript
 - Keeps `session.json.memoryNodes` mirror synchronized when present
 
 ### `prompt_composer.py`
@@ -141,7 +141,8 @@ Future Selves Generated → AvatarGenerator.generate(futureSelf) [for each]
 ### `backend/cli/chat_future_self.py`
 - Terminal REPL for chatting with a selected future-self branch
 - Inputs: `--session-id` plus either `--self-id` or `--branch`, plus model/config flags
-- Persists each successful turn to transcript + branch memory signals
+- Persists each successful turn to transcript
+- On exit, analyzes the transcript and commits extracted insights to branch memory
 - Commands:
   - `/context`, `/reset`, `/help`, `/exit`
   - `/branch [2|3] [optional time horizon]` to generate children and pick a new path
