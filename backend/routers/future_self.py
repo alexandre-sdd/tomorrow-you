@@ -9,6 +9,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from backend.config.runtime import get_runtime_config
 from backend.config.settings import Settings, get_settings
 from backend.engines import ContextResolver
+from backend.engines.conversation_memory import analyze_and_persist_transcript_insights
 from backend.engines.context_resolver import ContextResolutionError
 from backend.engines.future_gen_context import (
     collect_sibling_names,
@@ -29,16 +30,10 @@ from backend.models.schemas import (
 router = APIRouter(prefix="/future-self", tags=["future-self"])
 _runtime_fg = get_runtime_config().future_generation
 
-# Lazily initialized engine instance (constructed only when generation is called).
-# This avoids failing imports/CLI help when env keys are not loaded yet.
-_generator: FutureSelfGenerator | None = None
-
-
 def _get_generator() -> FutureSelfGenerator:
-    global _generator
-    if _generator is None:
-        _generator = FutureSelfGenerator()
-    return _generator
+    # Create a fresh generator per invocation to avoid reusing async clients
+    # across closed event loops when CLI paths call asyncio.run multiple times.
+    return FutureSelfGenerator()
 
 
 # ---------------------------------------------------------------------------
@@ -265,6 +260,21 @@ async def generate_future_selves(
                 status_code=500, detail=f"Cannot resolve parent branch: {exc}"
             ) from exc
         level_desc = f"from '{parent_self.name}'"
+
+        # Analyze transcript right before re-branching so the latest conversation
+        # signals are reflected in memory and downstream generation context.
+        try:
+            analyze_and_persist_transcript_insights(
+                session_id=request.session_id,
+                storage_root=settings.storage_path,
+                branch_name=parent_branch_name,
+                self_id=request.parent_self_id,
+                self_name=parent_self.name,
+                api_key=settings.mistral_api_key,
+            )
+        except Exception:
+            # Best-effort enrichment: generation still proceeds if extraction fails.
+            pass
 
         # Resolve ancestor chain + conversation excerpts
         ancestor_summary, conversation_excerpts = resolve_ancestor_context(

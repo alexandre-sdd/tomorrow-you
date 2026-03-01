@@ -1,0 +1,39 @@
+{
+  "id": "7f1acff704",
+  "parentId": "af0098c0dc",
+  "branchLabel": "836b8f4b2e",
+  "facts": [
+    {
+      "id": "1b3e4c8baf",
+      "fact": "Optimizes for: Maximize creative expression and personal freedom while navigating significant health issues.",
+      "source": "interview",
+      "extractedAt": 1772336545.181013
+    }
+  ],
+  "notes": [
+    "Branch node for: Self Who Prioritized Creative Freedom and Faced Health Challenges (parent: 101ac3bf55)"
+  ],
+  "selfCard": {
+    "id": "8970d60164",
+    "type": "future",
+    "name": "Self Who Prioritized Creative Freedom and Faced Health Challenges",
+    "optimizationGoal": "Maximize creative expression and personal freedom while navigating significant health issues.",
+    "toneOfVoice": "Resilient, determined, introspective, and slightly weary.",
+    "worldview": "True creative freedom can be tested by life's unexpected challenges, but it also provides the strength to overcome them.",
+    "coreBelief": "I believe that the richness of life comes from the experiences we create, but sometimes these experiences are shaped by challenges we never anticipated.",
+    "tradeOff": "I gained unparalleled creative fulfillment and personal freedom, but I had to face significant health challenges that tested my resilience and forced me to adapt my lifestyle.",
+    "avatarPrompt": "A realistic 35-year-old person sitting in a serene, sunlit room filled with plants and creative tools, reflecting a space of healing and adaptation. They have a determined yet weary expression, wearing comfortable, practical clothing that accommodates their health needs. The setting is a peaceful, well-organized home studio with signs of both creative work and health management. The photograph is cinematic, capturing the essence of resilience and adaptation.",
+    "avatarUrl": null,
+    "visualStyle": {
+      "primaryColor": "#00A8A8",
+      "accentColor": "#8FD8D8",
+      "mood": "calm",
+      "glowIntensity": 0.5
+    },
+    "voiceId": "voice_calm_001",
+    "parentSelfId": "359bd4dea9",
+    "depthLevel": 3,
+    "childrenIds": []
+  },
+  "createdAt": 1772336545.181013
+}

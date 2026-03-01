@@ -1,0 +1,31 @@
+{
+  "id": "node_root_profile",
+  "parentId": null,
+  "branchLabel": "root",
+  "facts": [
+    {
+      "id": "fact_root_001",
+      "fact": "Core values include family stability, career growth, financial security, building a strong life with my wife.",
+      "source": "interview",
+      "extractedAt": 1772335232.552505
+    },
+    {
+      "id": "fact_root_002",
+      "fact": "Current dilemma: Should I accept a promotion that moves me from New York to Singapore, knowing it could accelerate my career but significantly reshape my marriage, my routines, and the life we have started building together?",
+      "source": "interview",
+      "extractedAt": 1772335232.552505
+    },
+    {
+      "id": "fact_root_003",
+      "fact": "Hidden tension: I want rapid career progression, but I also want emotional closeness and routine",
+      "source": "interview",
+      "extractedAt": 1772335232.552505
+    }
+  ],
+  "notes": [
+    "Root node created from profile extraction.",
+    "Seed state before future-self branch selection."
+  ],
+  "selfCard": null,
+  "createdAt": 1772335232.552505
+}

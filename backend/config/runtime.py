@@ -52,6 +52,23 @@ class FutureGenerationRuntimeConfig(BaseModel):
 class FutureGenContextRuntimeConfig(BaseModel):
     max_conversation_excerpts_per_ancestor: int
     max_total_excerpts: int
+    include_roles: list[str]
+
+    @model_validator(mode="after")
+    def _validate_roles(self) -> FutureGenContextRuntimeConfig:
+        allowed_roles = {"user", "assistant", "memory"}
+        normalized = [str(role).strip().lower() for role in self.include_roles]
+        filtered = [role for role in normalized if role]
+        if not filtered:
+            raise ValueError("future_generation_context.include_roles must not be empty")
+        invalid = sorted({role for role in filtered if role not in allowed_roles})
+        if invalid:
+            raise ValueError(
+                "future_generation_context.include_roles contains unsupported roles: "
+                + ", ".join(invalid)
+            )
+        self.include_roles = filtered
+        return self
 
 
 class CliRuntimeConfig(BaseModel):
@@ -74,6 +91,40 @@ class StorageRuntimeConfig(BaseModel):
     path: str
 
 
+class ConversationMemoryRuntimeConfig(BaseModel):
+    enabled: bool
+    max_notes_per_node: int = Field(ge=1)
+    max_facts_per_node: int = Field(ge=1)
+    max_transcript_entries: int = Field(ge=1)
+
+
+class MemoryExtractionRuntimeConfig(BaseModel):
+    enabled: bool
+    model: str
+    temperature: float
+    top_p: float
+    max_tokens: int = Field(ge=1)
+    timeout_seconds: float = Field(gt=0)
+    max_messages_for_analysis: int = Field(ge=2)
+    input_roles: list[str]
+
+    @model_validator(mode="after")
+    def _validate_input_roles(self) -> MemoryExtractionRuntimeConfig:
+        allowed_roles = {"user", "assistant"}
+        normalized = [str(role).strip().lower() for role in self.input_roles]
+        filtered = [role for role in normalized if role]
+        if not filtered:
+            raise ValueError("memory_extraction.input_roles must not be empty")
+        invalid = sorted({role for role in filtered if role not in allowed_roles})
+        if invalid:
+            raise ValueError(
+                "memory_extraction.input_roles contains unsupported roles: "
+                + ", ".join(invalid)
+            )
+        self.input_roles = filtered
+        return self
+
+
 class RuntimeConfig(BaseModel):
     mistral_chat: MistralChatRuntimeConfig
     prompt_composer: PromptComposerRuntimeConfig
@@ -84,6 +135,8 @@ class RuntimeConfig(BaseModel):
     app: AppRuntimeConfig
     server: ServerRuntimeConfig
     storage: StorageRuntimeConfig
+    conversation_memory: ConversationMemoryRuntimeConfig
+    memory_extraction: MemoryExtractionRuntimeConfig
 
     @model_validator(mode="after")
     def _validate_cli_branch_default(self) -> RuntimeConfig:
