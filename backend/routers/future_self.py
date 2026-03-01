@@ -7,7 +7,7 @@ from pathlib import Path
 from fastapi import APIRouter, Depends, HTTPException
 
 from backend.config.settings import Settings, get_settings
-from backend.engines.context_resolver import (
+from backend.engines.future_gen_context import (
     collect_sibling_names,
     resolve_ancestor_context,
 )
