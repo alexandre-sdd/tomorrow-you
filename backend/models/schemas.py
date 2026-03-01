@@ -283,6 +283,52 @@ class CurrentSelfGenerationSchema(BaseModel):
     )
 
 
+class RawExtractedProfileData(BaseModel):
+    career: dict = Field(default_factory=dict)
+    career_confidence: float = Field(default=0.0, ge=0.0, le=1.0)
+
+    financial: dict = Field(default_factory=dict)
+    financial_confidence: float = Field(default=0.0, ge=0.0, le=1.0)
+
+    personal: dict = Field(default_factory=dict)
+    personal_confidence: float = Field(default=0.0, ge=0.0, le=1.0)
+
+    health: dict = Field(default_factory=dict)
+    health_confidence: float = Field(default=0.0, ge=0.0, le=1.0)
+
+    life_situation: dict = Field(default_factory=dict)
+    life_situation_confidence: float = Field(default=0.0, ge=0.0, le=1.0)
+
+    psychology: dict[str, list[str]] = Field(
+        default_factory=lambda: {
+            "core_values": [],
+            "fears": [],
+            "hidden_tensions": [],
+        }
+    )
+    psychology_confidence: float = Field(default=0.0, ge=0.0, le=1.0)
+
+    decision_style: str = ""
+    decision_style_confidence: float = Field(default=0.0, ge=0.0, le=1.0)
+
+    self_narrative: str = ""
+    self_narrative_confidence: float = Field(default=0.0, ge=0.0, le=1.0)
+
+    current_dilemma: str = ""
+    dilemma_confidence: float = Field(default=0.0, ge=0.0, le=1.0)
+
+
+class RawCurrentSelfOutput(BaseModel):
+    name: str
+    optimization_goal: str
+    tone_of_voice: str
+    worldview: str
+    core_belief: str
+    trade_off: str
+    avatar_prompt: str
+    visual_style: dict
+
+
 # ---------------------------------------------------------------------------
 # Internal raw models — parse Mistral output before voice assignment
 # These use snake_case directly (no alias) because we control serialization.

@@ -11,7 +11,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from backend.config.settings import get_settings
-from backend.routers import future_self, interview, onboarding
+from backend.routers import conversation, future_self, interview, onboarding, pipeline
 
 # ---------------------------------------------------------------------------
 # App initialization
@@ -43,6 +43,8 @@ def create_app() -> FastAPI:
     app.include_router(onboarding.router)  # /interview/* endpoints
     app.include_router(interview.router)    # /interview/* legacy endpoints (if any)
     app.include_router(future_self.router)  # /future-self/* endpoints
+    app.include_router(conversation.router)  # /conversation/* endpoints
+    app.include_router(pipeline.router)  # /pipeline/* endpoints
     
     # Health check
     @app.get("/health")

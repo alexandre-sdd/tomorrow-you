@@ -40,6 +40,7 @@ from backend.models.schemas import (
     InterviewReplyResponse,
     InterviewStartRequest,
     InterviewStatusResponse,
+    SelfCard,
     UserProfile,
 )
 
@@ -72,6 +73,61 @@ def _save_session(session_id: str, session_data: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with open(path, "w") as f:
         json.dump(session_data, f, indent=2)
+
+
+def _initialize_memory_tree(session_id: str, current_self: SelfCard) -> None:
+    """
+    Initialize memory tree structure with root node.
+    
+    Creates memory/nodes/ directory and root node with currentSelf.
+    This is called when onboarding completes.
+    """
+    settings = get_settings()
+    session_dir = Path(settings.storage_root) / session_id
+    nodes_dir = session_dir / "memory" / "nodes"
+    nodes_dir.mkdir(parents=True, exist_ok=True)
+    
+    # Create root node with currentSelf
+    now = time.time()
+    root_node_id = "root_node"
+    
+    root_node = {
+        "id": root_node_id,
+        "parentId": None,  # Root has no parent
+        "branchLabel": "root",
+        "facts": [
+            {
+                "id": f"fact_{root_node_id}_0",
+                "fact": f"Current self: {current_self.name}",
+                "source": "onboarding",
+                "extractedAt": now,
+            },
+            {
+                "id": f"fact_{root_node_id}_1",
+                "fact": f"Optimization goal: {current_self.optimization_goal}",
+                "source": "onboarding",
+                "extractedAt": now,
+            }
+        ],
+        "notes": ["Root node created during onboarding"],
+        "selfCard": current_self.model_dump(by_alias=True),
+        "createdAt": now,
+    }
+    
+    # Write root node
+    root_node_file = nodes_dir / f"{root_node_id}.json"
+    root_node_file.write_text(json.dumps(root_node, indent=2), encoding="utf-8")
+    
+    # Initialize branches.json with root branch
+    branches_file = session_dir / "memory" / "branches.json"
+    branches = [
+        {
+            "name": "root",
+            "headNodeId": root_node_id,
+            "parentBranchName": None,
+        }
+    ]
+    branches_file.write_text(json.dumps(branches, indent=2), encoding="utf-8")
 
 
 # ---------------------------------------------------------------------------
@@ -781,6 +837,10 @@ async def complete_interview(request: InterviewCompleteRequest) -> InterviewComp
     session_data["userProfile"] = profile.model_dump(mode="json")
     session_data["currentSelf"] = gen_result.current_self.model_dump(mode="json")
     session_data["status"] = "ready_for_future_self_generation"
+    
+    # Initialize memory tree structure with root node
+    _initialize_memory_tree(request.session_id, gen_result.current_self)
+    
     _save_session(request.session_id, session_data)
     
     # Clear interview session from cache
