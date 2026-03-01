@@ -21,7 +21,7 @@ storage/test_sessions/
 
 # Test results
 test_results_*.txt
-
+backend/storage/sessions/
 # IDE
 .vscode/
 .idea/

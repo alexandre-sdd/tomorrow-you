@@ -61,6 +61,65 @@ class SelfCard(BaseModel):
     )
 
 
+# ---------------------------------------------------------------------------
+# Onboarding profile structures
+# ---------------------------------------------------------------------------
+
+class CareerProfile(BaseModel):
+    model_config = _camel_config()
+
+    job_title: str = ""
+    industry: str = ""
+    seniority_level: str = ""  # e.g., "entry", "mid", "senior", "executive"
+    years_experience: int = 0
+    current_company: str = ""
+    career_goal: str = ""
+    job_satisfaction: str = ""  # 1-10 or descriptor
+    main_challenges: list[str] = Field(default_factory=list)
+
+
+class FinancialProfile(BaseModel):
+    model_config = _camel_config()
+
+    income_level: str = ""  # e.g., "50-75k", "75-100k", "100-150k", "150k+"
+    financial_goals: list[str] = Field(default_factory=list)
+    money_mindset: str = ""  # e.g., "security-focused", "growth-oriented", "balanced"
+    risk_tolerance: str = ""  # e.g., "low", "medium", "high"
+    main_financial_concern: str = ""
+
+
+class PersonalProfile(BaseModel):
+    model_config = _camel_config()
+
+    hobbies: list[str] = Field(default_factory=list)
+    daily_routines: list[str] = Field(default_factory=list)
+    main_interests: list[str] = Field(default_factory=list)
+    relationships: str = ""  # e.g., "married", "single", "in partnership"
+    key_relationships: list[str] = Field(default_factory=list)
+    personal_values: list[str] = Field(default_factory=list)
+
+
+class HealthProfile(BaseModel):
+    model_config = _camel_config()
+
+    physical_health: str = ""  # e.g., "good", "fair", "needs attention"
+    mental_health: str = ""  # e.g., "stable", "managing stress", "challenged"
+    sleep_quality: str = ""  # e.g., "good", "fair", "poor"
+    exercise_frequency: str = ""  # e.g., "daily", "3-4x/week", "irregular"
+    stress_level: str = ""  # 1-10 or descriptor
+    health_goals: list[str] = Field(default_factory=list)
+
+
+class LifeSituationProfile(BaseModel):
+    model_config = _camel_config()
+
+    current_location: str = ""
+    life_stage: str = ""  # e.g., "early career", "establishing self", "mid-career pivot", "advancement phase"
+    major_responsibilities: list[str] = Field(default_factory=list)
+    recent_transitions: list[str] = Field(default_factory=list)
+    upcoming_changes: list[str] = Field(default_factory=list)
+
+
 class UserProfile(BaseModel):
     model_config = _camel_config()
 
@@ -71,6 +130,13 @@ class UserProfile(BaseModel):
     decision_style: str
     self_narrative: str
     current_dilemma: str
+    
+    # Extended profile sections (optional, populated during onboarding)
+    career: CareerProfile = Field(default_factory=CareerProfile)
+    financial: FinancialProfile = Field(default_factory=FinancialProfile)
+    personal: PersonalProfile = Field(default_factory=PersonalProfile)
+    health: HealthProfile = Field(default_factory=HealthProfile)
+    life_situation: LifeSituationProfile = Field(default_factory=LifeSituationProfile)
 
 
 # ---------------------------------------------------------------------------
@@ -98,6 +164,119 @@ class GenerateFutureSelvesResponse(BaseModel):
     session_id: str
     future_self_options: list[SelfCard]
     generated_at: float = Field(default_factory=time.time)
+
+
+# ---------------------------------------------------------------------------
+# Onboarding request/response models
+# ---------------------------------------------------------------------------
+
+class InterviewStartRequest(BaseModel):
+    model_config = _camel_config()
+
+    session_id: str
+    user_name: str = "User"
+
+
+class InterviewReplyRequest(BaseModel):
+    model_config = _camel_config()
+
+    session_id: str
+    user_message: str
+
+
+class InterviewStatusResponse(BaseModel):
+    model_config = _camel_config()
+
+    session_id: str
+    profile_completeness: float = Field(ge=0.0, le=1.0, description="0-1 indicating % profile filled")
+    extracted_fields: dict[str, bool]  # field_name -> is_extracted
+    current_dilemma: str | None = None
+    is_ready_for_generation: bool = False
+
+
+class InterviewReplyResponse(BaseModel):
+    model_config = _camel_config()
+
+    session_id: str
+    agent_message: str
+    profile_completeness: float = Field(ge=0.0, le=1.0)
+    extracted_fields: dict[str, bool]
+
+
+class InterviewCompleteRequest(BaseModel):
+    model_config = _camel_config()
+
+    session_id: str
+    user_confirmed_dilemma: str | None = None  # Confirm or override extracted dilemma
+
+
+class InterviewCompleteResponse(BaseModel):
+    model_config = _camel_config()
+
+    session_id: str
+    user_profile: UserProfile
+    current_self: SelfCard
+    ready_for_future_generation: bool = True
+    message: str = "Onboarding complete! Ready to explore future selves."
+
+
+# ---------------------------------------------------------------------------
+# Profile extraction internal schema (for Mistral)
+# ---------------------------------------------------------------------------
+
+class ExtractedProfileData(BaseModel):
+    """
+    Incremental profile extraction output from Mistral.
+    Confidence scores help track data quality and guide follow-up questions.
+    """
+    model_config = ConfigDict(populate_by_name=True)
+    
+    career: CareerProfile = Field(default_factory=CareerProfile)
+    career_confidence: float = Field(default=0.0, ge=0.0, le=1.0)
+    
+    financial: FinancialProfile = Field(default_factory=FinancialProfile)
+    financial_confidence: float = Field(default=0.0, ge=0.0, le=1.0)
+    
+    personal: PersonalProfile = Field(default_factory=PersonalProfile)
+    personal_confidence: float = Field(default=0.0, ge=0.0, le=1.0)
+    
+    health: HealthProfile = Field(default_factory=HealthProfile)
+    health_confidence: float = Field(default=0.0, ge=0.0, le=1.0)
+    
+    life_situation: LifeSituationProfile = Field(default_factory=LifeSituationProfile)
+    life_situation_confidence: float = Field(default=0.0, ge=0.0, le=1.0)
+    
+    psychology: dict[str, list[str]] = Field(
+        default_factory=lambda: {
+            "core_values": [],
+            "fears": [],
+            "hidden_tensions": [],
+        }
+    )
+    psychology_confidence: float = Field(default=0.0, ge=0.0, le=1.0)
+    
+    decision_style: str = ""
+    decision_style_confidence: float = Field(default=0.0, ge=0.0, le=1.0)
+    
+    self_narrative: str = ""
+    self_narrative_confidence: float = Field(default=0.0, ge=0.0, le=1.0)
+    
+    current_dilemma: str = ""
+    dilemma_confidence: float = Field(default=0.0, ge=0.0, le=1.0)
+
+
+# ---------------------------------------------------------------------------
+# Current Self auto-generation schema (for Mistral)
+# ---------------------------------------------------------------------------
+
+class CurrentSelfGenerationSchema(BaseModel):
+    """
+    JSON schema for Mistral to auto-generate CurrentSelf from UserProfile.
+    Uses profile data to derive avatar, tone, worldview, core belief, trade-off.
+    """
+    current_self: dict = Field(
+        description="Generated CurrentSelf card derived from user profile"
+    )
 
 
 # ---------------------------------------------------------------------------

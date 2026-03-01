@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from pathlib import Path
 
 from pydantic import Field
 from pydantic_settings import BaseSettings
@@ -18,7 +19,12 @@ class Settings(BaseSettings):
     mistral_model: str = _runtime.app.mistral_model
 
     # Mistral Agent IDs — one per agent created on la Plateforme
+    # Create agents at https://console.mistral.ai/agents
+    # Paste system prompts from prompts/<agent_name>.md into agent builder
     mistral_agent_id_future_self: str  # e.g. ag:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+    mistral_agent_id_interview: str = ""  # Optional: for interview agent (can use base model)
+    mistral_agent_id_profile_extraction: str = ""  # For incremental profile extraction
+    mistral_agent_id_current_self_generation: str = ""  # For CurrentSelf auto-generation
 
     # ------------------------------------------------------------------
     # ElevenLabs
