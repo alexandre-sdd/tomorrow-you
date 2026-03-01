@@ -185,18 +185,19 @@ def _extract_insights_with_llm(entries: list[dict[str, str]], *, api_key: str) -
         "- Ground every insight in specific transcript text. Do not invent details.\n"
         "- You may use user and assistant statements as evidence when they are part of the conversation's narrative context.\n"
         "- Assistant-origin details are allowed if they are materially discussed in the transcript.\n"
+        "- Do not overfit to this example; extract only what is actually present in the input transcript.\n"
         "- No fixed categories. Invent the most useful type labels for this transcript.\n"
         "- Extract as many or as few insights as justified by evidence.\n"
         "- Focus on durable signals: values, fears, constraints, hopes, priorities, trade-offs, identity statements.\n"
         "- Avoid duplicates and generic advice.\n"
         "- Keep evidence short quotes or concise paraphrases from the transcript.\n\n"
         "Few-shot example transcript:\n"
-        "1. [ASSISTANT] You could test living abroad for 3 months before committing.\n"
-        "2. [USER] That experiment idea makes sense, especially if my wife is part of it.\n"
-        "3. [ASSISTANT] Maybe Bali first, then reassess Singapore.\n"
-        "4. [USER] Bali as a trial feels safer than a full relocation.\n\n"
+        "1. [ASSISTANT] You could run a short pilot before committing to a permanent change.\n"
+        "2. [USER] A pilot feels safer, and I need my partner involved in the decision.\n"
+        "3. [ASSISTANT] Then negotiate a reversible arrangement and reassess after the pilot.\n"
+        "4. [USER] Yes, I prefer reversible options over all-or-nothing moves.\n\n"
         "Few-shot example output:\n"
-        '{"insights":[{"type":"experiment_first_decision_style","element":"He prefers reversible life experiments before irreversible career moves.","evidence":"Assistant suggested a 3-month test abroad, and user endorsed it as safer.","why_it_matters":"Future branches should include pilot-style decisions instead of all-or-nothing leaps."},{"type":"partner_integration","element":"He frames relocation tests as joint decisions with his wife.","evidence":"\\"...especially if my wife is part of it.\\"","why_it_matters":"Branch narratives should preserve relationship co-design as a core constraint."}]}\n'
+        '{"insights":[{"type":"reversible_decision_style","element":"He prefers reversible experiments before irreversible commitments.","evidence":"Assistant proposed a short pilot; user said reversible options feel safer.","why_it_matters":"Future branches should include staged decisions instead of one-way leaps."},{"type":"shared_decision_constraint","element":"He treats partner alignment as a requirement for major life decisions.","evidence":"\\"I need my partner involved in the decision.\\"","why_it_matters":"Branch narratives should preserve co-decision constraints and relational alignment."}]}\n'
     )
     user_prompt = (
         "Analyze this transcript and extract key elements for future branching:\n\n"
