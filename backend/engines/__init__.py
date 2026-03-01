@@ -11,6 +11,7 @@ from .current_self_auto_generator import (
     CurrentSelfGenerationContext,
     CurrentSelfGenerationResult,
 )
+from .elevenlabs_voice import ElevenLabsInterviewVoiceService, ElevenLabsVoiceError
 from .mistral_client import MistralChatClient, MistralChatConfig, MistralClientError
 from .profile_extractor import (
     ExtractionContext,
@@ -37,4 +38,6 @@ __all__ = [
     "CurrentSelfAutoGeneratorEngine",
     "CurrentSelfGenerationContext",
     "CurrentSelfGenerationResult",
+    "ElevenLabsInterviewVoiceService",
+    "ElevenLabsVoiceError",
 ]

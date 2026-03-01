@@ -12,7 +12,10 @@ These endpoints wrap PipelineOrchestrator methods with proper HTTP semantics.
 
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends, HTTPException, status
+import base64
+from pathlib import Path
+
+from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
 from pydantic import BaseModel, ConfigDict, Field
 from pydantic.alias_generators import to_camel
 
@@ -246,6 +249,47 @@ async def branch_conversation(
         child_selves=child_selves,
         message=f"Generated {len(child_selves)} future selves from {parent_self.name}",
     )
+
+
+@router.post("/upload-photo/{session_id}")
+async def upload_user_photo(
+    session_id: str,
+    file: UploadFile = File(...),
+    settings: Settings = Depends(get_settings),
+) -> dict[str, str]:
+    """
+    Upload a reference photo of the user for avatar generation.
+
+    The photo is stored as base64 in storage/sessions/{session_id}/user_photo.b64
+    and will be used as a visual reference when generating future self avatars.
+    Supports JPEG and PNG. The photo is optional — avatar generation works
+    without it by relying solely on the AI-generated avatar_prompt.
+    """
+    if file.content_type not in ("image/jpeg", "image/png", "image/webp"):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Only JPEG, PNG, and WebP images are accepted.",
+        )
+
+    contents = await file.read()
+    if len(contents) > 10 * 1024 * 1024:  # 10 MB limit
+        raise HTTPException(
+            status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+            detail="Image must be under 10 MB.",
+        )
+
+    session_dir = Path(settings.storage_root) / session_id
+    if not session_dir.exists():
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Session {session_id} not found.",
+        )
+
+    photo_b64 = base64.b64encode(contents).decode("utf-8")
+    photo_path = session_dir / "user_photo.b64"
+    photo_path.write_text(photo_b64, encoding="utf-8")
+
+    return {"status": "ok", "session_id": session_id}
 
 
 @router.get("/status/{session_id}", response_model=PipelineStatusResponse)

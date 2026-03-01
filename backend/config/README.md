@@ -9,6 +9,7 @@ Configuration is split into:
 - models and generation behavior
 - context/memory limits
 - app/server/storage defaults
+- interview voice defaults (`interview_voice.*`) for ElevenLabs STT/TTS
 
 Override file path with:
 - `RUNTIME_CONFIG_PATH=/path/to/runtime.yaml`
