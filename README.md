@@ -31,33 +31,33 @@ You talk → AI listens → Profile is built → Future selves are generated
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                        Frontend (Next.js)                    │
+│                        Frontend (Next.js)                   │
 │  Landing → Interview → Profile → Selection → Conversation   │
 └────────────────────────────┬────────────────────────────────┘
                              │ REST (fetch)
 ┌────────────────────────────▼────────────────────────────────┐
-│                      Backend (FastAPI)                       │
-│                                                              │
-│  /interview/*    /pipeline/*    /future-self/*  /conversation│
-│                                                              │
-│  ┌─────────────┐  ┌──────────────┐  ┌───────────────────┐  │
-│  │  Interview  │  │   Pipeline   │  │  Context Resolver  │  │
-│  │   Agent     │  │ Orchestrator │  │  (memory walker)   │  │
-│  └─────────────┘  └──────────────┘  └───────────────────┘  │
-│  ┌─────────────┐  ┌──────────────┐  ┌───────────────────┐  │
-│  │  Profile    │  │ Future Self  │  │   Conversation    │  │
-│  │ Extractor   │  │  Generator   │  │     Session       │  │
-│  └─────────────┘  └──────────────┘  └───────────────────┘  │
+│                      Backend (FastAPI)                      │
+│                                                             │
+│ /interview/*   /pipeline/*    /future-self/*  /conversation │
+│                                                             │
+│  ┌─────────────┐  ┌──────────────┐  ┌───────────────────┐   │
+│  │  Interview  │  │   Pipeline   │  │  Context Resolver │   │
+│  │   Agent     │  │ Orchestrator │  │  (memory walker)  │   │
+│  └─────────────┘  └──────────────┘  └───────────────────┘   │
+│  ┌─────────────┐  ┌──────────────┐  ┌───────────────────┐   │
+│  │  Profile    │  │ Future Self  │  │   Conversation    │   │
+│  │ Extractor   │  │  Generator   │  │     Session       │   │
+│  └─────────────┘  └──────────────┘  └───────────────────┘   │
 └──────────┬──────────────────────────────────────────────────┘
            │
 ┌──────────▼──────────────────────────────────────────────────┐
-│                    Providers                                 │
-│  Mistral (LLM + Pixtral avatar)   ElevenLabs (STT + TTS)   │
+│                    Providers                                │
+│  Mistral (LLM + Pixtral avatar)   ElevenLabs (STT + TTS)    │
 └─────────────────────────────────────────────────────────────┘
            │
 ┌──────────▼──────────────────────────────────────────────────┐
-│                    Storage (file-based)                      │
-│  sessions/{id}/                                              │
+│                    Storage (file-based)                     │
+│  sessions/{id}/                                             │
 │  ├── session.json          (profile, all selves, state)     │
 │  ├── transcript.json       (linear append-only log)         │
 │  ├── avatars/              (cached AI-generated images)     │
