@@ -119,7 +119,8 @@ Future Selves Generated → AvatarGenerator.generate(futureSelf) [for each]
 
 ### `conversation_memory.py`
 - Persists conversation turns to `transcript.json` (`user`/`assistant`)
-- Runs LLM transcript analysis (few-shot prompt) to extract open-ended key elements at checkpoint events (exit/rebranch)
+- Runs LLM transcript analysis (few-shot prompt) using configured roles (default: `user` + `assistant`) to extract open-ended key elements at checkpoint events (exit/rebranch)
+- Uses recompute/replace semantics per branch: removes prior `transcript_analysis` facts and prior `Transcript insight [...]` notes/transcript memory, then writes fresh extracted insights
 - Appends extracted insights to current branch node `facts` and `notes`, and adds `memory` entries to transcript
 - Keeps `session.json.memoryNodes` mirror synchronized when present
 
@@ -153,6 +154,11 @@ Future Selves Generated → AvatarGenerator.generate(futureSelf) [for each]
 - Terminal helper to run the same generation flow as `POST /future-self/generate`
 - Supports root-level (`--parent-self-id` omitted) and deeper branching (`--parent-self-id <id>`)
 - Prints generated self IDs so chat can start immediately with `--self-id`
+
+### `backend/cli/backfill_transcript_insights.py`
+- One-off maintenance CLI to recompute transcript-derived branch memory for existing sessions
+- Inputs: `--session-id`, optional `--storage-root`, optional `--branch`
+- Uses the same extraction pipeline as chat/rebranch checkpoints
 
 ### `CONVERSATION_ENGINE_MVP.md`
 - Defines scope and boundaries for the first CLI-only version

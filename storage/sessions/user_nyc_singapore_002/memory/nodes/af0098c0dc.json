@@ -1,0 +1,123 @@
+{
+  "id": "af0098c0dc",
+  "parentId": "56e1ab677b",
+  "branchLabel": "101ac3bf55",
+  "facts": [
+    {
+      "id": "173faf3a5a",
+      "fact": "Optimizes for: Maximize creative expression and personal freedom at the cost of relational stability and emotional support.",
+      "source": "interview",
+      "extractedAt": 1772335846.879342
+    },
+    {
+      "id": "fact_38f835a6f6d2",
+      "fact": "He values reversible, experimental approaches to major life decisions.",
+      "type": "experimentation",
+      "source": "transcript_analysis",
+      "branchName": "101ac3bf55",
+      "selfId": "359bd4dea9",
+      "extractedAt": 1772339079.5116742,
+      "evidence": "He turned the Singapore offer into a six-month experiment and negotiated remote weeks and flexible timelines.",
+      "whyItMatters": "Future branches should include trial periods and creative workarounds to mitigate risk."
+    },
+    {
+      "id": "fact_0b6eb3eeb2f6",
+      "fact": "He involves his wife as a co-architect in major life decisions.",
+      "type": "partner_integration",
+      "source": "transcript_analysis",
+      "branchName": "101ac3bf55",
+      "selfId": "359bd4dea9",
+      "extractedAt": 1772339079.5116742,
+      "evidence": "He dragged his wife into the design of the move to Singapore and pitched Lisbon as a reset with her.",
+      "whyItMatters": "Branch narratives should preserve relationship co-design as a core constraint."
+    },
+    {
+      "id": "fact_9e05ea5db17e",
+      "fact": "He uses alternative options as leverage to clarify his priorities.",
+      "type": "shadow_option",
+      "source": "transcript_analysis",
+      "branchName": "101ac3bf55",
+      "selfId": "359bd4dea9",
+      "extractedAt": 1772339079.5116742,
+      "evidence": "He used Barcelona as leverage to ask what he was really chasing in Singapore.",
+      "whyItMatters": "Future branches should consider shadow options to gain clarity on true motivations."
+    },
+    {
+      "id": "fact_ce5cabf2e160",
+      "fact": "He prioritizes the well-being of his wife in his decisions.",
+      "type": "relationship_priorities",
+      "source": "transcript_analysis",
+      "branchName": "101ac3bf55",
+      "selfId": "359bd4dea9",
+      "extractedAt": 1772339079.5116742,
+      "evidence": "He noticed his wife's loneliness in Singapore and pitched Lisbon as a reset for both of them.",
+      "whyItMatters": "Branch narratives should prioritize the emotional and social well-being of his partner."
+    },
+    {
+      "id": "fact_51db20109d12",
+      "fact": "He recognizes the emotional complexity of non-monogamous relationships.",
+      "type": "non_monogamy_complexity",
+      "source": "transcript_analysis",
+      "branchName": "101ac3bf55",
+      "selfId": "359bd4dea9",
+      "extractedAt": 1772339079.5116742,
+      "evidence": "He describes the emotional challenges and eventual breakdown of his relationship with Sofia and Bunny.",
+      "whyItMatters": "Future branches should consider the emotional and relational costs of non-monogamy."
+    },
+    {
+      "id": "fact_942e0d02bfb7",
+      "fact": "He values depth over intensity in relationships.",
+      "type": "intensity_vs_depth",
+      "source": "transcript_analysis",
+      "branchName": "101ac3bf55",
+      "selfId": "359bd4dea9",
+      "extractedAt": 1772339079.5116742,
+      "evidence": "He reflects on trading the depth of a life for the intensity of moments and ultimately chooses Bunny as home.",
+      "whyItMatters": "Branch narratives should prioritize long-term depth over short-term intensity."
+    },
+    {
+      "id": "fact_f17d923fe62d",
+      "fact": "He acknowledges his mistakes and the importance of communication in relationships.",
+      "type": "self_awareness",
+      "source": "transcript_analysis",
+      "branchName": "101ac3bf55",
+      "selfId": "359bd4dea9",
+      "extractedAt": 1772339079.5116742,
+      "evidence": "He admits to treating his relationship with Sofia and Bunny as a conquest and not a collaboration.",
+      "whyItMatters": "Future branches should emphasize open communication and mutual consent in relationships."
+    }
+  ],
+  "notes": [
+    "Branch node for: Self Who Prioritized Creative Freedom and Faced Isolation (parent: d4a52e5da1)",
+    "Transcript insight [experimentation]: He values reversible, experimental approaches to major life decisions.",
+    "Transcript insight [partner_integration]: He involves his wife as a co-architect in major life decisions.",
+    "Transcript insight [shadow_option]: He uses alternative options as leverage to clarify his priorities.",
+    "Transcript insight [relationship_priorities]: He prioritizes the well-being of his wife in his decisions.",
+    "Transcript insight [non_monogamy_complexity]: He recognizes the emotional complexity of non-monogamous relationships.",
+    "Transcript insight [intensity_vs_depth]: He values depth over intensity in relationships.",
+    "Transcript insight [self_awareness]: He acknowledges his mistakes and the importance of communication in relationships."
+  ],
+  "selfCard": {
+    "id": "359bd4dea9",
+    "type": "future",
+    "name": "Self Who Prioritized Creative Freedom and Faced Isolation",
+    "optimizationGoal": "Maximize creative expression and personal freedom at the cost of relational stability and emotional support.",
+    "toneOfVoice": "Introspective, slightly melancholic, articulate, and emotionally raw.",
+    "worldview": "True creative freedom often comes with unexpected loneliness, and the path less traveled can be isolating.",
+    "coreBelief": "I believe that the richness of life comes from the experiences we create, but sometimes the cost is higher than anticipated.",
+    "tradeOff": "I gained unparalleled creative fulfillment and personal freedom, but I lost the emotional safety net of close relationships and the comfort of a stable support system.",
+    "avatarPrompt": "A realistic 33-year-old man in a sparse, modern apartment, surrounded by artistic tools and half-finished projects. He wears casual, slightly disheveled clothing, with a thoughtful and somewhat lonely expression. The setting is minimalistic, with large windows showing a cityscape at dusk. His demeanor reflects a sense of deep introspection and emotional complexity, captured in a cinematic, slightly abstract portrait.",
+    "avatarUrl": null,
+    "visualStyle": {
+      "primaryColor": "#4682B4",
+      "accentColor": "#B0E0E6",
+      "mood": "intense",
+      "glowIntensity": 0.75
+    },
+    "voiceId": "voice_intense_001",
+    "parentSelfId": "aaa3257e01",
+    "depthLevel": 2,
+    "childrenIds": []
+  },
+  "createdAt": 1772335846.879342
+}

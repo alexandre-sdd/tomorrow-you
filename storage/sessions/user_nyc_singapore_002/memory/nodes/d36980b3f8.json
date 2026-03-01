@@ -1,0 +1,39 @@
+{
+  "id": "d36980b3f8",
+  "parentId": "56e1ab677b",
+  "branchLabel": "f04d939165",
+  "facts": [
+    {
+      "id": "d33cfe27a0",
+      "fact": "Optimizes for: Maximize creative expression, personal freedom, and unconventional life experiences while maintaining a stable and fulfilling relationship.",
+      "source": "interview",
+      "extractedAt": 1772335846.879342
+    }
+  ],
+  "notes": [
+    "Branch node for: Self Who Prioritized Creative Freedom and Found Unexpected Stability (parent: d4a52e5da1)"
+  ],
+  "selfCard": {
+    "id": "846039b05c",
+    "type": "future",
+    "name": "Self Who Prioritized Creative Freedom and Found Unexpected Stability",
+    "optimizationGoal": "Maximize creative expression, personal freedom, and unconventional life experiences while maintaining a stable and fulfilling relationship.",
+    "toneOfVoice": "Confident, warm, reflective, and grounded.",
+    "worldview": "True fulfillment comes from creating your own path, but stability and deep relationships can coexist with creative freedom.",
+    "coreBelief": "I believe that a life rich in experiences and creativity can also be stable and deeply connected.",
+    "tradeOff": "I gained creative fulfillment and personal freedom, and surprisingly, I also found stability and deepened my relationship, but I had to let go of some financial security and traditional career milestones.",
+    "avatarPrompt": "A realistic 33-year-old man in a cozy, artistic loft, surrounded by creative tools and personal artifacts. He wears casual yet stylish clothing, with a warm and content expression. The setting is a blend of a home studio and living space, filled with natural light and personal touches. His demeanor reflects a sense of accomplishment and emotional richness, captured in a cinematic, documentary-style portrait.",
+    "avatarUrl": null,
+    "visualStyle": {
+      "primaryColor": "#8B4513",
+      "accentColor": "#FFD700",
+      "mood": "warm",
+      "glowIntensity": 0.65
+    },
+    "voiceId": "voice_warm_001",
+    "parentSelfId": "aaa3257e01",
+    "depthLevel": 2,
+    "childrenIds": []
+  },
+  "createdAt": 1772335846.879342
+}

@@ -16,6 +16,7 @@ This project now splits configuration into:
 - ancestor context limits (`future_generation_context`)
 - conversation persistence defaults (`conversation_memory`)
 - transcript analysis defaults (`memory_extraction`)
+- transcript/context role inclusion (`memory_extraction.input_roles`, `future_generation_context.include_roles`)
 - CLI defaults (`cli`)
 - app/server/storage defaults used by `Settings` (`app`, `server`, `storage`)
 

@@ -56,8 +56,13 @@ Run a fast, natural text conversation in the terminal with a selected future-sel
 ## Data Safety
 - Writes are limited to session-local memory artifacts:
   - append turn data to `transcript.json`
-  - append extracted transcript insights to current branch memory node (`facts`/`notes`)
+  - recompute/replace extracted transcript insights on current branch memory node (`facts`/`notes`)
 - No destructive edits and no branch history pruning.
+
+## Transcript Insight Policy
+- Transcript extraction is role-configurable; default input roles are `user` + `assistant`.
+- Rebranch ancestor excerpts are role-configurable; default included roles are `user`, `assistant`, `memory`.
+- Each extraction run for a branch removes prior auto-extracted transcript insights and writes a fresh set.
 
 ## Quick Run
 ```bash
@@ -73,4 +78,10 @@ You can also generate a new batch first:
 python3 -m backend.cli.generate_future_selves \
   --session-id user_nyc_singapore_001 \
   --count 2
+```
+
+Backfill transcript insights for an existing session:
+```bash
+python3 -m backend.cli.backfill_transcript_insights \
+  --session-id user_nyc_singapore_001
 ```

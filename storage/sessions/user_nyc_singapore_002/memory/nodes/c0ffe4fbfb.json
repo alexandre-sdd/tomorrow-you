@@ -1,0 +1,39 @@
+{
+  "id": "c0ffe4fbfb",
+  "parentId": "node_root_profile",
+  "branchLabel": "707c90da0f",
+  "facts": [
+    {
+      "id": "8040a02d93",
+      "fact": "Optimizes for: Prioritize marital stability, local career growth, and deepening family roots.",
+      "source": "interview",
+      "extractedAt": 1772335474.283612
+    }
+  ],
+  "notes": [
+    "Branch node for: Self Who Chose Rooted Growth (parent: root)"
+  ],
+  "selfCard": {
+    "id": "fead6a362b",
+    "type": "future",
+    "name": "Self Who Chose Rooted Growth",
+    "optimizationGoal": "Prioritize marital stability, local career growth, and deepening family roots.",
+    "toneOfVoice": "Warm, steady, thoughtful, emotionally present.",
+    "worldview": "A fulfilling life is built on strong relationships and a sense of belonging.",
+    "coreBelief": "I believe that true success is measured by the strength of my relationships and the depth of my connections.",
+    "tradeOff": "I maintained a close and stable marriage, but I sometimes wonder about the career opportunities I might have missed.",
+    "avatarPrompt": "A 35-year-old man sitting on a park bench in New York, wearing casual but neat clothing, with a content and relaxed expression. His wife sitting beside him, both enjoying a quiet moment together. The photograph is warm and inviting, with soft focus and natural lighting, conveying a sense of comfort and emotional presence.",
+    "avatarUrl": null,
+    "visualStyle": {
+      "primaryColor": "#5A3A1A",
+      "accentColor": "#F3E3D1",
+      "mood": "warm",
+      "glowIntensity": 0.45
+    },
+    "voiceId": "voice_warm_001",
+    "parentSelfId": null,
+    "depthLevel": 1,
+    "childrenIds": []
+  },
+  "createdAt": 1772335474.283612
+}

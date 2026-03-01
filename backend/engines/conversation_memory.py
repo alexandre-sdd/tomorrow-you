@@ -108,29 +108,16 @@ def analyze_and_persist_transcript_insights(
 
     session_dir = Path(storage_root) / session_id
     transcript_path = session_dir / "transcript.json"
-    transcript = _load_json_list(transcript_path)
-    if not transcript:
-        return []
-
     convo_entries = _select_branch_conversation_entries(
-        transcript=transcript,
+        transcript=_load_json_list(transcript_path),
         branch_name=branch_name,
         self_id=self_id,
     )
-    if len(convo_entries) < 2:
-        return []
-    if not _has_unanalyzed_conversation(
-        transcript=transcript,
-        branch_name=branch_name,
-        self_id=self_id,
-    ):
-        return []
-
-    clipped_entries = convo_entries[-_extract_cfg.max_messages_for_analysis :]
-    raw_output = _extract_insights_with_llm(clipped_entries, api_key=api_key)
-    insights = _parse_insights(raw_output)
-    if not insights:
-        return []
+    insights: list[dict[str, str]] = []
+    if convo_entries:
+        clipped_entries = convo_entries[-_extract_cfg.max_messages_for_analysis :]
+        raw_output = _extract_insights_with_llm(clipped_entries, api_key=api_key)
+        insights = _parse_insights(raw_output)
 
     now = time.time()
     return _persist_insights(
@@ -149,14 +136,17 @@ def _select_branch_conversation_entries(
     branch_name: str,
     self_id: str | None,
 ) -> list[dict[str, str]]:
+    allowed_roles = {
+        role for role in _extract_cfg.input_roles if role in {"user", "assistant"}
+    } or {"user", "assistant"}
     selected: list[dict[str, str]] = []
     for raw in transcript:
         if not isinstance(raw, dict):
             continue
         if raw.get("phase") != "conversation":
             continue
-        role = raw.get("role")
-        if role not in {"user", "assistant"}:
+        role = str(raw.get("role") or "").strip().lower()
+        if role not in allowed_roles:
             continue
 
         entry_branch = raw.get("branchName")
@@ -169,43 +159,8 @@ def _select_branch_conversation_entries(
         content = raw.get("content")
         if not isinstance(content, str) or not content.strip():
             continue
-        selected.append({"role": str(role), "content": content.strip()})
+        selected.append({"role": role, "content": content.strip()})
     return selected
-
-
-def _has_unanalyzed_conversation(
-    *,
-    transcript: list,
-    branch_name: str,
-    self_id: str | None,
-) -> bool:
-    latest_conversation_turn = 0
-    latest_memory_turn = 0
-
-    for raw in transcript:
-        if not isinstance(raw, dict):
-            continue
-        if raw.get("phase") != "conversation":
-            continue
-        entry_branch = raw.get("branchName")
-        entry_self = raw.get("selfId")
-        if branch_name and entry_branch and entry_branch != branch_name:
-            continue
-        if self_id and entry_self and entry_self != self_id:
-            continue
-
-        turn = raw.get("turn")
-        turn_num = int(turn) if isinstance(turn, int) or (isinstance(turn, str) and turn.isdigit()) else 0
-        role = raw.get("role")
-        if role in {"user", "assistant"} and turn_num > latest_conversation_turn:
-            latest_conversation_turn = turn_num
-        if role == "memory":
-            content = raw.get("content")
-            if isinstance(content, str) and content.startswith("Transcript insight ["):
-                if turn_num > latest_memory_turn:
-                    latest_memory_turn = turn_num
-
-    return latest_conversation_turn > latest_memory_turn
 
 
 def _extract_insights_with_llm(entries: list[dict[str, str]], *, api_key: str) -> str:
@@ -227,17 +182,21 @@ def _extract_insights_with_llm(entries: list[dict[str, str]], *, api_key: str) -
         "Return ONLY JSON with this shape:\n"
         '{"insights":[{"type":"string","element":"string","evidence":"string","why_it_matters":"string"}]}\n'
         "Rules:\n"
+        "- Ground every insight in specific transcript text. Do not invent details.\n"
+        "- You may use user and assistant statements as evidence when they are part of the conversation's narrative context.\n"
+        "- Assistant-origin details are allowed if they are materially discussed in the transcript.\n"
         "- No fixed categories. Invent the most useful type labels for this transcript.\n"
         "- Extract as many or as few insights as justified by evidence.\n"
         "- Focus on durable signals: values, fears, constraints, hopes, priorities, trade-offs, identity statements.\n"
         "- Avoid duplicates and generic advice.\n"
-        "- Every insight must be grounded in transcript evidence.\n\n"
+        "- Keep evidence short quotes or concise paraphrases from the transcript.\n\n"
         "Few-shot example transcript:\n"
-        "1. [USER] I want the promotion, but I am scared the move will distance me from my wife.\n"
-        "2. [ASSISTANT] What matters most if those goals conflict?\n"
-        "3. [USER] Long term I want both, but I prioritize the marriage if I must choose.\n\n"
+        "1. [ASSISTANT] You could test living abroad for 3 months before committing.\n"
+        "2. [USER] That experiment idea makes sense, especially if my wife is part of it.\n"
+        "3. [ASSISTANT] Maybe Bali first, then reassess Singapore.\n"
+        "4. [USER] Bali as a trial feels safer than a full relocation.\n\n"
         "Few-shot example output:\n"
-        '{"insights":[{"type":"relationship_priority","element":"He will prioritize marital closeness over career acceleration when forced to choose.","evidence":"\\"I prioritize the marriage if I must choose.\\"","why_it_matters":"Future branches should account for a strong relational decision constraint."},{"type":"ambition_with_anxiety","element":"He still seeks career growth but associates relocation with emotional risk.","evidence":"\\"I want the promotion, but I am scared...\\"","why_it_matters":"Future scenarios should preserve ambition while modeling emotional cost and mitigation."}]}\n'
+        '{"insights":[{"type":"experiment_first_decision_style","element":"He prefers reversible life experiments before irreversible career moves.","evidence":"Assistant suggested a 3-month test abroad, and user endorsed it as safer.","why_it_matters":"Future branches should include pilot-style decisions instead of all-or-nothing leaps."},{"type":"partner_integration","element":"He frames relocation tests as joint decisions with his wife.","evidence":"\\"...especially if my wife is part of it.\\"","why_it_matters":"Branch narratives should preserve relationship co-design as a core constraint."}]}\n'
     )
     user_prompt = (
         "Analyze this transcript and extract key elements for future branching:\n\n"
@@ -306,17 +265,22 @@ def _persist_insights(
     if not node:
         return []
 
-    notes = list(node.get("notes") or [])
-    facts = list(node.get("facts") or [])
-    existing_keys = _existing_insight_keys(facts=facts)
+    notes_all = list(node.get("notes") or [])
+    facts_all = list(node.get("facts") or [])
+    notes = [
+        n
+        for n in notes_all
+        if not (isinstance(n, str) and n.startswith("Transcript insight ["))
+    ]
+    facts = [
+        f
+        for f in facts_all
+        if not (isinstance(f, dict) and f.get("source") == "transcript_analysis")
+    ]
 
     added: list[dict[str, str]] = []
     memory_entries: list[dict[str, Any]] = []
     for insight in insights:
-        key = _insight_key(insight["type"], insight["element"])
-        if key in existing_keys:
-            continue
-        existing_keys.add(key)
         added.append(insight)
 
         fact_entry: dict[str, Any] = {
@@ -324,6 +288,8 @@ def _persist_insights(
             "fact": insight["element"],
             "type": insight["type"],
             "source": "transcript_analysis",
+            "branchName": branch_name,
+            "selfId": self_id,
             "extractedAt": timestamp,
         }
         if insight.get("evidence"):
@@ -347,9 +313,6 @@ def _persist_insights(
             )
         )
 
-    if not added:
-        return []
-
     node["notes"] = notes[-_memory_cfg.max_notes_per_node :]
     node["facts"] = facts[-_memory_cfg.max_facts_per_node :]
     node_path.parent.mkdir(parents=True, exist_ok=True)
@@ -358,14 +321,12 @@ def _persist_insights(
 
     transcript_path = session_dir / "transcript.json"
     transcript = _load_json_list(transcript_path)
+    transcript = _drop_prior_branch_memory_entries(
+        transcript=transcript,
+        branch_name=branch_name,
+        self_id=self_id,
+    )
     for entry in memory_entries:
-        if _memory_entry_exists(
-            transcript=transcript,
-            branch_name=branch_name,
-            self_id=self_id,
-            content=str(entry.get("content", "")),
-        ):
-            continue
         _append_transcript_entries(transcript, [entry])
     _trim_transcript(transcript)
     transcript_path.parent.mkdir(parents=True, exist_ok=True)
@@ -374,28 +335,34 @@ def _persist_insights(
     return added
 
 
-def _memory_entry_exists(
+def _drop_prior_branch_memory_entries(
     *,
     transcript: list,
     branch_name: str,
     self_id: str | None,
-    content: str,
-) -> bool:
+) -> list:
+    cleaned: list = []
     for raw in transcript:
         if not isinstance(raw, dict):
+            cleaned.append(raw)
             continue
-        if raw.get("phase") != "conversation":
+        if raw.get("phase") != "conversation" or raw.get("role") != "memory":
+            cleaned.append(raw)
             continue
-        if raw.get("role") != "memory":
-            continue
-        if raw.get("content") != content:
+
+        content = raw.get("content")
+        if not isinstance(content, str) or not content.startswith("Transcript insight ["):
+            cleaned.append(raw)
             continue
         if raw.get("branchName") != branch_name:
+            cleaned.append(raw)
             continue
-        if self_id and raw.get("selfId") and raw.get("selfId") != self_id:
+        entry_self = raw.get("selfId")
+        if self_id and entry_self and entry_self != self_id:
+            cleaned.append(raw)
             continue
-        return True
-    return False
+        # Drop old auto-extracted memory for this branch/self.
+    return cleaned
 
 
 def _resolve_branch_head_node_id(*, session_dir: Path, branch_name: str) -> str | None:
@@ -434,21 +401,6 @@ def _sync_session_memory_nodes(*, session_dir: Path, node: dict) -> None:
         memory_nodes.append(node)
     session["memoryNodes"] = memory_nodes
     session_path.write_text(json.dumps(session, indent=2), encoding="utf-8")
-
-
-def _existing_insight_keys(*, facts: list) -> set[str]:
-    keys: set[str] = set()
-    for raw in facts:
-        if not isinstance(raw, dict):
-            continue
-        if raw.get("source") != "transcript_analysis":
-            continue
-        type_value = _clean_text(raw.get("type") or "signal")
-        fact_value = _clean_text(raw.get("fact") or "")
-        if not fact_value:
-            continue
-        keys.add(_insight_key(type_value or "signal", fact_value))
-    return keys
 
 
 def _insight_key(type_value: str, element_value: str) -> str:

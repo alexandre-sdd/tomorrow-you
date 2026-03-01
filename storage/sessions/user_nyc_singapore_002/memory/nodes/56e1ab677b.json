@@ -1,0 +1,99 @@
+{
+  "id": "56e1ab677b",
+  "parentId": "node_root_profile",
+  "branchLabel": "d4a52e5da1",
+  "facts": [
+    {
+      "id": "ea1edf7afa",
+      "fact": "Optimizes for: Maximize creative expression, personal freedom, and unconventional life experiences.",
+      "source": "interview",
+      "extractedAt": 1772335678.06252
+    },
+    {
+      "id": "fact_37c6fce677be",
+      "fact": "He prioritizes designing a life that feels meaningful in the long term over conventional career success.",
+      "type": "life_design_priority",
+      "source": "transcript_analysis",
+      "branchName": "d4a52e5da1",
+      "selfId": "aaa3257e01",
+      "extractedAt": 1772339075.4425228,
+      "evidence": "\"What\u2019s the move that\u2019ll make me feel alive when I\u2019m 80, looking back?\"",
+      "whyItMatters": "Future branches should focus on life design and personal fulfillment rather than traditional career metrics."
+    },
+    {
+      "id": "fact_662c519f36cb",
+      "fact": "He values testing life changes through small, reversible experiments before committing.",
+      "type": "experimentation",
+      "source": "transcript_analysis",
+      "branchName": "d4a52e5da1",
+      "selfId": "aaa3257e01",
+      "extractedAt": 1772339075.4425228,
+      "evidence": "Spending a month in Lisbon to test reinvention and three months in Bali to test life abroad.",
+      "whyItMatters": "Future branches should include pilot experiments to validate life decisions before full commitment."
+    },
+    {
+      "id": "fact_08963903869a",
+      "fact": "He involves his partner in major life decisions and experiments.",
+      "type": "partner_integration",
+      "source": "transcript_analysis",
+      "branchName": "d4a52e5da1",
+      "selfId": "aaa3257e01",
+      "extractedAt": 1772339075.4425228,
+      "evidence": "\"We asked ourselves: Could we build something extraordinary together, somewhere new?\"",
+      "whyItMatters": "Branch narratives should include joint decision-making with his partner as a core constraint."
+    },
+    {
+      "id": "fact_962c32ea1902",
+      "fact": "He uses job offers as leverage to negotiate flexible, life-enhancing terms.",
+      "type": "negotiation_strategy",
+      "source": "transcript_analysis",
+      "branchName": "d4a52e5da1",
+      "selfId": "aaa3257e01",
+      "extractedAt": 1772339075.4425228,
+      "evidence": "Negotiated a remote-first role with quarterly trips to Singapore and a 4-day workweek in Lisbon.",
+      "whyItMatters": "Future branches should explore creative negotiation strategies to align career with life goals."
+    },
+    {
+      "id": "fact_4b0835b8b3f3",
+      "fact": "He rejects binary choices and seeks third options that combine elements of different paths.",
+      "type": "binary_thinking_avoidance",
+      "source": "transcript_analysis",
+      "branchName": "d4a52e5da1",
+      "selfId": "aaa3257e01",
+      "extractedAt": 1772339075.4425228,
+      "evidence": "\"What\u2019s the third option you\u2019re not letting yourself imagine yet?\"",
+      "whyItMatters": "Future branches should explore creative alternatives to conventional either/or decisions."
+    }
+  ],
+  "notes": [
+    "Branch node for: Self Who Prioritized Creative Freedom (parent: root)",
+    "Transcript insight [life_design_priority]: He prioritizes designing a life that feels meaningful in the long term over conventional career success.",
+    "Transcript insight [experimentation]: He values testing life changes through small, reversible experiments before committing.",
+    "Transcript insight [partner_integration]: He involves his partner in major life decisions and experiments.",
+    "Transcript insight [negotiation_strategy]: He uses job offers as leverage to negotiate flexible, life-enhancing terms.",
+    "Transcript insight [binary_thinking_avoidance]: He rejects binary choices and seeks third options that combine elements of different paths."
+  ],
+  "selfCard": {
+    "id": "aaa3257e01",
+    "type": "future",
+    "name": "Self Who Prioritized Creative Freedom",
+    "optimizationGoal": "Maximize creative expression, personal freedom, and unconventional life experiences.",
+    "toneOfVoice": "Expressive, passionate, unconventional, emotionally vibrant.",
+    "worldview": "Life is too short to follow a script; true fulfillment comes from creating your own path.",
+    "coreBelief": "I believe that the richness of life comes from the experiences we create and the freedom we allow ourselves to explore.",
+    "tradeOff": "I gained creative fulfillment and personal freedom, but I sacrificed financial security and the stability of a traditional career path.",
+    "avatarPrompt": "A realistic 35-year-old artist in a vibrant studio, surrounded by paintings and sculptures, wearing a paint-splattered smock, with a passionate and intense expression. The studio is filled with natural light, and the background shows a bustling cityscape. The photographic style is cinematic and slightly abstract, capturing the essence of creative energy.",
+    "avatarUrl": null,
+    "visualStyle": {
+      "primaryColor": "#8A2BE2",
+      "accentColor": "#E6E6FA",
+      "mood": "ethereal",
+      "glowIntensity": 0.75
+    },
+    "voiceId": "voice_ethereal_001",
+    "parentSelfId": null,
+    "depthLevel": 1,
+    "childrenIds": []
+  },
+  "createdAt": 1772335678.06252
+}

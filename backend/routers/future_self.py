@@ -30,16 +30,10 @@ from backend.models.schemas import (
 router = APIRouter(prefix="/future-self", tags=["future-self"])
 _runtime_fg = get_runtime_config().future_generation
 
-# Lazily initialized engine instance (constructed only when generation is called).
-# This avoids failing imports/CLI help when env keys are not loaded yet.
-_generator: FutureSelfGenerator | None = None
-
-
 def _get_generator() -> FutureSelfGenerator:
-    global _generator
-    if _generator is None:
-        _generator = FutureSelfGenerator()
-    return _generator
+    # Create a fresh generator per invocation to avoid reusing async clients
+    # across closed event loops when CLI paths call asyncio.run multiple times.
+    return FutureSelfGenerator()
 
 
 # ---------------------------------------------------------------------------

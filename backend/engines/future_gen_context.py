@@ -27,6 +27,7 @@ def resolve_ancestor_context(
     *,
     max_conversation_excerpts_per_ancestor: int = _runtime_fg_ctx.max_conversation_excerpts_per_ancestor,
     max_total_excerpts: int = _runtime_fg_ctx.max_total_excerpts,
+    include_roles: list[str] | tuple[str, ...] = tuple(_runtime_fg_ctx.include_roles),
 ) -> tuple[str, list[str]]:
     """
     Walk from ``parent_self_id`` up to root, collecting ancestor summaries
@@ -93,6 +94,12 @@ def resolve_ancestor_context(
     conversation_excerpts: list[str] = []
     transcript_file = session_dir / "transcript.json"
     if transcript_file.exists():
+        allowed_roles = {
+            str(role).strip().lower()
+            for role in include_roles
+            if isinstance(role, str) and role.strip()
+        } or {"user", "assistant", "memory"}
+
         transcript: list[dict] = json.loads(
             transcript_file.read_text(encoding="utf-8")
         )
@@ -107,22 +114,39 @@ def resolve_ancestor_context(
             for entry in transcript
             if entry.get("phase") == "conversation"
             and entry.get("selfName") in ancestor_names
-            and entry.get("role") in {"user", "memory"}
+            and str(entry.get("role", "")).strip().lower() in allowed_roles
         ]
 
-        # Take most recent entries, grouped by ancestor
+        # Take most recent entries, grouped by ancestor.
+        # Pass 1 prefers user/assistant turns so narrative context is not crowded out
+        # by transcript-memory entries. Pass 2 backfills remaining slots.
         seen_per_ancestor: dict[str, int] = {}
-        for entry in reversed(convo_entries):
-            if len(conversation_excerpts) >= max_total_excerpts:
-                break
-            name = entry.get("selfName", "")
-            seen_per_ancestor.setdefault(name, 0)
-            if seen_per_ancestor[name] >= max_conversation_excerpts_per_ancestor:
-                continue
-            role = entry.get("role", "?")
-            content = entry.get("content", "")
-            conversation_excerpts.append(f"[{role} ↔ {name}]: {content}")
-            seen_per_ancestor[name] += 1
+        selected_ids: set[int] = set()
+        preferred_roles = {"user", "assistant"} & allowed_roles
+
+        def _collect_pass(*, roles: set[str] | None) -> None:
+            for entry in reversed(convo_entries):
+                if len(conversation_excerpts) >= max_total_excerpts:
+                    break
+                entry_id = id(entry)
+                if entry_id in selected_ids:
+                    continue
+                role = str(entry.get("role", "?")).strip().lower()
+                if roles is not None and role not in roles:
+                    continue
+
+                name = entry.get("selfName", "")
+                seen_per_ancestor.setdefault(name, 0)
+                if seen_per_ancestor[name] >= max_conversation_excerpts_per_ancestor:
+                    continue
+                content = entry.get("content", "")
+                conversation_excerpts.append(f"[{role} ↔ {name}]: {content}")
+                seen_per_ancestor[name] += 1
+                selected_ids.add(entry_id)
+
+        if preferred_roles:
+            _collect_pass(roles=preferred_roles)
+        _collect_pass(roles=allowed_roles - preferred_roles if preferred_roles else None)
 
         # Reverse back to chronological order
         conversation_excerpts.reverse()

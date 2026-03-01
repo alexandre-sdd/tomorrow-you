@@ -1,0 +1,39 @@
+{
+  "id": "e9277ede10",
+  "parentId": "af0098c0dc",
+  "branchLabel": "ebe1fccdad",
+  "facts": [
+    {
+      "id": "63d58fbbba",
+      "fact": "Optimizes for: Maximize creative expression, personal freedom, and the development of deep, meaningful relationships.",
+      "source": "interview",
+      "extractedAt": 1772336545.181013
+    }
+  ],
+  "notes": [
+    "Branch node for: Self Who Prioritized Creative Freedom and Found Community (parent: 101ac3bf55)"
+  ],
+  "selfCard": {
+    "id": "d162b62c1e",
+    "type": "future",
+    "name": "Self Who Prioritized Creative Freedom and Found Community",
+    "optimizationGoal": "Maximize creative expression, personal freedom, and the development of deep, meaningful relationships.",
+    "toneOfVoice": "Warm, open, reflective, and inviting.",
+    "worldview": "True creative freedom can coexist with emotional connection if you actively cultivate both.",
+    "coreBelief": "I believe that the richness of life comes from both the experiences we create and the relationships we nurture.",
+    "tradeOff": "I gained unparalleled creative fulfillment, personal freedom, and a strong sense of community, but I had to actively work to maintain these relationships and sometimes compromise on my independence.",
+    "avatarPrompt": "A realistic 35-year-old person standing in a vibrant, artistic community space, surrounded by diverse individuals engaged in creative pursuits. They have a warm, inviting expression, wearing casual yet stylish clothing that reflects their creative spirit. The setting is a cozy, well-lit studio with art on the walls and people collaborating on projects. The photograph is cinematic, capturing the essence of a thriving, connected community.",
+    "avatarUrl": null,
+    "visualStyle": {
+      "primaryColor": "#FF6B35",
+      "accentColor": "#FFD166",
+      "mood": "warm",
+      "glowIntensity": 0.7
+    },
+    "voiceId": "voice_warm_001",
+    "parentSelfId": "359bd4dea9",
+    "depthLevel": 3,
+    "childrenIds": []
+  },
+  "createdAt": 1772336545.181013
+}

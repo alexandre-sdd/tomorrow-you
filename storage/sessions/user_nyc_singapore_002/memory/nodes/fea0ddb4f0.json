@@ -1,0 +1,99 @@
+{
+  "id": "fea0ddb4f0",
+  "parentId": "node_root_profile",
+  "branchLabel": "727676ff10",
+  "facts": [
+    {
+      "id": "79d9d55a9a",
+      "fact": "Optimizes for: Maximize international career growth, financial upside, and global network expansion.",
+      "source": "interview",
+      "extractedAt": 1772335474.283612
+    },
+    {
+      "id": "fact_260fccfa344e",
+      "fact": "He prioritizes his wife's feelings and needs as a core factor in his decision.",
+      "type": "relationship_centrality",
+      "source": "transcript_analysis",
+      "branchName": "727676ff10",
+      "selfId": "e267e4edc7",
+      "extractedAt": 1772339071.985537,
+      "evidence": "\"I don't know how it's gonna go with my wife...\"",
+      "whyItMatters": "Future branches must address relationship dynamics as a primary constraint."
+    },
+    {
+      "id": "fact_03e208ba6d0d",
+      "fact": "He fears losing specific, cherished moments and routines with his wife.",
+      "type": "fear_of_loss",
+      "source": "transcript_analysis",
+      "branchName": "727676ff10",
+      "selfId": "e267e4edc7",
+      "extractedAt": 1772339071.985537,
+      "evidence": "\"What\u2019s the one thing you\u2019re most afraid of losing with her if you go? Not the big abstract stuff\u2014the *specific moment or rhythm* that feels like your anchor right now.\"",
+      "whyItMatters": "Branches should explore ways to preserve or recreate these moments."
+    },
+    {
+      "id": "fact_cad230fb861b",
+      "fact": "He is concerned about making assumptions about his wife's willingness to relocate.",
+      "type": "assumption_risk",
+      "source": "transcript_analysis",
+      "branchName": "727676ff10",
+      "selfId": "e267e4edc7",
+      "extractedAt": 1772339071.985537,
+      "evidence": "\"Wait should I ask her to come ? What did you do ? Can you support us both ?\"",
+      "whyItMatters": "Branches should include explicit communication and joint decision-making processes."
+    },
+    {
+      "id": "fact_196166518612",
+      "fact": "He values the importance of mutual support and teamwork in the relationship.",
+      "type": "support_system",
+      "source": "transcript_analysis",
+      "branchName": "727676ff10",
+      "selfId": "e267e4edc7",
+      "extractedAt": 1772339071.985537,
+      "evidence": "\"It was about whether we were still a team.\"",
+      "whyItMatters": "Branches should emphasize collaborative problem-solving and shared commitment."
+    },
+    {
+      "id": "fact_6f3bae9cdf24",
+      "fact": "He is torn between career opportunities and the potential impact on his relationship.",
+      "type": "career_vs_relationship",
+      "source": "transcript_analysis",
+      "branchName": "727676ff10",
+      "selfId": "e267e4edc7",
+      "extractedAt": 1772339071.985537,
+      "evidence": "\"The career numbers add up, the opportunity is undeniable\u2014but the *her* part of the equation? That\u2019s the variable no spreadsheet can solve.\"",
+      "whyItMatters": "Branches should weigh career benefits against relationship costs."
+    }
+  ],
+  "notes": [
+    "Branch node for: Self Who Embraced the Global Leap (parent: root)",
+    "Transcript insight [relationship_centrality]: He prioritizes his wife's feelings and needs as a core factor in his decision.",
+    "Transcript insight [fear_of_loss]: He fears losing specific, cherished moments and routines with his wife.",
+    "Transcript insight [assumption_risk]: He is concerned about making assumptions about his wife's willingness to relocate.",
+    "Transcript insight [support_system]: He values the importance of mutual support and teamwork in the relationship.",
+    "Transcript insight [career_vs_relationship]: He is torn between career opportunities and the potential impact on his relationship."
+  ],
+  "selfCard": {
+    "id": "e267e4edc7",
+    "type": "future",
+    "name": "Self Who Embraced the Global Leap",
+    "optimizationGoal": "Maximize international career growth, financial upside, and global network expansion.",
+    "toneOfVoice": "Confident, decisive, ambitious, slightly more detached.",
+    "worldview": "True growth often requires stepping out of comfort zones and embracing new challenges.",
+    "coreBelief": "I believe that taking bold steps, even if they are uncomfortable, leads to the most significant personal and professional growth.",
+    "tradeOff": "I gained a high-powered career and financial success, but I sacrificed some of the closeness and routine I had with my wife and family.",
+    "avatarPrompt": "A 35-year-old professional man standing in a high-rise office in Singapore, wearing a tailored suit, with a confident and determined expression. The cityscape visible through the floor-to-ceiling windows behind him, bathed in the warm glow of the setting sun. The photograph is cinematic, with a sharp focus on his face, conveying a sense of ambition and slight detachment.",
+    "avatarUrl": null,
+    "visualStyle": {
+      "primaryColor": "#1A3A5A",
+      "accentColor": "#D1E3F3",
+      "mood": "elevated",
+      "glowIntensity": 0.75
+    },
+    "voiceId": "voice_elevated_001",
+    "parentSelfId": null,
+    "depthLevel": 1,
+    "childrenIds": []
+  },
+  "createdAt": 1772335474.283612
+}
