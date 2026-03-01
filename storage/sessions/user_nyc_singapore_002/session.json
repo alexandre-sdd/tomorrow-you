@@ -1,0 +1,100 @@
+{
+  "id": "user_nyc_singapore_001",
+  "status": "profile",
+  "transcript": [],
+  "userProfile": {
+    "id": "user_nyc_singapore_002",
+    "coreValues": [
+      "family stability",
+      "career growth",
+      "financial security",
+      "building a strong life with my wife"
+    ],
+    "fears": [
+      "regretting a missed career opportunity",
+      "damaging the balance of my marriage",
+      "feeling isolated far from home",
+      "choosing comfort over long-term growth"
+    ],
+    "hiddenTensions": [
+      "I want rapid career progression, but I also want emotional closeness and routine",
+      "I see myself as ambitious, but I do not want success to come at the expense of family life",
+      "I am drawn to the idea of reinvention abroad, but I am afraid of losing my support system"
+    ],
+    "decisionStyle": "Analytical and forward-looking, but much slower and more conflicted when a decision affects family life.",
+    "selfNarrative": "I am a high-performing young professional who has built strong momentum in New York, but I increasingly judge success by the quality of the life I build with my wife, not just by title or salary.",
+    "currentDilemma": "Should I accept a promotion that moves me from New York to Singapore, knowing it could accelerate my career but significantly reshape my marriage, my routines, and the life we have started building together?"
+  },
+  "currentSelf": {
+    "id": "self_current_001",
+    "type": "current",
+    "name": "Current Self",
+    "optimizationGoal": "Balance career growth, financial upside, marital stability, and long-term life coherence.",
+    "toneOfVoice": "Measured, reflective, articulate, slightly tense, careful with conclusions.",
+    "worldview": "The best decisions are the ones that create momentum without damaging the parts of life that matter most.",
+    "coreBelief": "Success only means something if it fits the life I actually want to live with the person I chose.",
+    "tradeOff": "By trying to preserve balance and optionality, I risk staying in uncertainty for too long and avoiding a decisive move.",
+    "avatarPrompt": "A realistic 28-year-old professional man living in New York, thoughtful expression, modern understated business-casual clothing, subtle signs of internal tension, polished urban aesthetic, cinematic portrait, emotionally grounded, premium product style",
+    "avatarUrl": null,
+    "visualStyle": {
+      "primaryColor": "#1F3A5F",
+      "accentColor": "#D6E4F0",
+      "mood": "calm",
+      "glowIntensity": 0.34
+    },
+    "voiceId": "voice_current_placeholder",
+    "parentSelfId": null,
+    "depthLevel": 0,
+    "childrenIds": [
+      "self_future_singapore_001",
+      "self_future_nyc_001"
+    ]
+  },
+  "futureSelfOptions": [],
+  "selectedFutureSelf": null,
+  "memoryHead": "node_root_profile",
+  "memoryBranches": [
+    {
+      "name": "root",
+      "headNodeId": "node_root_profile",
+      "parentBranchName": null
+    }
+  ],
+  "memoryNodes": [
+    {
+      "id": "node_root_profile",
+      "parentId": null,
+      "branchLabel": "root",
+      "facts": [
+        {
+          "id": "fact_root_001",
+          "fact": "Core values include family stability, career growth, financial security, building a strong life with my wife.",
+          "source": "interview",
+          "extractedAt": 1772335232.552505
+        },
+        {
+          "id": "fact_root_002",
+          "fact": "Current dilemma: Should I accept a promotion that moves me from New York to Singapore, knowing it could accelerate my career but significantly reshape my marriage, my routines, and the life we have started building together?",
+          "source": "interview",
+          "extractedAt": 1772335232.552505
+        },
+        {
+          "id": "fact_root_003",
+          "fact": "Hidden tension: I want rapid career progression, but I also want emotional closeness and routine",
+          "source": "interview",
+          "extractedAt": 1772335232.552505
+        }
+      ],
+      "notes": [
+        "Root node created from profile extraction.",
+        "Seed state before future-self branch selection."
+      ],
+      "selfCard": null,
+      "createdAt": 1772335232.552505
+    }
+  ],
+  "createdAt": 1772294400,
+  "updatedAt": 1772335232.552505,
+  "futureSelvesFull": {},
+  "explorationPaths": {}
+}
