@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { BranchTreeModal } from "@/components/BranchTreeModal";
 import { ChatPanel } from "@/components/ChatPanel";
 import { InputBar } from "@/components/InputBar";
 import { ScreenHeader } from "@/components/ScreenHeader";
@@ -51,6 +52,7 @@ export function ConversationScreen({
   onBackToSelection,
 }: ConversationScreenProps) {
   const [branchCount, setBranchCount] = useState(3);
+  const [isTreeOpen, setIsTreeOpen] = useState(false);
 
   const byId = useMemo(() => {
     const map = new Map<string, SelfCard>();
@@ -78,19 +80,6 @@ export function ConversationScreen({
     }
     return map;
   }, [futureSelves]);
-
-  const rootNodes = useMemo(
-    () =>
-      futureSelves
-        .filter((selfCard) => !selfCard.parentSelfId || !byId.has(selfCard.parentSelfId))
-        .sort((a, b) => {
-          if (a.depthLevel !== b.depthLevel) {
-            return a.depthLevel - b.depthLevel;
-          }
-          return a.name.localeCompare(b.name);
-        }),
-    [futureSelves, byId],
-  );
 
   const activeSelf = useMemo(
     () => futureSelves.find((selfCard) => selfCard.id === activeSelfId) ?? null,
@@ -127,8 +116,6 @@ export function ConversationScreen({
     return path;
   }, [activeSelf, byId]);
 
-  const activePathIds = useMemo(() => new Set(activePath.map((selfCard) => selfCard.id)), [activePath]);
-
   const parentSelf = useMemo(
     () => (activeSelf?.parentSelfId ? byId.get(activeSelf.parentSelfId) ?? null : null),
     [activeSelf, byId],
@@ -139,25 +126,8 @@ export function ConversationScreen({
     [activeSelf, childrenByParent],
   );
 
-  const descendantCountById = useMemo(() => {
-    const memo = new Map<string, number>();
-    const countChildren = (nodeId: string): number => {
-      const cached = memo.get(nodeId);
-      if (cached !== undefined) {
-        return cached;
-      }
-      const children = childrenByParent.get(nodeId) ?? [];
-      const total = children.reduce((acc, child) => acc + 1 + countChildren(child.id), 0);
-      memo.set(nodeId, total);
-      return total;
-    };
-    for (const selfCard of futureSelves) {
-      countChildren(selfCard.id);
-    }
-    return memo;
-  }, [childrenByParent, futureSelves]);
-
   const horizonLabel = activeSelf ? getTimeHorizonLabel(activeSelf.depthLevel) : "Present";
+  const activeChildrenLabel = `${activeChildren.length} child${activeChildren.length === 1 ? "" : "ren"}`;
   const isVoiceBusy = isTranscribing || isSynthesizing;
   const inputDisabled = isSendingMessage || isBranching || isVoiceBusy || isRecording;
   const recordButtonLabel = isRecording ? "■" : "🎙";
@@ -171,42 +141,6 @@ export function ConversationScreen({
         : isPlaying
           ? "Playing reply..."
           : "Voice ready";
-
-  const renderTreeNode = (selfCard: SelfCard) => {
-    const children = childrenByParent.get(selfCard.id) ?? [];
-    const isActive = activeSelfId === selfCard.id;
-    const isOnActivePath = activePathIds.has(selfCard.id);
-    const descendantCount = descendantCountById.get(selfCard.id) ?? 0;
-    const selfHorizonLabel = getTimeHorizonLabel(selfCard.depthLevel);
-
-    return (
-      <article key={selfCard.id} className="tree-node-wrap">
-        <button
-          type="button"
-          className={[
-            "tree-node",
-            isOnActivePath ? "tree-node-path" : "",
-            isActive ? "tree-node-active" : "",
-          ].join(" ").trim()}
-          onClick={() => onChangeSelf(selfCard.id)}
-        >
-          <span className="tree-node-name">{selfCard.name}</span>
-          <span className="tree-node-meta">Depth {selfCard.depthLevel} · {selfHorizonLabel}</span>
-          {descendantCount > 0 ? (
-            <span className="tree-node-branch">
-              {descendantCount} branch{descendantCount > 1 ? "es" : ""} below
-            </span>
-          ) : null}
-        </button>
-
-        {children.length > 0 ? (
-          <div className="tree-children">
-            {children.map((child) => renderTreeNode(child))}
-          </div>
-        ) : null}
-      </article>
-    );
-  };
 
   if (!activeSelf) {
     return (
@@ -227,6 +161,9 @@ export function ConversationScreen({
       <aside className="surface-card conversation-sidebar">
         <p className="eyebrow">Session {sessionId}</p>
         <h2>Node Navigator</h2>
+        <button type="button" onClick={() => setIsTreeOpen(true)}>
+          Open branch map
+        </button>
         <div className="path-chip-row">
           {activePath.map((node) => (
             <button
@@ -239,6 +176,9 @@ export function ConversationScreen({
             </button>
           ))}
         </div>
+        <p className="status-hint">
+          Current node has {activeChildrenLabel}.
+        </p>
         <div className="sidebar-node-actions">
           <button
             type="button"
@@ -260,13 +200,6 @@ export function ConversationScreen({
           >
             Go to first child
           </button>
-        </div>
-        <div className="branch-tree-canvas conversation-tree-canvas">
-          {rootNodes.length > 0 ? (
-            rootNodes.map((rootNode) => renderTreeNode(rootNode))
-          ) : (
-            <p className="empty-text">No conversation nodes yet.</p>
-          )}
         </div>
         <SelfCardPanel
           selfCard={activeSelf}
@@ -335,6 +268,15 @@ export function ConversationScreen({
           onSubmit={onSendMessage}
         />
       </section>
+
+      <BranchTreeModal
+        isOpen={isTreeOpen}
+        title="Conversation Branch Map"
+        futureSelves={futureSelves}
+        activeSelfId={activeSelfId}
+        onSelectSelf={onChangeSelf}
+        onClose={() => setIsTreeOpen(false)}
+      />
     </section>
   );
 }

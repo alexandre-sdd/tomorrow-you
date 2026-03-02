@@ -1,10 +1,10 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
+import { BranchTreeModal } from "@/components/BranchTreeModal";
 import { ScreenHeader } from "@/components/ScreenHeader";
 import { SelfCardPanel } from "@/components/SelfCardPanel";
 import type { SelfCard } from "@/lib/types";
-import { getTimeHorizonLabel } from "@/lib/timeHorizon";
 
 interface SelfSelectionScreenProps {
   futureSelves: SelfCard[];
@@ -23,6 +23,8 @@ export function SelfSelectionScreen({
   onSelectSelf,
   onStartConversation,
 }: SelfSelectionScreenProps) {
+  const [isTreeOpen, setIsTreeOpen] = useState(false);
+
   const byId = useMemo(() => {
     const map = new Map<string, SelfCard>();
     for (const selfCard of futureSelves) {
@@ -30,38 +32,6 @@ export function SelfSelectionScreen({
     }
     return map;
   }, [futureSelves]);
-
-  const childrenByParent = useMemo(() => {
-    const map = new Map<string, SelfCard[]>();
-    for (const selfCard of futureSelves) {
-      const parent = selfCard.parentSelfId ?? "__root__";
-      const list = map.get(parent) ?? [];
-      list.push(selfCard);
-      map.set(parent, list);
-    }
-    for (const list of map.values()) {
-      list.sort((a, b) => {
-        if (a.depthLevel !== b.depthLevel) {
-          return a.depthLevel - b.depthLevel;
-        }
-        return a.name.localeCompare(b.name);
-      });
-    }
-    return map;
-  }, [futureSelves]);
-
-  const rootNodes = useMemo(
-    () =>
-      futureSelves
-        .filter((selfCard) => !selfCard.parentSelfId || !byId.has(selfCard.parentSelfId))
-        .sort((a, b) => {
-          if (a.depthLevel !== b.depthLevel) {
-            return a.depthLevel - b.depthLevel;
-          }
-          return a.name.localeCompare(b.name);
-        }),
-    [futureSelves, byId],
-  );
 
   const activeSelf = activeSelfId ? byId.get(activeSelfId) ?? null : null;
 
@@ -84,62 +54,10 @@ export function SelfSelectionScreen({
     path.reverse();
     return path;
   }, [activeSelf, byId]);
-
-  const activePathIds = useMemo(() => new Set(activePath.map((selfCard) => selfCard.id)), [activePath]);
-
-  const descendantCountById = useMemo(() => {
-    const memo = new Map<string, number>();
-    const countChildren = (nodeId: string): number => {
-      const cached = memo.get(nodeId);
-      if (cached !== undefined) {
-        return cached;
-      }
-      const children = childrenByParent.get(nodeId) ?? [];
-      const total = children.reduce((acc, child) => acc + 1 + countChildren(child.id), 0);
-      memo.set(nodeId, total);
-      return total;
-    };
-    for (const selfCard of futureSelves) {
-      countChildren(selfCard.id);
-    }
-    return memo;
-  }, [childrenByParent, futureSelves]);
-
-  const renderTreeNode = (selfCard: SelfCard) => {
-    const children = childrenByParent.get(selfCard.id) ?? [];
-    const isActive = activeSelfId === selfCard.id;
-    const isOnActivePath = activePathIds.has(selfCard.id);
-    const descendantCount = descendantCountById.get(selfCard.id) ?? 0;
-    const horizonLabel = getTimeHorizonLabel(selfCard.depthLevel);
-
-    return (
-      <article key={selfCard.id} className="tree-node-wrap">
-        <button
-          type="button"
-          className={[
-            "tree-node",
-            isOnActivePath ? "tree-node-path" : "",
-            isActive ? "tree-node-active" : "",
-          ].join(" ").trim()}
-          onClick={() => onSelectSelf(selfCard.id)}
-        >
-          <span className="tree-node-name">{selfCard.name}</span>
-          <span className="tree-node-meta">Depth {selfCard.depthLevel} · {horizonLabel}</span>
-          {descendantCount > 0 ? (
-            <span className="tree-node-branch">
-              {descendantCount} branch{descendantCount > 1 ? "es" : ""} below
-            </span>
-          ) : null}
-        </button>
-
-        {children.length > 0 ? (
-          <div className="tree-children">
-            {children.map((child) => renderTreeNode(child))}
-          </div>
-        ) : null}
-      </article>
-    );
-  };
+  const maxDepth = useMemo(
+    () => futureSelves.reduce((acc, selfCard) => Math.max(acc, selfCard.depthLevel), 0),
+    [futureSelves],
+  );
 
   return (
     <section className="stack-screen">
@@ -161,18 +79,19 @@ export function SelfSelectionScreen({
       </div>
 
       <div className="selection-layout">
-        <article className="surface-card branch-tree-card">
+        <article className="surface-card branch-map-launcher-card">
           <p className="eyebrow">Branch Navigator</p>
+          <h2>Open tree view</h2>
           <p className="branch-tree-hint">
-            Your futures are organized as a branching tree. Pick any node to continue that path.
+            Use the popup map to navigate visually between futures. Each node uses its avatar.
           </p>
-          <div className="branch-tree-canvas">
-            {rootNodes.length > 0 ? (
-              rootNodes.map((rootNode) => renderTreeNode(rootNode))
-            ) : (
-              <p className="empty-text">No future selves generated yet.</p>
-            )}
+          <div className="branch-map-stats">
+            <p>{futureSelves.length} futures generated</p>
+            <p>Deepest branch: {maxDepth}</p>
           </div>
+          <button type="button" onClick={() => setIsTreeOpen(true)}>
+            Open branch map
+          </button>
         </article>
 
         <article className="surface-card branch-detail-card">
@@ -212,6 +131,15 @@ export function SelfSelectionScreen({
           </button>
         </article>
       </div>
+
+      <BranchTreeModal
+        isOpen={isTreeOpen}
+        title="Choose Your Future Node"
+        futureSelves={futureSelves}
+        activeSelfId={activeSelfId}
+        onSelectSelf={onSelectSelf}
+        onClose={() => setIsTreeOpen(false)}
+      />
     </section>
   );
 }
