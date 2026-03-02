@@ -80,6 +80,24 @@ export function BranchTreeModal({
     return path;
   }, [activeSelfId, byId]);
 
+  const activePath = useMemo(() => {
+    if (!activeSelfId) {
+      return [] as SelfCard[];
+    }
+    const path: SelfCard[] = [];
+    const seen = new Set<string>();
+    let cursor = byId.get(activeSelfId) ?? null;
+
+    while (cursor && !seen.has(cursor.id)) {
+      path.push(cursor);
+      seen.add(cursor.id);
+      cursor = cursor.parentSelfId ? byId.get(cursor.parentSelfId) ?? null : null;
+    }
+
+    path.reverse();
+    return path;
+  }, [activeSelfId, byId]);
+
   useEffect(() => {
     if (!isOpen) {
       return;
@@ -107,7 +125,8 @@ export function BranchTreeModal({
     const isOnActivePath = activePathIds.has(selfCard.id);
 
     return (
-      <div key={selfCard.id} className="tree-visual-node-wrap">
+      <div key={selfCard.id} className="tree-list-item">
+        <div className="tree-list-row">
         <button
           type="button"
           className={[
@@ -119,7 +138,6 @@ export function BranchTreeModal({
             onSelectSelf(selfCard.id);
             onClose();
           }}
-          title={selfCard.name}
           aria-label={selfCard.name}
         >
           {selfCard.avatarUrl ? (
@@ -133,9 +151,10 @@ export function BranchTreeModal({
           )}
           <span className="tree-avatar-tooltip">{selfCard.name}</span>
         </button>
+        </div>
 
         {children.length > 0 ? (
-          <div className="tree-visual-children">
+          <div className="tree-list-children">
             {children.map((child) => renderNode(child))}
           </div>
         ) : null}
@@ -167,8 +186,21 @@ export function BranchTreeModal({
         </div>
 
         <p className="branch-tree-modal-hint">
-          Hover an avatar to see its name. Click a node to move to that branch.
+          Hover an avatar to see its name. Click a node to jump to that branch.
         </p>
+
+        {activePath.length > 0 ? (
+          <div className="path-chip-row">
+            {activePath.map((node) => (
+              <span
+                key={node.id}
+                className={activeSelfId === node.id ? "path-chip path-chip-active" : "path-chip"}
+              >
+                {node.name}
+              </span>
+            ))}
+          </div>
+        ) : null}
 
         <div className="branch-tree-modal-canvas">
           {rootNodes.length > 0 ? (

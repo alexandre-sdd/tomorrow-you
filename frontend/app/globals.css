@@ -826,30 +826,39 @@ button:disabled {
   padding: 16px;
   overflow: auto;
   display: grid;
-  gap: 16px;
+  gap: 18px;
 }
 
-.tree-visual-node-wrap {
+.tree-list-item {
   display: grid;
-  gap: 12px;
+  gap: 10px;
+}
+
+.tree-list-row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: 70px;
+  overflow: visible;
 }
 
 .tree-avatar-node {
   position: relative;
-  width: 70px;
-  height: 70px;
+  width: 72px;
+  height: 72px;
   border-radius: 50%;
   border: 2px solid rgba(9, 9, 13, 0.26);
   background: rgba(255, 255, 255, 0.56);
   display: grid;
   place-items: center;
   padding: 0;
+  overflow: visible;
 }
 
 .tree-avatar-node .avatar-placeholder,
 .tree-avatar-image {
-  width: 62px;
-  height: 62px;
+  width: 64px;
+  height: 64px;
 }
 
 .tree-avatar-image {
@@ -869,9 +878,9 @@ button:disabled {
 
 .tree-avatar-tooltip {
   position: absolute;
-  top: calc(100% + 8px);
-  left: 50%;
-  transform: translateX(-50%) translateY(-4px);
+  top: calc(50% + 8px);
+  left: calc(100% + 10px);
+  transform: translateY(-100%) translateX(-4px);
   opacity: 0;
   pointer-events: none;
   background: #050507;
@@ -881,22 +890,35 @@ button:disabled {
   white-space: nowrap;
   font-size: 12px;
   transition: opacity 140ms ease, transform 140ms ease;
-  z-index: 4;
+  z-index: 40;
 }
 
 .tree-avatar-node:hover .tree-avatar-tooltip,
 .tree-avatar-node:focus-visible .tree-avatar-tooltip {
   opacity: 1;
-  transform: translateX(-50%) translateY(0);
+  transform: translateY(-100%) translateX(0);
 }
 
-.tree-visual-children {
-  margin-left: 34px;
-  padding-left: 16px;
+.tree-avatar-node:hover,
+.tree-avatar-node:focus-visible {
+  z-index: 30;
+}
+
+.tree-list-children {
+  margin-left: 36px;
+  padding-left: 18px;
   border-left: 1px dashed var(--line-strong);
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
+  display: grid;
+  gap: 10px;
+}
+
+.tree-list-children > .tree-list-item > .tree-list-row::before {
+  content: "";
+  position: absolute;
+  left: -18px;
+  top: 36px;
+  width: 18px;
+  border-top: 1px dashed var(--line-strong);
 }
 
 .branch-row {
@@ -957,8 +979,13 @@ button:disabled {
     font-size: 20px;
   }
 
-  .tree-visual-children {
-    margin-left: 18px;
+  .tree-list-children {
+    margin-left: 24px;
     padding-left: 12px;
+  }
+
+  .tree-list-children > .tree-list-item > .tree-list-row::before {
+    left: -12px;
+    width: 12px;
   }
 }
