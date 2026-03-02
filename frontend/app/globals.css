@@ -456,6 +456,118 @@ button:disabled {
   gap: 14px;
 }
 
+.selection-layout {
+  display: grid;
+  grid-template-columns: minmax(420px, 1.25fr) minmax(340px, 1fr);
+  gap: 16px;
+}
+
+.branch-tree-card {
+  display: grid;
+  gap: 10px;
+}
+
+.branch-tree-hint {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.branch-tree-canvas {
+  border-radius: 18px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.42);
+  padding: 14px;
+  max-height: 62vh;
+  overflow: auto;
+  display: grid;
+  gap: 10px;
+}
+
+.tree-node-wrap {
+  display: grid;
+  gap: 8px;
+}
+
+.tree-node {
+  width: 100%;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  background: rgba(247, 245, 242, 0.92);
+  color: var(--text);
+  padding: 10px 12px;
+  display: grid;
+  gap: 4px;
+  text-align: left;
+}
+
+.tree-node-name {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.tree-node-meta {
+  font-size: 12px;
+  color: var(--muted);
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.tree-node-branch {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.tree-node-path {
+  border-color: rgba(28, 28, 37, 0.45);
+}
+
+.tree-node-active {
+  background: #050507;
+  color: #fff;
+  border-color: #050507;
+}
+
+.tree-node-active .tree-node-meta,
+.tree-node-active .tree-node-branch {
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.tree-children {
+  margin-left: 14px;
+  padding-left: 14px;
+  border-left: 1px dashed var(--line-strong);
+  display: grid;
+  gap: 8px;
+}
+
+.branch-detail-card {
+  display: grid;
+  gap: 12px;
+  align-content: start;
+}
+
+.path-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.path-chip {
+  padding: 7px 11px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.54);
+  color: var(--text);
+  font-size: 12px;
+}
+
+.path-chip-active {
+  background: #050507;
+  color: #fff;
+  border-color: #050507;
+}
+
 .self-card {
   width: 100%;
   border-radius: 20px;
@@ -616,7 +728,8 @@ button:disabled {
   display: grid;
   gap: 12px;
   max-height: calc(100vh - 134px);
-  overflow: hidden;
+  overflow-y: auto;
+  padding-right: 6px;
 }
 
 .sidebar-list {
@@ -624,6 +737,16 @@ button:disabled {
   gap: 12px;
   overflow-y: auto;
   padding-right: 4px;
+}
+
+.sidebar-node-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.conversation-tree-canvas {
+  max-height: 42vh;
 }
 
 .conversation-main {
@@ -668,6 +791,10 @@ button:disabled {
   }
 
   .conversation-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .selection-layout {
     grid-template-columns: 1fr;
   }
 

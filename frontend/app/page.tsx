@@ -755,14 +755,10 @@ export default function HomePage() {
         return next;
       });
 
-      if (result.childSelves.length > 0) {
-        setActiveSelfId(result.childSelves[0].id);
-      }
-
       const status = await getPipelineStatus(sessionId);
       setPipelineStatus(status);
 
-      setInfo(`Branched from ${activeSelf.name}. Added ${result.childSelves.length} new futures.`);
+      setInfo(`Branched from ${activeSelf.name}. Added ${result.childSelves.length} new futures. Select a child node in the navigator.`);
     } catch (err) {
       withError("Branching failed", err);
     } finally {
