@@ -754,7 +754,7 @@ button:disabled {
   gap: 12px;
   max-height: calc(100vh - 134px);
   overflow-y: auto;
-  padding-right: 6px;
+  padding-right: 12px;
 }
 
 .sidebar-list {
@@ -791,14 +791,16 @@ button:disabled {
 
 .branch-tree-modal {
   width: min(980px, 100%);
-  max-height: min(86vh, 860px);
+  height: min(86vh, 860px);
   border-radius: 26px;
   border: 1px solid var(--line);
   background: rgba(246, 244, 240, 0.95);
   box-shadow: 0 24px 80px rgba(10, 10, 14, 0.25);
-  display: grid;
+  display: flex;
+  flex-direction: column;
   gap: 12px;
   padding: 18px;
+  overflow: hidden;
 }
 
 .branch-tree-modal-header {
@@ -824,6 +826,8 @@ button:disabled {
   border: 1px solid var(--line);
   background: rgba(255, 255, 255, 0.5);
   padding: 16px;
+  flex: 1 1 auto;
+  min-height: 0;
   overflow: auto;
   display: grid;
   gap: 18px;
@@ -932,6 +936,57 @@ button:disabled {
   font-size: 14px;
 }
 
+/* Keep scrollbars subtle and consistent with the surface tone */
+.chat-panel,
+.branch-tree-canvas,
+.conversation-sidebar,
+.sidebar-list,
+.branch-tree-modal-canvas {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(10, 10, 13, 0.28) transparent;
+  scrollbar-gutter: stable;
+}
+
+.chat-panel::-webkit-scrollbar,
+.branch-tree-canvas::-webkit-scrollbar,
+.conversation-sidebar::-webkit-scrollbar,
+.sidebar-list::-webkit-scrollbar,
+.branch-tree-modal-canvas::-webkit-scrollbar {
+  width: 11px;
+  height: 11px;
+}
+
+.chat-panel::-webkit-scrollbar-track,
+.branch-tree-canvas::-webkit-scrollbar-track,
+.conversation-sidebar::-webkit-scrollbar-track,
+.sidebar-list::-webkit-scrollbar-track,
+.branch-tree-modal-canvas::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 999px;
+  margin-block: 12px;
+  margin-inline-end: 3px;
+}
+
+.chat-panel::-webkit-scrollbar-thumb,
+.branch-tree-canvas::-webkit-scrollbar-thumb,
+.conversation-sidebar::-webkit-scrollbar-thumb,
+.sidebar-list::-webkit-scrollbar-thumb,
+.branch-tree-modal-canvas::-webkit-scrollbar-thumb {
+  background: rgba(10, 10, 13, 0.24);
+  border-radius: 999px;
+  border: 2.5px solid transparent;
+  background-clip: padding-box;
+  min-height: 26px;
+}
+
+.chat-panel::-webkit-scrollbar-thumb:hover,
+.branch-tree-canvas::-webkit-scrollbar-thumb:hover,
+.conversation-sidebar::-webkit-scrollbar-thumb:hover,
+.sidebar-list::-webkit-scrollbar-thumb:hover,
+.branch-tree-modal-canvas::-webkit-scrollbar-thumb:hover {
+  background: rgba(10, 10, 13, 0.35);
+}
+
 @media (max-width: 980px) {
   .app-bg {
     padding: 14px;
@@ -972,7 +1027,7 @@ button:disabled {
 
   .branch-tree-modal {
     padding: 14px;
-    max-height: 92vh;
+    height: 92vh;
   }
 
   .branch-tree-modal-header h3 {
