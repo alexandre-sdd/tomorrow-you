@@ -38,6 +38,7 @@ from backend.engines.current_self_auto_generator import (
 from backend.engines.elevenlabs_voice import (
     ElevenLabsInterviewVoiceService,
     ElevenLabsVoiceError,
+    looks_like_placeholder_voice_id,
 )
 from backend.engines.profile_extractor import (
     ExtractionContext,
@@ -314,6 +315,75 @@ def _decode_audio_base64(audio_base64: str) -> bytes:
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Invalid base64 payload in audioBase64.",
         ) from exc
+
+
+def _ensure_voice_config(session_data: dict[str, Any]) -> dict[str, Any]:
+    raw = session_data.get("voiceConfig")
+    if isinstance(raw, dict):
+        return raw
+
+    created: dict[str, Any] = {}
+    session_data["voiceConfig"] = created
+    return created
+
+
+def _sanitize_voice_id(raw_value: Any) -> str:
+    if not isinstance(raw_value, str):
+        return ""
+    candidate = raw_value.strip()
+    if not candidate:
+        return ""
+    if looks_like_placeholder_voice_id(candidate):
+        return ""
+    return candidate
+
+
+def _load_or_create_session_for_voice(session_id: str) -> dict[str, Any]:
+    path = _get_session_path(session_id)
+    if path.exists():
+        return _load_session(session_id)
+
+    # Allow TTS to work even if /interview/start was not called yet.
+    now = time.time()
+    return {
+        "id": session_id,
+        "status": "onboarding",
+        "transcript": [],
+        "userProfile": None,
+        "currentSelf": None,
+        "createdAt": now,
+        "updatedAt": now,
+    }
+
+
+def _resolve_interview_voice_id(
+    *,
+    requested_voice_id: str | None,
+    session_data: dict[str, Any],
+) -> tuple[str, bool]:
+    voice_config = _ensure_voice_config(session_data)
+    locked = _sanitize_voice_id(voice_config.get("interviewVoiceId"))
+    if locked:
+        return locked, False
+
+    settings = get_settings()
+    candidates = (
+        requested_voice_id,
+        settings.elevenlabs_default_voice_id,
+    )
+    selected = next((voice_id for voice_id in (_sanitize_voice_id(c) for c in candidates) if voice_id), "")
+
+    if not selected:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=(
+                "No valid interview voice ID configured. "
+                "Set ELEVENLABS_DEFAULT_VOICE_ID in .env to a real ElevenLabs voice ID."
+            ),
+        )
+
+    voice_config["interviewVoiceId"] = selected
+    return selected, True
 
 
 async def _generate_interview_reply(
@@ -760,8 +830,16 @@ async def interview_tts(request: InterviewTtsRequest) -> StreamingResponse:
             detail="text must not be empty.",
         )
 
+    session_data = _load_or_create_session_for_voice(request.session_id)
+    selected_voice_id, created_lock = _resolve_interview_voice_id(
+        requested_voice_id=request.voice_id,
+        session_data=session_data,
+    )
+    if created_lock:
+        _save_session(request.session_id, session_data)
+
     voice_service = ElevenLabsInterviewVoiceService()
-    chunk_stream = voice_service.synthesize_stream(text=text, voice_id=request.voice_id)
+    chunk_stream = voice_service.synthesize_stream(text=text, voice_id=selected_voice_id)
 
     try:
         first_chunk = next(chunk_stream)
@@ -787,7 +865,10 @@ async def interview_tts(request: InterviewTtsRequest) -> StreamingResponse:
     return StreamingResponse(
         _audio_stream(),
         media_type=voice_service.tts_media_type(),
-        headers={"Cache-Control": "no-store"},
+        headers={
+            "Cache-Control": "no-store",
+            "X-Interview-Voice-Id": selected_voice_id,
+        },
     )
 
 

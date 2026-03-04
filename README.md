@@ -51,7 +51,7 @@ You speak about your current crossroads, and the system generates multiple plaus
 │                    Providers                                │
 │  Mistral (LLM + Pixtral avatar)   ElevenLabs (STT + TTS)    │
 └─────────────────────────────────────────────────────────────┘
-           │
+         │
 ┌──────────▼──────────────────────────────────────────────────┐
 │                    Storage (file-based)                     │
 │  sessions/{id}/                                             │

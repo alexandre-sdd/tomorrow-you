@@ -5,6 +5,8 @@ import base64
 import binascii
 import json
 import re
+import time
+from pathlib import Path
 from typing import Any, AsyncGenerator, Iterator
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -81,6 +83,56 @@ def _decode_audio_base64(audio_base64: str) -> bytes:
         ) from exc
 
 
+def _get_session_path(settings: Settings, session_id: str) -> Path:
+    return Path(settings.storage_path) / session_id / "session.json"
+
+
+def _load_session(settings: Settings, session_id: str) -> dict[str, Any]:
+    path = _get_session_path(settings, session_id)
+    if not path.exists():
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Session {session_id} not found",
+        )
+    with path.open("r", encoding="utf-8") as f:
+        raw = json.load(f)
+    if not isinstance(raw, dict):
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Session {session_id} has invalid data",
+        )
+    return raw
+
+
+def _save_session(settings: Settings, session_id: str, session_data: dict[str, Any]) -> None:
+    path = _get_session_path(settings, session_id)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    session_data["updatedAt"] = time.time()
+    with path.open("w", encoding="utf-8") as f:
+        json.dump(session_data, f, indent=2)
+
+
+def _ensure_voice_config(session_data: dict[str, Any]) -> dict[str, Any]:
+    raw = session_data.get("voiceConfig")
+    if isinstance(raw, dict):
+        return raw
+
+    created: dict[str, Any] = {}
+    session_data["voiceConfig"] = created
+    return created
+
+
+def _sanitize_voice_id(raw_value: Any) -> str:
+    if not isinstance(raw_value, str):
+        return ""
+    candidate = raw_value.strip()
+    if not candidate:
+        return ""
+    if looks_like_placeholder_voice_id(candidate):
+        return ""
+    return candidate
+
+
 def _resolve_branch_context(
     resolver: ContextResolver,
     session_id: str,
@@ -99,43 +151,30 @@ def _resolve_branch_context(
     return branch_name, context
 
 
-def _normalized_text_for_gender(
-    self_card: dict[str, Any],
-    user_profile: dict[str, Any] | None = None,
-) -> str:
-    fields: tuple[Any, ...] = (
-        self_card.get("name"),
-        self_card.get("avatarPrompt"),
-        self_card.get("avatar_prompt"),
-        self_card.get("toneOfVoice"),
-        self_card.get("tone_of_voice"),
-        self_card.get("worldview"),
-        self_card.get("coreBelief"),
-        self_card.get("core_belief"),
-    )
-    if user_profile:
-        fields = fields + (
-            user_profile.get("selfNarrative"),
-            user_profile.get("self_narrative"),
-            user_profile.get("decisionStyle"),
-            user_profile.get("decision_style"),
-            user_profile.get("currentDilemma"),
-            user_profile.get("current_dilemma"),
-            user_profile.get("relationships"),
-            (user_profile.get("personal") or {}).get("relationships")
-            if isinstance(user_profile.get("personal"), dict)
-            else None,
-        )
+def _normalized_text_for_gender(user_profile: dict[str, Any] | None = None) -> str:
+    if not user_profile:
+        return ""
 
+    personal = user_profile.get("personal")
+    personal_relationships = personal.get("relationships") if isinstance(personal, dict) else None
+    fields: tuple[Any, ...] = (
+        user_profile.get("gender"),
+        user_profile.get("sex"),
+        user_profile.get("selfNarrative"),
+        user_profile.get("self_narrative"),
+        user_profile.get("decisionStyle"),
+        user_profile.get("decision_style"),
+        user_profile.get("currentDilemma"),
+        user_profile.get("current_dilemma"),
+        user_profile.get("relationships"),
+        personal_relationships,
+    )
     parts = [value.strip().lower() for value in fields if isinstance(value, str) and value.strip()]
     return " ".join(parts)
 
 
-def _infer_voice_gender(
-    self_card: dict[str, Any],
-    user_profile: dict[str, Any] | None = None,
-) -> str | None:
-    text = _normalized_text_for_gender(self_card, user_profile)
+def _infer_voice_gender(user_profile: dict[str, Any] | None = None) -> str | None:
+    text = _normalized_text_for_gender(user_profile)
     if not text:
         return None
 
@@ -169,36 +208,21 @@ def _infer_voice_gender(
     return None
 
 
-def _self_card_voice_id(self_card: dict[str, Any]) -> str:
-    raw = self_card.get("voiceId")
-    if isinstance(raw, str) and raw.strip():
-        return raw.strip()
-    raw_snake = self_card.get("voice_id")
-    if isinstance(raw_snake, str) and raw_snake.strip():
-        return raw_snake.strip()
-    return ""
-
-
 def _conversation_voice_candidates(
     request: ConversationTtsRequest,
-    self_card: dict[str, Any],
     user_profile: dict[str, Any] | None,
     settings: Settings,
-) -> list[str]:
+) -> tuple[list[str], str | None]:
     candidate_ids: list[str] = []
 
     if request.voice_id:
         candidate_ids.append(request.voice_id.strip())
 
-    gender = request.voice_gender or _infer_voice_gender(self_card, user_profile)
+    gender = request.voice_gender or _infer_voice_gender(user_profile)
     if gender == "male" and settings.elevenlabs_chat_default_male_voice_id:
         candidate_ids.append(settings.elevenlabs_chat_default_male_voice_id.strip())
     if gender == "female" and settings.elevenlabs_chat_default_female_voice_id:
         candidate_ids.append(settings.elevenlabs_chat_default_female_voice_id.strip())
-
-    card_voice_id = _self_card_voice_id(self_card)
-    if card_voice_id and not looks_like_placeholder_voice_id(card_voice_id):
-        candidate_ids.append(card_voice_id)
 
     candidate_ids.append(settings.elevenlabs_default_voice_id.strip())
 
@@ -214,7 +238,38 @@ def _conversation_voice_candidates(
         seen.add(candidate)
         unique_valid.append(candidate)
 
-    return unique_valid
+    return unique_valid, gender
+
+
+def _locked_conversation_candidates(
+    *,
+    request: ConversationTtsRequest,
+    session_data: dict[str, Any],
+    user_profile: dict[str, Any] | None,
+    settings: Settings,
+) -> tuple[list[str], str | None]:
+    dynamic_candidates, inferred_gender = _conversation_voice_candidates(
+        request=request,
+        user_profile=user_profile,
+        settings=settings,
+    )
+    voice_config = _ensure_voice_config(session_data)
+    locked = _sanitize_voice_id(voice_config.get("conversationVoiceId"))
+
+    candidates: list[str] = []
+    if locked:
+        candidates.append(locked)
+    candidates.extend(dynamic_candidates)
+
+    unique_candidates: list[str] = []
+    seen: set[str] = set()
+    for candidate in candidates:
+        if candidate in seen:
+            continue
+        seen.add(candidate)
+        unique_candidates.append(candidate)
+
+    return unique_candidates, inferred_gender
 
 
 @router.post("/reply", response_model=ConversationReplyResponse)
@@ -510,7 +565,7 @@ async def conversation_tts(
     settings: Settings = Depends(get_settings),
 ) -> StreamingResponse:
     """
-    Synthesize one future-self reply to speech with persona-aware voice selection.
+    Synthesize one future-self reply to speech with stable session voice selection.
     """
     _require_voice_enabled()
     text = request.text.strip()
@@ -526,11 +581,11 @@ async def conversation_tts(
         session_id=request.session_id,
         self_id=request.self_id,
     )
-    self_card = context.self_card if isinstance(context.self_card, dict) else {}
-    candidate_voice_ids = _conversation_voice_candidates(
+    session_data = _load_session(settings, request.session_id)
+    candidate_voice_ids, inferred_gender = _locked_conversation_candidates(
         request=request,
-        self_card=self_card,
         user_profile=context.user_profile if isinstance(context.user_profile, dict) else None,
+        session_data=session_data,
         settings=settings,
     )
     if not candidate_voice_ids:
@@ -538,8 +593,8 @@ async def conversation_tts(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=(
                 "No valid conversation voice ID configured. "
-                "Set ELEVENLABS_DEFAULT_VOICE_ID and optionally ELEVENLABS_CHAT_DEFAULT_MALE_VOICE_ID / "
-                "ELEVENLABS_CHAT_DEFAULT_FEMALE_VOICE_ID in .env."
+                "Set ELEVENLABS_DEFAULT_VOICE_ID and, for gender-based selection, "
+                "ELEVENLABS_CHAT_DEFAULT_MALE_VOICE_ID and ELEVENLABS_CHAT_DEFAULT_FEMALE_VOICE_ID in .env."
             ),
         )
 
@@ -576,6 +631,26 @@ async def conversation_tts(
             status_code=status.HTTP_502_BAD_GATEWAY,
             detail=str(last_error) if last_error else "Text-to-speech failed.",
         )
+
+    voice_config = _ensure_voice_config(session_data)
+    should_persist = False
+
+    if _sanitize_voice_id(voice_config.get("conversationVoiceId")) != selected_voice_id:
+        voice_config["conversationVoiceId"] = selected_voice_id
+        should_persist = True
+
+    if request.voice_gender:
+        if voice_config.get("conversationVoiceGender") != request.voice_gender:
+            voice_config["conversationVoiceGender"] = request.voice_gender
+            should_persist = True
+    elif inferred_gender:
+        existing_gender = voice_config.get("conversationVoiceGender")
+        if not isinstance(existing_gender, str) or not existing_gender.strip():
+            voice_config["conversationVoiceGender"] = inferred_gender
+            should_persist = True
+
+    if should_persist:
+        _save_session(settings, request.session_id, session_data)
 
     def _audio_stream() -> Iterator[bytes]:
         if first_chunk:
