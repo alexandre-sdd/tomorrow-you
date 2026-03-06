@@ -13,6 +13,8 @@ served via the /avatars static mount in main.py.
 from __future__ import annotations
 
 import asyncio
+import base64
+import binascii
 import json
 import re
 from pathlib import Path
@@ -46,6 +48,8 @@ _AGENT_INSTRUCTIONS = (
     + _STYLE_DIRECTIVE
 )
 
+_MAX_REFERENCE_PHOTO_B64_CHARS = 2_500_000
+
 
 class AvatarGenerator:
     """Generates avatar images for SelfCards using Mistral image generation."""
@@ -66,12 +70,12 @@ class AvatarGenerator:
         """
         try:
             agent_id = await self._get_or_create_agent()
-            prompt = self._build_prompt(self_card, session_id)
+            inputs = self._build_inputs(self_card, session_id)
 
             response = await asyncio.to_thread(
                 self.client.beta.conversations.start,
                 agent_id=agent_id,
-                inputs=prompt,
+                inputs=inputs,
             )
 
             image_bytes = await self._download_generated_image(response)
@@ -133,31 +137,56 @@ class AvatarGenerator:
     # Prompt construction
     # ------------------------------------------------------------------
 
-    def _build_prompt(
+    def _build_inputs(
         self,
         self_card: SelfCard,
         session_id: str,
+    ) -> list[dict[str, Any]]:
+        prompt = self._build_prompt(self_card)
+        content: list[dict[str, Any]] = [{"type": "text", "text": prompt}]
+        photo = self._load_user_photo(session_id)
+
+        if photo:
+            photo_b64, mime_type = photo
+            if len(photo_b64) <= _MAX_REFERENCE_PHOTO_B64_CHARS:
+                content.append(
+                    {
+                        "type": "image_url",
+                        "image_url": {
+                            "url": f"data:{mime_type};base64,{photo_b64}",
+                        },
+                    }
+                )
+            else:
+                print(
+                    "[AvatarGenerator] Reference photo too large for inline input; "
+                    "skipping likeness transfer."
+                )
+
+        return [{"role": "user", "content": content}]
+
+    def _build_prompt(
+        self,
+        self_card: SelfCard,
     ) -> str:
         # Strip the photorealism cues from the LLM-generated prompt and keep
         # only the character description — the style is enforced by the agent.
         character_description = self._strip_photorealism(self_card.avatar_prompt)
+        primary_color = self_card.visual_style.primary_color
+        accent_color = self_card.visual_style.accent_color
 
-        prompt = (
-            f"Generate a character portrait avatar. "
-            f"Character: {character_description} "
-            f"{_STYLE_DIRECTIVE}"
+        return (
+            "Generate exactly one avatar portrait.\n"
+            f"Persona name: {self_card.name}\n"
+            f"Optimization goal: {self_card.optimization_goal}\n"
+            f"Tone: {self_card.tone_of_voice}\n"
+            f"Character description: {character_description}\n"
+            f"Palette preference: primary {primary_color}, accent {accent_color}.\n"
+            f"{_STYLE_DIRECTIVE}\n"
+            "If an image is provided, preserve facial identity, skin tone, and hairstyle.\n"
+            "Quality constraints: single subject only, centered composition, anatomically correct face, "
+            "sharp eyes, clean edges, no text, no logos, no watermark, no extra limbs."
         )
-
-        user_photo_b64 = self._load_user_photo(session_id)
-
-        if user_photo_b64:
-            return (
-                "Use the face and ethnicity of the user profile photo in this session as the "
-                "basis for the character's appearance. "
-                + prompt
-            )
-
-        return prompt
 
     @staticmethod
     def _strip_photorealism(prompt: str) -> str:
@@ -233,11 +262,37 @@ class AvatarGenerator:
     # Storage helpers
     # ------------------------------------------------------------------
 
-    def _load_user_photo(self, session_id: str) -> str | None:
-        path = Path(self.settings.storage_root) / session_id / "user_photo.b64"
-        if path.exists():
-            return path.read_text(encoding="utf-8").strip() or None
-        return None
+    def _load_user_photo(self, session_id: str) -> tuple[str, str] | None:
+        session_dir = Path(self.settings.storage_root) / session_id
+        b64_path = session_dir / "user_photo.b64"
+        if not b64_path.exists():
+            return None
+
+        photo_b64 = b64_path.read_text(encoding="utf-8").strip()
+        if not photo_b64:
+            return None
+
+        mime_path = session_dir / "user_photo.mime"
+        mime_type = mime_path.read_text(encoding="utf-8").strip() if mime_path.exists() else ""
+        if mime_type not in {"image/jpeg", "image/png", "image/webp"}:
+            mime_type = self._guess_image_mime(photo_b64)
+
+        return photo_b64, mime_type
+
+    @staticmethod
+    def _guess_image_mime(photo_b64: str) -> str:
+        try:
+            raw = base64.b64decode(photo_b64, validate=True)
+        except (binascii.Error, ValueError):
+            return "image/jpeg"
+
+        if raw.startswith(b"\x89PNG\r\n\x1a\n"):
+            return "image/png"
+        if raw.startswith(b"\xff\xd8\xff"):
+            return "image/jpeg"
+        if raw.startswith(b"RIFF") and raw[8:12] == b"WEBP":
+            return "image/webp"
+        return "image/jpeg"
 
     def _save_image_bytes(self, image_bytes: bytes, self_id: str, session_id: str) -> str:
         avatar_dir = Path(self.settings.storage_root) / session_id / "avatars"

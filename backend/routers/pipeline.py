@@ -261,8 +261,9 @@ async def upload_user_photo(
     Upload a reference photo of the user for avatar generation.
 
     The photo is stored as base64 in storage/sessions/{session_id}/user_photo.b64
+    with mime type in user_photo.mime
     and will be used as a visual reference when generating future self avatars.
-    Supports JPEG and PNG. The photo is optional — avatar generation works
+    Supports JPEG, PNG, and WebP. The photo is optional — avatar generation works
     without it by relying solely on the AI-generated avatar_prompt.
     """
     if file.content_type not in ("image/jpeg", "image/png", "image/webp"):
@@ -288,6 +289,8 @@ async def upload_user_photo(
     photo_b64 = base64.b64encode(contents).decode("utf-8")
     photo_path = session_dir / "user_photo.b64"
     photo_path.write_text(photo_b64, encoding="utf-8")
+    photo_mime_path = session_dir / "user_photo.mime"
+    photo_mime_path.write_text(file.content_type, encoding="utf-8")
 
     return {"status": "ok", "session_id": session_id}
 

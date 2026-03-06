@@ -103,70 +103,94 @@ def _normalized_text_for_gender(
     self_card: dict[str, Any],
     user_profile: dict[str, Any] | None = None,
 ) -> str:
+    del self_card  # Gender inference should rely on user signals, not persona text.
+    if not user_profile:
+        return ""
+
     fields: tuple[Any, ...] = (
-        self_card.get("name"),
-        self_card.get("avatarPrompt"),
-        self_card.get("avatar_prompt"),
-        self_card.get("toneOfVoice"),
-        self_card.get("tone_of_voice"),
-        self_card.get("worldview"),
-        self_card.get("coreBelief"),
-        self_card.get("core_belief"),
+        user_profile.get("gender"),
+        user_profile.get("sex"),
+        user_profile.get("selfNarrative"),
+        user_profile.get("self_narrative"),
+        user_profile.get("currentDilemma"),
+        user_profile.get("current_dilemma"),
+        user_profile.get("relationships"),
+        (user_profile.get("personal") or {}).get("relationships")
+        if isinstance(user_profile.get("personal"), dict)
+        else None,
     )
-    if user_profile:
-        fields = fields + (
-            user_profile.get("selfNarrative"),
-            user_profile.get("self_narrative"),
-            user_profile.get("decisionStyle"),
-            user_profile.get("decision_style"),
-            user_profile.get("currentDilemma"),
-            user_profile.get("current_dilemma"),
-            user_profile.get("relationships"),
-            (user_profile.get("personal") or {}).get("relationships")
-            if isinstance(user_profile.get("personal"), dict)
-            else None,
-        )
 
     parts = [value.strip().lower() for value in fields if isinstance(value, str) and value.strip()]
     return " ".join(parts)
+
+
+def _normalize_gender_value(raw: Any) -> str | None:
+    if not isinstance(raw, str):
+        return None
+    value = raw.strip().lower()
+    if not value:
+        return None
+
+    male_tokens = {"male", "man", "m", "cis male", "cis man"}
+    female_tokens = {"female", "woman", "f", "cis female", "cis woman"}
+
+    if value in male_tokens:
+        return "male"
+    if value in female_tokens:
+        return "female"
+    return None
+
+
+def _infer_gender_from_self_identification(text: str) -> str | None:
+    if not text:
+        return None
+
+    male_patterns = (
+        r"\bi(?:\s+am|['’]m)\s+(?:a\s+)?man\b",
+        r"\bi(?:\s+am|['’]m)\s+(?:a\s+)?male\b",
+        r"\bi(?:\s+am|['’]m)\s+(?:a\s+)?guy\b",
+        r"\bas\s+a\s+man\b",
+        r"\bas\s+a\s+male\b",
+    )
+    female_patterns = (
+        r"\bi(?:\s+am|['’]m)\s+(?:a\s+)?woman\b",
+        r"\bi(?:\s+am|['’]m)\s+(?:a\s+)?female\b",
+        r"\bi(?:\s+am|['’]m)\s+(?:a\s+)?girl\b",
+        r"\bas\s+a\s+woman\b",
+        r"\bas\s+a\s+female\b",
+    )
+
+    male_score = sum(1 for pattern in male_patterns if re.search(pattern, text))
+    female_score = sum(1 for pattern in female_patterns if re.search(pattern, text))
+
+    if male_score > female_score and male_score > 0:
+        return "male"
+    if female_score > male_score and female_score > 0:
+        return "female"
+    return None
 
 
 def _infer_voice_gender(
     self_card: dict[str, Any],
     user_profile: dict[str, Any] | None = None,
 ) -> str | None:
+    if user_profile:
+        explicit_gender = _normalize_gender_value(user_profile.get("gender"))
+        if explicit_gender:
+            return explicit_gender
+
+        explicit_sex = _normalize_gender_value(user_profile.get("sex"))
+        if explicit_sex:
+            return explicit_sex
+
+        personal = user_profile.get("personal")
+        if isinstance(personal, dict):
+            personal_gender = _normalize_gender_value(personal.get("gender"))
+            if personal_gender:
+                return personal_gender
+
     text = _normalized_text_for_gender(self_card, user_profile)
-    if not text:
-        return None
-
-    male_markers = (
-        r"\bman\b",
-        r"\bmale\b",
-        r"\bhusband\b",
-        r"\bfather\b",
-        r"\bhe\b",
-        r"\bhim\b",
-        r"\bhis\b",
-        r"\bboy\b",
-    )
-    female_markers = (
-        r"\bwoman\b",
-        r"\bfemale\b",
-        r"\bwife\b",
-        r"\bmother\b",
-        r"\bshe\b",
-        r"\bher\b",
-        r"\bgirl\b",
-    )
-
-    male_score = sum(1 for marker in male_markers if re.search(marker, text))
-    female_score = sum(1 for marker in female_markers if re.search(marker, text))
-
-    if male_score > female_score:
-        return "male"
-    if female_score > male_score:
-        return "female"
-    return None
+    return _infer_gender_from_self_identification(text)
 
 
 def _self_card_voice_id(self_card: dict[str, Any]) -> str:
