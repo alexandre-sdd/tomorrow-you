@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 
 from pydantic import Field
@@ -16,6 +17,8 @@ def _resolve_storage_path(path_value: str) -> str:
     path = Path(path_value).expanduser()
     if path.is_absolute():
         return str(path.resolve())
+    if os.getenv("VERCEL"):
+        return str((Path("/tmp") / path).resolve())
     return str((_PROJECT_ROOT / path).resolve())
 
 
