@@ -10,11 +10,14 @@ Next.js frontend for the live end-to-end pipeline used in `backend/test_onboardi
 2. Start frontend (new terminal):
    - `cd frontend`
    - `npm install`
-   - `npm run dev`
+   - `BACKEND_API_URL=http://localhost:8000 npm run dev`
 3. Open:
    - `http://localhost:3000`
 
-If backend runs on another host/port:
+By default, frontend requests go to `/api/*`, and Next.js rewrites those
+to `BACKEND_API_URL` (or `NEXT_PUBLIC_API_BASE_URL` if provided).
+
+If you want direct browser calls instead of the `/api` proxy:
 - `NEXT_PUBLIC_API_BASE_URL=http://localhost:8000 npm run dev`
 
 ## Implemented Flow

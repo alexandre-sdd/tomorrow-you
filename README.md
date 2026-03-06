@@ -94,6 +94,24 @@ Then open:
 - Frontend: `http://localhost:3000`
 - Backend docs: `http://localhost:8000/docs`
 
+## Vercel Deployment Pattern (Next.js + FastAPI)
+
+This repo now supports the common tutorial pattern where Next.js calls
+`/api/*` and rewrites to FastAPI:
+
+- Backend deploy (FastAPI preset):
+  - Root directory: `./`
+  - Entrypoint: `app.py` (exports `backend.main.app`)
+- Frontend deploy (Next.js preset):
+  - Root directory: `frontend`
+  - Env var: `BACKEND_API_URL=https://<your-backend>.vercel.app`
+
+Frontend defaults to same-origin `/api` calls and proxies to `BACKEND_API_URL`.
+You can still bypass the proxy with `NEXT_PUBLIC_API_BASE_URL`.
+
+Note: file-based storage in this MVP (`storage/sessions`) is not durable on
+serverless ephemeral filesystems; move to durable storage for production.
+
 ## 2-Minute Demo Flow
 
 1. Start interview and answer a few prompts (voice or text).

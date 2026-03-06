@@ -1,7 +1,7 @@
 import type { SelfCard, UserProfile } from "./types";
 
 const API_BASE =
-  process.env.NEXT_PUBLIC_API_BASE_URL?.trim() || "http://localhost:8000";
+  (process.env.NEXT_PUBLIC_API_BASE_URL?.trim() || "/api").replace(/\/+$/, "");
 
 type Dict = Record<string, unknown>;
 
