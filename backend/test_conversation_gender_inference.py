@@ -37,7 +37,18 @@ class ConversationGenderInferenceTests(unittest.TestCase):
         )
         self.assertEqual(gender, "male")
 
+    def test_maps_free_text_personal_gender_aliases(self) -> None:
+        male = _infer_voice_gender(
+            self_card={},
+            user_profile={"personal": {"gender": "guy"}},
+        )
+        female = _infer_voice_gender(
+            self_card={},
+            user_profile={"personal": {"gender": "she/her"}},
+        )
+        self.assertEqual(male, "male")
+        self.assertEqual(female, "female")
+
 
 if __name__ == "__main__":
     unittest.main()
-

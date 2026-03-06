@@ -95,6 +95,7 @@ class FinancialProfile(BaseModel):
 class PersonalProfile(BaseModel):
     model_config = _camel_config()
 
+    gender: str = ""  # free-text self-identified gender from interview
     hobbies: list[str] = Field(default_factory=list)
     daily_routines: list[str] = Field(default_factory=list)
     main_interests: list[str] = Field(default_factory=list)

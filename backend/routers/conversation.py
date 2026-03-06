@@ -115,6 +115,9 @@ def _normalized_text_for_gender(
         user_profile.get("currentDilemma"),
         user_profile.get("current_dilemma"),
         user_profile.get("relationships"),
+        (user_profile.get("personal") or {}).get("gender")
+        if isinstance(user_profile.get("personal"), dict)
+        else None,
         (user_profile.get("personal") or {}).get("relationships")
         if isinstance(user_profile.get("personal"), dict)
         else None,
@@ -131,12 +134,49 @@ def _normalize_gender_value(raw: Any) -> str | None:
     if not value:
         return None
 
-    male_tokens = {"male", "man", "m", "cis male", "cis man"}
-    female_tokens = {"female", "woman", "f", "cis female", "cis woman"}
+    compact = re.sub(r"[^a-z/ ]+", " ", value)
+    normalized = re.sub(r"\s+", " ", compact).strip()
 
-    if value in male_tokens:
+    male_tokens = {
+        "male",
+        "man",
+        "m",
+        "cis male",
+        "cis man",
+        "guy",
+        "boy",
+        "he/him",
+        "he him",
+        "trans man",
+        "trans male",
+    }
+    female_tokens = {
+        "female",
+        "woman",
+        "f",
+        "cis female",
+        "cis woman",
+        "girl",
+        "she/her",
+        "she her",
+        "trans woman",
+        "trans female",
+    }
+
+    if normalized in male_tokens:
         return "male"
-    if value in female_tokens:
+    if normalized in female_tokens:
+        return "female"
+
+    male_hits = any(token in normalized for token in (" male ", " man ", " guy ", " boy ", " he/him ", " he him "))
+    female_hits = any(token in normalized for token in (" female ", " woman ", " girl ", " she/her ", " she her "))
+    padded = f" {normalized} "
+    male_hits = male_hits or any(token in padded for token in (" male ", " man ", " guy ", " boy ", " he/him ", " he him "))
+    female_hits = female_hits or any(token in padded for token in (" female ", " woman ", " girl ", " she/her ", " she her "))
+
+    if male_hits and not female_hits:
+        return "male"
+    if female_hits and not male_hits:
         return "female"
     return None
 

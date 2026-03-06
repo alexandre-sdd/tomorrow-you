@@ -68,6 +68,7 @@ PROFILE_EXTRACTION_RESPONSE_FORMAT = {
                 "personal": {
                     "type": "object",
                     "properties": {
+                        "gender": {"type": "string"},
                         "hobbies": {"type": "array", "items": {"type": "string"}},
                         "daily_routines": {"type": "array", "items": {"type": "string"}},
                         "main_interests": {"type": "array", "items": {"type": "string"}},
@@ -284,6 +285,8 @@ Guidelines:
 3. Surface contradictions in hidden_tensions
 4. Only mark dilemma_confidence >= 0.8 when the user has explicitly named the core decision
 5. Preserve any data that remains relevant from previous extractions
+6. Capture self-identified gender in personal.gender when the user states it (free text, in their own words)
+7. Do not infer personal.gender from relationship words alone (e.g., wife/husband/girlfriend/boyfriend)
 
 Return a complete profile extraction in JSON format with all fields populated (use empty values if not mentioned).
 """
@@ -386,7 +389,7 @@ Return a complete profile extraction in JSON format with all fields populated (u
 
     def _calculate_completeness(self, profile: UserProfile) -> float:
         """Calculate profile completeness as 0-1 score."""
-        total_fields = 25  # Approximate count of extractable fields
+        total_fields = 26  # Approximate count of extractable fields
         filled_fields = 0
         
         # Core required fields
@@ -418,6 +421,8 @@ Return a complete profile extraction in JSON format with all fields populated (u
             filled_fields += 1
         
         # Personal
+        if profile.personal.gender:
+            filled_fields += 1
         if profile.personal.relationships:
             filled_fields += 1
         if profile.personal.hobbies:
@@ -453,6 +458,7 @@ Return a complete profile extraction in JSON format with all fields populated (u
             "career_goal": bool(profile.career.career_goal),
             "income_level": bool(profile.financial.income_level),
             "money_mindset": bool(profile.financial.money_mindset),
+            "gender": bool(profile.personal.gender),
             "relationships": bool(profile.personal.relationships),
             "hobbies": bool(profile.personal.hobbies),
             "personal_values": bool(profile.personal.personal_values),

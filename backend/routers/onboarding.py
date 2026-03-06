@@ -166,7 +166,10 @@ def _initialize_interview_session(
 
     # Seed with opening if first time
     if not existing_profile:
-        greeting = f"Hello {user_name}! I'm here to get to know you and understand what brought you here today. Tell me—what's going on in your life right now that made you come to Tomorrow You?"
+        greeting = (
+            f"Hello {user_name}! I'm here to understand what brought you here today. "
+            "In your own words, what's going on in your life right now, and how do you identify your gender?"
+        )
         history.append({"role": "assistant", "content": greeting})
 
     _INTERVIEW_HISTORIES[session_id] = history
@@ -235,6 +238,12 @@ def _build_deepening_followup(profile: UserProfile | None) -> str:
         return (
             "Before I hand this off, one key piece is still missing. "
             "What matters most to you in this decision right now—security, growth, stability, impact, or something else?"
+        )
+
+    if not profile.personal.gender:
+        return (
+            "Before we hand this off, I need one setup detail for voice personalization. "
+            "How do you identify your gender?"
         )
 
     if not profile.decision_style and not profile.self_narrative:
@@ -1014,7 +1023,7 @@ async def complete_interview(request: InterviewCompleteRequest) -> InterviewComp
 
 def _calculate_completeness(profile: UserProfile) -> float:
     """Calculate profile completeness as 0-1."""
-    total_fields = 20
+    total_fields = 21
     filled_fields = 0
     
     if profile.core_values:
@@ -1036,6 +1045,8 @@ def _calculate_completeness(profile: UserProfile) -> float:
     if profile.financial.income_level:
         filled_fields += 1
     if profile.financial.money_mindset:
+        filled_fields += 1
+    if profile.personal.gender:
         filled_fields += 1
     if profile.personal.relationships:
         filled_fields += 1
@@ -1068,6 +1079,7 @@ def _build_extracted_fields(profile: UserProfile) -> dict[str, bool]:
         "career_goal": bool(profile.career.career_goal),
         "income_level": bool(profile.financial.income_level),
         "money_mindset": bool(profile.financial.money_mindset),
+        "gender": bool(profile.personal.gender),
         "relationships": bool(profile.personal.relationships),
         "hobbies": bool(profile.personal.hobbies),
         "life_stage": bool(profile.life_situation.life_stage),

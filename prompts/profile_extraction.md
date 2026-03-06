@@ -50,6 +50,7 @@ After each extraction, generate a `signals` object with these fields:
 
 ### 2. Personal Life & Relationships
 
+* `gender` (free-text self-identification)
 * `relationship_status`, `key_relationships`, `hobbies`
 * `daily_routines`, `main_interests`, `personal_values`
 
@@ -119,6 +120,11 @@ Language patterns reveal psychology:
 * **Repeated themes** → core anxiety (if they keep coming back to money, that's a value signal)
 * **What they DON'T mention** → if asked about emotions and they pivot to finances, that's avoidance of emotional processing
 * **Speed of response** → short, clipped answers on emotional topics may indicate discomfort
+
+### Gender capture rule
+
+Capture `gender` only when the user self-identifies explicitly (for example: "I'm a man", "female", "he/him").
+Do not infer `gender` from partner/family words like wife, husband, boyfriend, or girlfriend.
 
 ### Confidence scoring
 
